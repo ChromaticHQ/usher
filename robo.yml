@@ -1,0 +1,12 @@
+custom_code_paths:
+  - 'src'
+phpcs_check_extensions:
+  - php
+  - txt
+phpcs_ignore_paths:
+  - '*/themes/*/css/'
+  - '*/themes/*/js/'
+  - '*/themes/*/node_modules'
+  - '*/themes/*/libraries/'
+phpcs_standards:
+  - PSR12

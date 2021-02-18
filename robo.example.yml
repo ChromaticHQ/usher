@@ -1,0 +1,26 @@
+custom_code_paths:
+  - 'RoboFile.php'
+  - 'robo/src'
+  - 'web/modules/custom'
+  - 'web/themes/custom'
+  - 'web/sites/*/themes'
+phpcs_check_extensions:
+  - php
+  - module
+  - inc
+  - install
+  - test
+  - profile
+  - theme
+  - css
+  - scss
+  - info
+  - txt
+phpcs_ignore_paths:
+  - '*/themes/*/css/'
+  - '*/themes/*/js/'
+  - '*/themes/*/node_modules'
+  - '*/themes/*/libraries/'
+phpcs_standards:
+  - Drupal
+  - DrupalPractice
