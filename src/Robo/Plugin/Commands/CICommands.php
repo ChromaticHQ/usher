@@ -2,9 +2,10 @@
 
 namespace CHQRobo\Robo\Plugin\Commands;
 
-use Robo\Tasks;
+use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
+use Robo\Tasks;
 
 /**
  * Robo commands related to continuous integration.
@@ -73,8 +74,6 @@ class CICommands extends Tasks
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
-     *
-     * @throws \Robo\Exception\TaskException
      */
     public function jobCheckCodingStandards(): Result
     {
@@ -93,8 +92,6 @@ class CICommands extends Tasks
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
-     *
-     * @throws \Robo\Exception\TaskException
      */
     public function jobFixCodingStandards(): Result
     {
@@ -113,10 +110,15 @@ class CICommands extends Tasks
      *
      * @return array
      *   An array containing application custom code paths.
+     *
+     * @throws \Robo\Exception\TaskException
      */
     protected function getCustomCodePaths(): array
     {
-        return Robo::config()->get('custom_code_paths');
+        if (!$customCodePaths = Robo::config()->get('custom_code_paths')) {
+            throw new TaskException($this, 'Expected Robo configuration not present: custom_code_paths');
+        }
+        return $customCodePaths;
     }
 
     /**
@@ -124,10 +126,14 @@ class CICommands extends Tasks
      *
      * @return array
      *   An array containing application custom code paths.
+     *
+     * @throws \Robo\Exception\TaskException
      */
     protected function getCodingStandards(): array
     {
-      // return ['PSR12'];
-        return Robo::config()->get('phpcs_standards');
+        if (!$phpcsStandards = Robo::config()->get('phpcs_standards')) {
+            throw new TaskException($this, 'Expected Robo configuration not present: phpcs_standards');
+        }
+        return $phpcsStandards;
     }
 }
