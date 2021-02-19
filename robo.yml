@@ -1,3 +1,4 @@
+---
 custom_code_paths:
   - 'src'
 phpcs_check_extensions:
