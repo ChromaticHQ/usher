@@ -26,6 +26,8 @@ class CICommands extends Tasks
      */
     protected $phpcsIgnorePaths;
 
+    protected $customCodePaths;
+
     /**
      * RoboFile constructor.
      */
@@ -36,6 +38,7 @@ class CICommands extends Tasks
 
         $this->phpcsCheckExtensions = Robo::config()->get('phpcs_check_extensions');
         $this->phpcsIgnorePaths = Robo::config()->get('phpcs_ignore_paths');
+        $this->customCodePaths = implode(' ', $this->getCustomCodePaths());
     }
 
     /**
@@ -61,7 +64,7 @@ class CICommands extends Tasks
     {
         return $this->taskExecStack()
         ->stopOnFail()
-        ->exec('vendor/bin/phpstan analyse --memory-limit=1G ' . implode(' ', $this->getCustomCodePaths()))
+        ->exec("vendor/bin/phpstan analyse --memory-limit=1G $this->customCodePaths")
         ->run();
     }
 
@@ -78,11 +81,10 @@ class CICommands extends Tasks
         $standards = implode(',', $this->getCodingStandards());
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        $customCodePaths = implode(' ', $this->getCustomCodePaths());
         return $this->taskExecStack()
         ->stopOnFail()
         ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-        ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions --ignore=$ignorePaths $customCodePaths")
+        ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions --ignore=$ignorePaths $this->customCodePaths")
         ->run();
     }
 
@@ -99,12 +101,10 @@ class CICommands extends Tasks
         $standards = implode(',', $this->getCodingStandards());
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        $customCodePaths = implode(' ', $this->getCustomCodePaths());
         return $this->taskExecStack()
         ->stopOnFail()
         ->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-        ->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions
-          --ignore=$ignorePaths $customCodePaths")
+        ->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions --ignore=$ignorePaths $this->customCodePaths")
         ->run();
     }
 
