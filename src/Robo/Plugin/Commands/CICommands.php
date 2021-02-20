@@ -27,6 +27,11 @@ class CICommands extends Tasks
      */
     protected $phpcsIgnorePaths;
 
+    /**
+     * A space separated list of custom code paths.
+     *
+     * @var string
+     */
     protected $customCodePaths;
 
     /**
@@ -34,7 +39,7 @@ class CICommands extends Tasks
      */
     public function __construct()
     {
-      // Treat this command like bash -e and exit as soon as there's a failure.
+        // Treat this command like bash -e and exit as soon as there's a failure.
         $this->stopOnFail();
 
         $this->phpcsCheckExtensions = Robo::config()->get('phpcs_check_extensions');
