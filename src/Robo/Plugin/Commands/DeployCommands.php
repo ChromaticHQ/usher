@@ -27,9 +27,9 @@ class DeployCommands extends Tasks
      * @param string $appDirPath
      *   The app directory path.
      * @param string $siteName
-     *   The Drupal site shortname.
-     * @param string docroot
-     *   The drupal document root directory.
+     *   The Drupal site shortname. Optional.
+     * @param string $docroot
+     *   The drupal document root directory. Optional.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
@@ -51,9 +51,9 @@ class DeployCommands extends Tasks
      * @param string $appDirPath
      *   The app directory path.
      * @param string $siteName
-     *   The Drupal site shortname.
-     * @param string docroot
-     *   The Drupal document root directory.
+     *   The Drupal site shortname. Optional.
+     * @param string $docroot
+     *   The Drupal document root directory. Optional.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
