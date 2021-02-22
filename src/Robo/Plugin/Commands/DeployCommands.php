@@ -62,7 +62,7 @@ class DeployCommands extends Tasks
     {
         return $this->taskExecStack()
         ->dir("$appDirPath/$docroot/sites/$siteName")
-        ->exec("$appDirPath/vendor/bin/drush deploy -- yes")
+        ->exec("$appDirPath/vendor/bin/drush deploy --yes")
         // Import the latest configuration again. This includes the latest
         // configuration_split configuration. Importing this twice ensures that
         // the latter command enables and disables modules based upon the most up
