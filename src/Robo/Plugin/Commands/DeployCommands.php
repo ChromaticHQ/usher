@@ -24,10 +24,10 @@ class DeployCommands extends Tasks
     /**
      * Run a Drupal 7 deployment.
      *
-     * @param string $siteName
-     *   The Benz site shortname.
      * @param string $appDirPath
      *   The app directory path.
+     * @param string $siteName
+     *   The Drupal site shortname.
      * @param string docroot
      *   The drupal document root directory.
      *
@@ -48,12 +48,12 @@ class DeployCommands extends Tasks
     /**
      * Run a Drupal 8/9 deployment.
      *
-     * @param string $siteName
-     *   The Benz site shortname.
      * @param string $appDirPath
      *   The app directory path.
+     * @param string $siteName
+     *   The Drupal site shortname.
      * @param string docroot
-     *   The drupal document root directory.
+     *   The Drupal document root directory.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
