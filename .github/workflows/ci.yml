@@ -1,0 +1,56 @@
+---
+name: Tests and Code Analysis
+on:  # yamllint disable-line rule:truthy
+  # Trigger the workflow on pushes to the main branch and all pull requests.
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - uses: actions/cache@v2.1.4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress
+
+      - name: PHP coding standards
+        run: composer php-check
+
+      - name: PHP static analysis
+        run: composer php-stan
+
+  yaml-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: YAML lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yml

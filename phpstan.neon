@@ -1,0 +1,5 @@
+parameters:
+  customRulesetUsed: true
+  reportUnmatchedIgnoredErrors: true
+includes:
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon

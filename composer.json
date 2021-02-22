@@ -12,7 +12,8 @@
     "require": {
         "consolidation/robo": "^1.4 || ^2",
         "squizlabs/php_codesniffer": "^3.5",
-        "phpstan/phpstan": "^0.12.77"
+        "phpstan/phpstan": "^0.12.77",
+        "phpstan/phpstan-deprecation-rules": "^0.12.6"
     },
     "autoload": {
         "psr-4": {
@@ -20,6 +21,13 @@
         }
     },
     "scripts": {
-        "robo": "robo --ansi"
+        "php-check": "composer robo job:check-coding-standards",
+        "php-fix": "composer robo job:fix-coding-standards",
+        "php-stan": "composer robo job:run-static-analysis",
+        "robo": "robo --ansi",
+        "test": [
+            "@php-check",
+            "@php-stan"
+        ]
     }
 }
