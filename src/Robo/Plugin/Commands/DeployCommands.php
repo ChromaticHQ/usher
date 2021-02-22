@@ -28,14 +28,16 @@ class DeployCommands extends Tasks
      *   The Benz site shortname.
      * @param string $appDirPath
      *   The app directory path.
+     * @param string docroot
+     *   The drupal document root directory.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function deployDrupal7(string $appDirPath, string $siteName = 'default'): Result
+    public function deployDrupal7(string $appDirPath, string $siteName = 'default', string $docroot = 'web'): Result
     {
         return $this->taskExecStack()
-        ->dir("web/sites/$siteName")
+        ->dir("$docroot/sites/$siteName")
         ->exec("$appDirPath/vendor/bin/drush cc all")
         ->exec("$appDirPath/vendor/bin/drush updb --yes")
         ->exec("$appDirPath/vendor/bin/drush fra --yes")
@@ -50,14 +52,16 @@ class DeployCommands extends Tasks
      *   The Benz site shortname.
      * @param string $appDirPath
      *   The app directory path.
+     * @param string docroot
+     *   The drupal document root directory.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function deployDrupal(string $appDirPath, string $siteName = 'default'): Result
+    public function deployDrupal(string $appDirPath, string $siteName = 'default', string $docroot = 'web'): Result
     {
         return $this->taskExecStack()
-        ->dir("$appDirPath/web/sites/$siteName")
+        ->dir("$appDirPath/$docroot/sites/$siteName")
         ->exec("$appDirPath/vendor/bin/drush deploy -- yes")
         // Import the latest configuration again. This includes the latest
         // configuration_split configuration. Importing this twice ensures that
