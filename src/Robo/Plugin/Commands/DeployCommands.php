@@ -35,11 +35,11 @@ class DeployCommands extends Tasks
     public function deployDrupal7(string $appDirPath, string $siteName = 'default'): Result
     {
         return $this->taskExecStack()
-        ->dir("web/sites/$siteName/")
-        ->exec('vendor/bin/drush cc all')
-        ->exec('vendor/bin/drush updb --yes')
-        ->exec('vendor/bin/drush fra --yes')
-        ->exec('vendor/bin/drush cc all')
+        ->dir("web/sites/$siteName")
+        ->exec('$appDirPath/vendor/bin/drush cc all')
+        ->exec('$appDirPath/vendor/bin/drush updb --yes')
+        ->exec('$appDirPath/vendor/bin/drush fra --yes')
+        ->exec('$appDirPath/vendor/bin/drush cc all')
         ->run();
     }
 
@@ -57,7 +57,7 @@ class DeployCommands extends Tasks
     public function deployDrupal(string $appDirPath, string $siteName = 'default'): Result
     {
         return $this->taskExecStack()
-        ->dir("$appDirPath/web/sites/$siteName/")
+        ->dir("$appDirPath/web/sites/$siteName")
         ->exec('$appDirPath/vendor/bin/drush deploy -- yes')
         // Import the latest configuration again. This includes the latest
         // configuration_split configuration. Importing this twice ensures that
