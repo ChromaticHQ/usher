@@ -33,7 +33,7 @@ detected:
 ```json
 "autoload": {
     "psr-4": {
-        "CHQRobo\\": "robo/src"
+        "YOURPREFIXRobo\\": "robo/src"
     }
 }
 ```
