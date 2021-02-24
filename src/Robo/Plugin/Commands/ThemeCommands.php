@@ -29,9 +29,13 @@ class ThemeCommands extends Tasks
      */
     public function themeBuild(): Result
     {
-        $themeBuildConfiguration = Robo::config()->get('theme_build');
+        if (empty($themeBuildConfiguration = Robo::config()->get('theme_build'))) {
+            throw new TaskException($this, 'Expected theme configuration not present: theme_build');
+        }
+        $this->io()->title("building themes");
         foreach ($themeBuildConfiguration as $themeConfig) {
             $themePath = $themeConfig['theme_path'];
+            $this->io()->section("building theme at $themePath");
             foreach ($themeConfig['theme_build_commands'] as $themeBuildCommand) {
                 $result = $this->taskExec($themeBuildCommand)
                     ->dir($themePath)
