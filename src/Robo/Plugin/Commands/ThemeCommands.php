@@ -24,7 +24,8 @@ class ThemeCommands extends Tasks
     /**
      * Build one or more themes.
      *
-     * Help text goes here TK.
+     * Configure theme build command(s) to be run using the 'theme_build' key
+     * in your robo.yml file.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
