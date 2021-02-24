@@ -69,9 +69,9 @@ class CICommands extends Tasks
     public function jobRunStaticAnalysis(): Result
     {
         return $this->taskExecStack()
-        ->stopOnFail()
-        ->exec("vendor/bin/phpstan analyse --memory-limit=1G $this->customCodePaths")
-        ->run();
+            ->stopOnFail()
+            ->exec("vendor/bin/phpstan analyse --memory-limit=1G $this->customCodePaths")
+            ->run();
     }
 
     /**
@@ -86,11 +86,11 @@ class CICommands extends Tasks
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
         return $this->taskExecStack()
-        ->stopOnFail()
-        ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-        ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
-            --ignore=$ignorePaths $this->customCodePaths")
-        ->run();
+            ->stopOnFail()
+            ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
+            ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
+                --ignore=$ignorePaths $this->customCodePaths")
+            ->run();
     }
 
     /**
@@ -105,11 +105,11 @@ class CICommands extends Tasks
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
         return $this->taskExecStack()
-        ->stopOnFail()
-        ->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-        ->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
-            --ignore=$ignorePaths $this->customCodePaths")
-        ->run();
+            ->stopOnFail()
+            ->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer')
+            ->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
+                --ignore=$ignorePaths $this->customCodePaths")
+            ->run();
     }
 
     /**
