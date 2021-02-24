@@ -22,7 +22,9 @@ class ThemeCommands extends Tasks
     }
 
     /**
-     * Build a theme.
+     * Build one or more themes.
+     *
+     * Help text goes here TK.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
