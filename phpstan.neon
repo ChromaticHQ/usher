@@ -1,5 +1,9 @@
 parameters:
   customRulesetUsed: true
   reportUnmatchedIgnoredErrors: true
+  ignoreErrors:
+    - message: '#\Call to deprecated method io\(\) of class Robo\\Tasks#'
+      paths:
+        - 'src/'
 includes:
   - vendor/phpstan/phpstan-deprecation-rules/rules.neon
