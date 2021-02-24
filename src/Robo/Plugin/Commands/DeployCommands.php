@@ -37,12 +37,12 @@ class DeployCommands extends Tasks
     public function deployDrupal7(string $appDirPath, string $siteName = 'default', string $docroot = 'web'): Result
     {
         return $this->taskExecStack()
-        ->dir("$docroot/sites/$siteName")
-        ->exec("$appDirPath/vendor/bin/drush cc all")
-        ->exec("$appDirPath/vendor/bin/drush updb --yes")
-        ->exec("$appDirPath/vendor/bin/drush fra --yes")
-        ->exec("$appDirPath/vendor/bin/drush cc all")
-        ->run();
+            ->dir("$docroot/sites/$siteName")
+            ->exec("$appDirPath/vendor/bin/drush cc all")
+            ->exec("$appDirPath/vendor/bin/drush updb --yes")
+            ->exec("$appDirPath/vendor/bin/drush fra --yes")
+            ->exec("$appDirPath/vendor/bin/drush cc all")
+            ->run();
     }
 
     /**
@@ -61,15 +61,15 @@ class DeployCommands extends Tasks
     public function deployDrupal(string $appDirPath, string $siteName = 'default', string $docroot = 'web'): Result
     {
         return $this->taskExecStack()
-        ->dir("$appDirPath/$docroot/sites/$siteName")
-        ->exec("$appDirPath/vendor/bin/drush deploy --yes")
-        // Import the latest configuration again. This includes the latest
-        // configuration_split configuration. Importing this twice ensures that
-        // the latter command enables and disables modules based upon the most up
-        // to date configuration. Additional information and discussion can be
-        // found here:
-        // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
-        ->exec("$appDirPath/vendor/bin/drush config:import --yes")
-        ->run();
+            ->dir("$appDirPath/$docroot/sites/$siteName")
+            ->exec("$appDirPath/vendor/bin/drush deploy --yes")
+            // Import the latest configuration again. This includes the latest
+            // configuration_split configuration. Importing this twice ensures that
+            // the latter command enables and disables modules based upon the most up
+            // to date configuration. Additional information and discussion can be
+            // found here:
+            // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
+            ->exec("$appDirPath/vendor/bin/drush config:import --yes")
+            ->run();
     }
 }
