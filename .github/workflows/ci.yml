@@ -47,6 +47,9 @@ jobs:
       - name: PHP static analysis
         run: composer php-stan
 
+      - name: Test robo theme:build command.
+        run: composer robo theme:build
+
   yaml-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 15

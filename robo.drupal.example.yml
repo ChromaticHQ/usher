@@ -25,3 +25,12 @@ phpcs_ignore_paths:
 phpcs_standards:
   - Drupal
   - DrupalPractice
+theme_build:
+  - theme_path: web/themes/custom/theme1
+    theme_build_commands:
+      - yarn
+      - yarn build
+  - theme_path: web/themes/custom/theme2
+    theme_build_commands:
+      - yarn
+      - yarn build
