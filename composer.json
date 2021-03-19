@@ -10,10 +10,11 @@
         }
     ],
     "require": {
-        "consolidation/robo": "^1.4 || ^2",
+        "consolidation/robo": "^2",
         "squizlabs/php_codesniffer": "^3.5",
         "phpstan/phpstan": "^0.12.77",
-        "phpstan/phpstan-deprecation-rules": "^0.12.6"
+        "phpstan/phpstan-deprecation-rules": "^0.12.6",
+        "drush/drush": "^10.4"
     },
     "autoload": {
         "psr-4": {
