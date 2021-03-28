@@ -70,7 +70,7 @@ class DevelopmentModeCommands extends Tasks
         // There isn't a great way to call a command in one class from another.
         // https://github.com/consolidation/Robo/issues/743
         // For now, it seems like calling robo from within robo works.
-        $result = $this->taskExec('composer robo theme:build')
+        $result = $this->taskExec("composer robo theme:build $siteName")
             ->run();
         $result = $this->frontendDevEnable($siteName, ['yes' => true]);
         $result = $this->drupalLoginLink($siteName);
