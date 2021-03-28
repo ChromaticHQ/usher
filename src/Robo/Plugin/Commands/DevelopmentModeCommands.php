@@ -322,7 +322,6 @@ class DevelopmentModeCommands extends Tasks
     {
         $devSettingsPath = "$this->drupalRoot/sites/$siteDir/settings.local.php";
 
-        // @todo: undefined index when called with magic.
         if (!$opts['yes']) {
             $this->yell("This command will overwrite any customizations you have made to $devSettingsPath and
                 $this->devServicesPath.");
