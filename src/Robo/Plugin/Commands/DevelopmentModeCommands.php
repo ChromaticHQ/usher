@@ -54,22 +54,22 @@ class DevelopmentModeCommands extends Tasks
      * Completely refreshes a development environment including running 'composer install', starting Lando, downloading
      * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
      *
-     * @param string $siteDir
-     *   The Drupal site directory name.
+     * @param string $siteName
+     *   The Drupal site name.
      *
      * @aliases magic
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function devRefresh($siteDir = 'default'): Result
+    public function devRefresh($siteName = 'default'): Result
     {
         $this->io()->title('developer magic. 🦄');
         $this->taskComposerInstall()->run();
         $this->taskExec('lando')->arg('start')->run();
-        $result = $this->databaseRefreshLando();
-        $result = $this->frontendDevEnable($siteDir, ['yes' => true]);
-        $result = $this->drupalLoginLink($siteDir);
+        $result = $this->databaseRefreshLando($siteName);
+        $result = $this->frontendDevEnable($siteName, ['yes' => true]);
+        $result = $this->drupalLoginLink($siteName);
         return $result;
     }
 
@@ -154,25 +154,31 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Refresh a site database in Lando.
      *
+     * @param string $siteName
+     *   The Drupal site name.
+     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function databaseRefreshLando(): Result
+    public function databaseRefreshLando(string $siteName = 'default'): Result
     {
-        $this->io()->title('chq database refresh.');
+        $this->io()->title('lando database refresh.');
 
-        $dbPath = $this->databaseDownload();
+        $dbPath = $this->databaseDownload($siteName);
 
-        $this->io()->section('importing chq database.');
+        $this->io()->section("importing $siteName database.");
         $this->say("Importing $dbPath");
+        // If this is a multi-site, include a host option so Lando imports to the correct database.
+        $hostOption = $siteName !== 'default' ? "--host=$siteName" : '';
         $this->taskExec('lando')
             ->arg('db-import')
             ->arg($dbPath)
+            ->arg($hostOption)
             ->run();
 
         $this->say("Deleting $dbPath");
         $this->taskExec('rm')->args($dbPath)->run();
-        return $this->drushDeployLando();
+        return $this->drushDeployLando($siteName);
     }
 
     /**
@@ -182,6 +188,8 @@ class DevelopmentModeCommands extends Tasks
      *   The Drupal site directory name.
      * @param bool $lando
      *   Use lando to call drush, else call drush directly.
+     *
+     * @aliases uli
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
@@ -222,14 +230,14 @@ class DevelopmentModeCommands extends Tasks
             return $uri;
         } elseif (isset($landoConfig['proxy']['appserver'])) {
             // Detect multi-site configurations.
-            $siteDomains = array_filter($landoConfig['proxy']['appserver'], function ($domain) {
-                if (strpos($domain, '$siteDir') !== false) {
+            $siteDomains = array_filter($landoConfig['proxy']['appserver'], function ($domain) use ($siteDir) {
+                if (strpos($domain, $siteDir) !== false) {
                     return true;
                 }
             });
-            if (count($siteDomains > 1)) {
+            if (count($siteDomains) > 1) {
                 throw new TaskException($this, 'Unable to determine URI.');
-            } elseif (count($siteDomains == 1)) {
+            } elseif (count($siteDomains) == 1) {
                 return array_pop($siteDomains);
             }
         } else {
@@ -247,22 +255,25 @@ class DevelopmentModeCommands extends Tasks
     public function databaseRefreshTugboat(): Result
     {
         $this->io()->title('refresh tugboat databases.');
-        $dbPath = $this->databaseDownload();
-        if (empty($dbPath)) {
-            throw new TaskException($this, 'Database download failed.');
+        foreach ($this->getSiteConfig() as $siteName => $siteInfo) {
+            $dbPath = $this->databaseDownload($siteName);
+            if (empty($dbPath)) {
+                $this->yell("'$siteName' database path not found.");
+                continue;
+            }
+            $dbName = $siteName === 'default' ? 'tugboat' : $siteName;
+            $result = $this->taskExec('mysql')
+                ->option('-h', 'mariadb')
+                ->option('-u', 'tugboat')
+                ->option('-ptugboat')
+                ->option('-e', "drop database if exists $dbName; create database $dbName;")
+                ->run();
+
+            $this->io()->section("import $siteName database.");
+            $result = $this->taskExec("zcat $dbPath | mysql -h mariadb -u tugboat -ptugboat $dbName")
+                ->run();
+            $result = $this->taskExec('rm')->args($dbPath)->run();
         }
-
-        $result = $this->taskExec('mysql')
-            ->option('-h', 'mariadb')
-            ->option('-u', 'tugboat')
-            ->option('-ptugboat')
-            ->option('-e', 'drop database if exists tugboat; create database tugboat;')
-            ->run();
-
-        $this->io()->section('import chromatichq.com database.');
-        $result = $this->taskExec("zcat $dbPath | mysql -h mariadb -u tugboat -ptugboat tugboat")
-            ->run();
-        $this->taskExec('rm')->args($dbPath)->run();
         return $result;
     }
 

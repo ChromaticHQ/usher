@@ -28,6 +28,28 @@ trait SitesConfigTrait
     }
 
     /**
+     * Get all site names from configuration.
+     *
+     * @return array
+     *   An array of all site names.
+     */
+    public function getAllSiteNames(): array
+    {
+        return array_keys($this->getAllSitesConfig());
+    }
+
+    /**
+     * Determine how many sites are included in sites config.
+     *
+     * @return int
+     *   The number of sites.
+     */
+    public function getSitesCount(): int
+    {
+        return count($this->getAllSitesConfig());
+    }
+
+    /**
      * Load sites configuration.
      *
      * @param string $siteName
@@ -40,7 +62,7 @@ trait SitesConfigTrait
     {
         $allSitesConfig = $this->getAllSitesConfig();
         if (empty($allSitesConfig[$siteName])) {
-            throw new TaskException($this, "Configuration for '$siteName' not found.");
+            throw new TaskException($this, "Configuration for '$siteName' not found in $this->sitesConfigFile.");
         }
         return $allSitesConfig[$siteName];
     }
@@ -60,7 +82,7 @@ trait SitesConfigTrait
     {
         $siteConfig = $this->getSiteConfig($siteName);
         if (empty($siteConfig[$key])) {
-            throw new TaskException($this, "Key $key not found for '$siteName'.");
+            throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
         }
         return $siteConfig[$key];
     }
