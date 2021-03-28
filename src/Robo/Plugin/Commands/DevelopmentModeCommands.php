@@ -16,7 +16,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DevelopmentModeCommands extends Tasks
 {
-
     use SitesConfigTrait;
 
     /**
