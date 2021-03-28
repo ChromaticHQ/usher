@@ -2,6 +2,7 @@
 
 namespace ChqRobo\Robo\Plugin\Commands;
 
+use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
@@ -12,6 +13,8 @@ use Robo\Tasks;
  */
 class ThemeCommands extends Tasks
 {
+    use SitesConfigTrait;
+
     /**
      * RoboFile constructor.
      */
@@ -25,15 +28,16 @@ class ThemeCommands extends Tasks
      * Build one or more themes.
      *
      * Configure theme build command(s) to be run using the 'theme_build' key
-     * in your robo.yml file.
+     * in your .sites.config.yml file.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function themeBuild(): Result
+    public function themeBuild($siteName = 'default'): Result
     {
-        if (empty($themeBuildConfiguration = Robo::config()->get('theme_build'))) {
-            throw new TaskException($this, 'Expected theme configuration not present: theme_build');
+        $sitesConfig = $this->getSiteConfig($siteName);
+        if (empty($themeBuildConfiguration = $sitesConfig['theme_build'])) {
+            throw new TaskException($this, "Expected theme configuration not present for $siteName.");
         }
         $this->io()->title("building themes");
         foreach ($themeBuildConfiguration as $themeConfig) {

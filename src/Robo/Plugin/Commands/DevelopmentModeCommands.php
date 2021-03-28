@@ -2,6 +2,7 @@
 
 namespace ChqRobo\Robo\Plugin\Commands;
 
+use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use AsyncAws\S3\S3Client;
 use DrupalFinder\DrupalFinder;
 use Drupal\Component\Serialization\Yaml;
@@ -15,6 +16,8 @@ use Robo\Tasks;
  */
 class DevelopmentModeCommands extends Tasks
 {
+
+    use SitesConfigTrait;
 
     /**
      * Drupal root directory.
@@ -66,19 +69,22 @@ class DevelopmentModeCommands extends Tasks
         $this->taskExec('lando')->arg('start')->run();
         $result = $this->databaseRefreshLando();
         $result = $this->frontendDevEnable($siteDir, ['yes' => true]);
-        $result = $this->drupalLogin($siteDir);
+        $result = $this->drupalLoginLink($siteDir);
         return $result;
     }
 
     /**
      * Download the latest database dump for the site.
      *
+     * @param string $siteName
+     *   The site name.
+     *
      * @return string
      *   The path of the last downloaded database.
      *
      * @throws \Robo\Exception\TaskException
      */
-    public function databaseDownload()
+    public function databaseDownload($siteName = 'default')
     {
         $this->io()->title('database download.');
 
@@ -91,8 +97,8 @@ class DevelopmentModeCommands extends Tasks
             }
         }
 
-        if (!$bucket = Robo::config()->get('database_s3_bucket')) {
-            throw new TaskException($this, 'database_s3_bucket value not set in robo.yml.');
+        if (!$bucket = $this->getConfig('database_s3_bucket', $siteName)) {
+            throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
         }
 
         $s3 = new S3Client();
@@ -148,9 +154,6 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Refresh a site database in Lando.
      *
-     * @param array $opts
-     *   The options passed in.
-     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
@@ -183,7 +186,7 @@ class DevelopmentModeCommands extends Tasks
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function drupalLogin($siteDir = 'default', $lando = true): Result
+    public function drupalLoginLink($siteDir = 'default', $lando = true): Result
     {
         $this->io()->section("create login link.");
         if ($lando) {
@@ -266,16 +269,19 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Deploy Drush via Lando.
      *
+     * @param string $siteDir
+     *   The Drupal site directory name.
+     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      *
      * @see https://www.drush.org/deploycommand
      */
-    protected function drushDeployLando(): Result
+    protected function drushDeployLando($siteDir = 'default'): Result
     {
         $this->io()->section('drush deploy.');
         return $this->taskExecStack()
-            ->dir('web/sites/default')
+            ->dir("web/sites/$siteDir")
             ->exec("lando drush deploy --yes")
             // Import the latest configuration again. This includes the latest
             // configuration_split configuration. Importing this twice ensures that
