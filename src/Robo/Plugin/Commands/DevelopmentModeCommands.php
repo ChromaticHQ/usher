@@ -5,11 +5,11 @@ namespace ChqRobo\Robo\Plugin\Commands;
 use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use AsyncAws\S3\S3Client;
 use DrupalFinder\DrupalFinder;
-use Drupal\Component\Serialization\Yaml;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Robo commands related to changing development modes.
@@ -216,7 +216,7 @@ class DevelopmentModeCommands extends Tasks
      */
     protected function landoUri($siteDir): string
     {
-        $landoConfig = Yaml::decode(file_get_contents('.lando.yml'));
+        $landoConfig = Yaml::parseFile('.lando.yml');
         $uri = $landoConfig['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'] ?? null;
         if ($uri) {
             return $uri;
@@ -330,12 +330,12 @@ class DevelopmentModeCommands extends Tasks
             ->run();
 
         $this->say("enablig twig.debug in development.services.yml.");
-        $devServices = Yaml::decode(file_get_contents($this->devServicesPath));
+        $devServices = Yaml::parseFile($this->devServicesPath);
         $devServices['parameters']['twig.config'] = [
             'debug' => true,
             'auto_reload' => true,
         ];
-        file_put_contents($this->devServicesPath, Yaml::encode($devServices));
+        file_put_contents($this->devServicesPath, Yaml::dump($devServices));
 
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
         $result = $this->collectionBuilder()

@@ -2,8 +2,8 @@
 
 namespace ChqRobo\Robo\Plugin\Traits;
 
-use Drupal\Component\Serialization\Yaml;
 use Robo\Exception\TaskException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Trait to provide site configuration functionality to Robo commands.
@@ -24,7 +24,7 @@ trait SitesConfigTrait
         if (!file_exists($this->sitesConfigFile)) {
             throw new TaskException($this, "$this->sitesConfigFile not found.");
         }
-        return Yaml::decode(file_get_contents($this->sitesConfigFile));
+        return Yaml::parseFile($this->sitesConfigFile);
     }
 
     /**
@@ -71,6 +71,6 @@ trait SitesConfigTrait
     public function writeSiteConfig(array $sitesConfig)
     {
         ksort($sitesConfig);
-        file_put_contents($this->sitesConfigFile, Yaml::encode($sitesConfig));
+        file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
     }
 }
