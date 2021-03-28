@@ -64,10 +64,15 @@ class DevelopmentModeCommands extends Tasks
      */
     public function devRefresh($siteName = 'default'): Result
     {
-        $this->io()->title('developer magic. 🦄');
-        $this->taskComposerInstall()->run();
-        $this->taskExec('lando')->arg('start')->run();
+        $this->io()->title('development environment refresh. 🦄✨');
+        $result = $this->taskComposerInstall()->run();
+        $result = $this->taskExec('lando')->arg('start')->run();
         $result = $this->databaseRefreshLando($siteName);
+        // There isn't a great way to call a command in one class from another.
+        // https://github.com/consolidation/Robo/issues/743
+        // For now, it seems like calling robo from within robo works.
+        $result = $this->taskExec('composer robo theme:build')
+            ->run();
         $result = $this->frontendDevEnable($siteName, ['yes' => true]);
         $result = $this->drupalLoginLink($siteName);
         return $result;

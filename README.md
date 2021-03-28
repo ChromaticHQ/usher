@@ -10,10 +10,11 @@ and can be extended in downstream repos.
 
 ## Configuration
 
-Create a `robo.yml` file in the root of your codebase. `robo.drupal.example.yml`
+1. Create a `robo.yml` file in the root of your codebase. `robo.drupal.example.yml`
 is provided as a starting point for Drupal projects.
-
-Add the following to your repo's `composer.json` "scripts" section so that you
+1. Create a `.sites.config.yml` file in the root of your codebase. See
+`.sites.config.example.yml` for reference on what can/should be configured.
+1. Add the following to your repo's `composer.json` "scripts" section so that you
 can call robo easily with `composer robo`:
 
 ```json
