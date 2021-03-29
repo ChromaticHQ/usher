@@ -19,7 +19,7 @@ trait SitesConfigTrait
      * @return array
      *   A configuration array for all sites.
      */
-    protected function getAllSitesConfig(): array
+    public function getAllSitesConfig(): array
     {
         if (!file_exists($this->sitesConfigFile)) {
             throw new TaskException($this, "$this->sitesConfigFile not found.");
@@ -88,9 +88,9 @@ trait SitesConfigTrait
     }
 
     /**
-     * Write site config file.
+     * Write sites configuration file.
      */
-    public function writeSiteConfig(array $sitesConfig)
+    public function writeSitesConfig(array $sitesConfig)
     {
         ksort($sitesConfig);
         file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
