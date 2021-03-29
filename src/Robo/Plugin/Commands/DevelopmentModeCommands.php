@@ -113,13 +113,17 @@ class DevelopmentModeCommands extends Tasks
         $latestDatabaseDump = array_pop($objects);
         $dbFilename = $latestDatabaseDump->getKey();
 
-        $result = $s3->GetObject([
-            'Bucket' => $bucket,
-            'Key' => $dbFilename,
-        ]);
-        $fp = fopen($dbFilename, 'wb');
-        stream_copy_to_stream($result->getBody()->getContentAsResource(), $fp);
-        $this->say('Database dump file downloaded >>> ' . $dbFilename);
+        if (file_exists($dbFilename)) {
+            $this->say("Skipping download. Latest database dump file exists >>> $dbFilename");
+        } else {
+            $result = $s3->GetObject([
+                'Bucket' => $bucket,
+                'Key' => $dbFilename,
+            ]);
+            $fp = fopen($dbFilename, 'wb');
+            stream_copy_to_stream($result->getBody()->getContentAsResource(), $fp);
+            $this->say("Database dump file downloaded >>> $dbFilename");
+        }
         return $dbFilename;
     }
 
