@@ -1,10 +1,10 @@
 ---
 default:
   theme_build:
-  - theme_path: src/Robo
-    theme_build_commands:
-      - pwd
-      - echo "This is where we pretend to build a theme!"
-  - theme_path: .github/
-    theme_build_commands:
-      - pwd
+    - theme_path: src/Robo
+      theme_build_commands:
+        - pwd
+        - echo "This is where we pretend to build a theme!"
+    - theme_path: .github/
+      theme_build_commands:
+        - pwd
