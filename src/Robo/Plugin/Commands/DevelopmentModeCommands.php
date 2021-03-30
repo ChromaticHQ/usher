@@ -232,26 +232,36 @@ class DevelopmentModeCommands extends Tasks
      */
     protected function landoUri($siteDir): string
     {
-        $landoConfig = Yaml::parseFile('.lando.yml');
-        $uri = $landoConfig['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'] ?? null;
-        if ($uri) {
-            return $uri;
-        } elseif (isset($landoConfig['proxy']['appserver'])) {
+        $landoConfigPath = "$this->drupalRoot/../.lando.yml";
+        $landoCfg = Yaml::parseFile($landoConfigPath);
+        // First, check for multisite proxy configuration.
+        if (isset($landoCfg['proxy']['appserver'])) {
+            if ($siteDir === 'default') {
+                throw new TaskException(
+                    $this,
+                    'Unable to determine URI. Multi-site detected, but you did not specify a site name.',
+                );
+            }
             // Detect multi-site configurations.
-            $siteDomains = array_filter($landoConfig['proxy']['appserver'], function ($domain) use ($siteDir) {
+            $siteDomains = array_filter($landoCfg['proxy']['appserver'], function ($domain) use ($siteDir) {
                 if (strpos($domain, $siteDir) !== false) {
                     return true;
                 }
             });
             if (count($siteDomains) > 1) {
-                throw new TaskException($this, 'Unable to determine URI.');
+                throw new TaskException($this, 'More than one possible URI found.');
             } elseif (count($siteDomains) == 1) {
-                return array_pop($siteDomains);
+                $domain = array_pop($siteDomains);
+                return "http://$domain";
             }
+        } elseif ($uri = $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'] ?? null) {
+            // If a Drush URI is explicitly set, use that.
+            return $uri;
         } else {
             // Our final fallback.
-            return 'http://' . $landoConfig['name'] . 'lndo.site';
+            return 'http://' . $landoCfg['name'] . 'lndo.site';
         }
+        throw new TaskException($this, 'Unable to determine URI.');
     }
 
     /**
