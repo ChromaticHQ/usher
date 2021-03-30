@@ -243,11 +243,8 @@ class DevelopmentModeCommands extends Tasks
                 );
             }
             // Detect multi-site configurations.
-            $siteDomains = array_filter($landoCfg['proxy']['appserver'], function ($domain) use ($siteDir) {
-                if (strpos($domain, $siteDir) !== false) {
-                    return true;
-                }
-            });
+            $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
+                strpos($domain, $siteDir) !== false);
             if (count($siteDomains) > 1) {
                 throw new TaskException($this, 'More than one possible URI found.');
             } elseif (count($siteDomains) == 1) {
