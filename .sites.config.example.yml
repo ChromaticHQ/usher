@@ -1,0 +1,12 @@
+---
+default:
+  database_s3_bucket: S3_BUCKET_NAME
+  theme_build:
+    - theme_path: web/themes/custom/theme1
+      theme_build_commands:
+        - yarn
+        - yarn build
+    - theme_path: web/themes/custom/theme2
+      theme_build_commands:
+        - yarn
+        - yarn build
