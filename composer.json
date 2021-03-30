@@ -16,7 +16,7 @@
         "phpstan/phpstan-deprecation-rules": "^0.12.6",
         "drush/drush": "^10.4",
         "async-aws/s3": "^1.8",
-        "php": "^7.4"
+        "php": ">=7.4"
     },
     "autoload": {
         "psr-4": {
