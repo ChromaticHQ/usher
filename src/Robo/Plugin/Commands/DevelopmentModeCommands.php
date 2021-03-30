@@ -246,7 +246,7 @@ class DevelopmentModeCommands extends Tasks
             $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
                 strpos($domain, $siteDir) !== false);
             if (count($siteDomains) > 1) {
-                throw new TaskException($this, 'More than one possible URI found.');
+                $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
             } elseif (count($siteDomains) == 1) {
                 $domain = array_pop($siteDomains);
                 return "http://$domain";
