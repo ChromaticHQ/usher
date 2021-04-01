@@ -270,7 +270,7 @@ class DevelopmentModeCommands extends Tasks
     public function databaseRefreshTugboat(): Result
     {
         $this->io()->title('refresh tugboat databases.');
-        foreach ($this->getSiteConfig() as $siteName => $siteInfo) {
+        foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
             $dbPath = $this->databaseDownload($siteName);
             if (empty($dbPath)) {
                 $this->yell("'$siteName' database path not found.");
