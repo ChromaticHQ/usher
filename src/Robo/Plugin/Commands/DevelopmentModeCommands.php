@@ -178,7 +178,7 @@ class DevelopmentModeCommands extends Tasks
             $s3KeyPrefix = $this->getConfig('database_s3_key_prefix_string', $siteName);
             $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
             $s3ConfigArray['Prefix'] = $s3KeyPrefix;
-        } catch (SitesConfigException $e) {
+        } catch (TaskException $e) {
             $this->say("No S3 Key prefix found for $siteName.");
         }
         return $s3ConfigArray;
