@@ -101,7 +101,9 @@ class DevelopmentModeCommands extends Tasks
             }
         }
 
-        $s3 = new S3Client();
+        $s3 = new S3Client([
+            'region' => $this->s3RegionForSite($siteName),
+        ]);
         $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
         // Ensure objects are sorted by last modified date.
@@ -113,7 +115,7 @@ class DevelopmentModeCommands extends Tasks
             $this->say("Skipping download. Latest database dump file exists >>> $dbFilename");
         } else {
             $result = $s3->GetObject([
-                'Bucket' => $bucket,
+                'Bucket' => $this->s3BucketForSite($siteName),
                 'Key' => $dbFilename,
             ]);
             $fp = fopen($dbFilename, 'wb');
@@ -163,17 +165,10 @@ class DevelopmentModeCommands extends Tasks
      *
      * @return array
      *   An S3 request object configuration array.
-     *
-     * @throws \Robo\Exception\TaskException
      */
     protected function s3BucketRequestConfig(string $siteName): array
     {
-        if (!$bucket = $this->getConfig('database_s3_bucket', $siteName)) {
-            throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
-        }
-        $this->say("'$siteName' S3 bucket: $bucket");
-
-        $s3ConfigArray = ['Bucket' => $bucket];
+        $s3ConfigArray = ['Bucket' => $this->s3BucketForSite($siteName)];
         try {
             $s3KeyPrefix = $this->getConfig('database_s3_key_prefix_string', $siteName);
             $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
@@ -183,6 +178,50 @@ class DevelopmentModeCommands extends Tasks
         }
         return $s3ConfigArray;
     }
+
+    /**
+     * Get S3 Bucket for site.
+     *
+     * @param string $siteName
+     *   The site name.
+     *
+     * @return string
+     *   An S3 bucket.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    protected function s3BucketForSite(string $siteName): string
+    {
+        if (!$bucket = $this->getConfig('database_s3_bucket', $siteName)) {
+            throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
+        }
+        $this->say("'$siteName' S3 bucket: $bucket");
+        return $bucket;
+    }
+
+    /**
+     * Get S3 region for site.
+     *
+     * @param string $siteName
+     *   The site name.
+     *
+     * @return string
+     *   An S3 region.
+     */
+    protected function s3RegionForSite(string $siteName): string
+    {
+        try {
+            $region = $this->getConfig('database_s3_region', $siteName);
+            $this->say("'$siteName' database_s3_region set to $region.");
+        } catch (TaskException $e) {
+            // Set default region if one is not set.
+            $defaultRegion = 'us-east-1';
+            $this->say("'$siteName' database_s3_region not set. Defaulting to $defaultRegion.");
+            $region = $defaultRegion;
+        }
+        return $region;
+    }
+
     /**
      * Refresh a site database in Lando.
      *
