@@ -336,7 +336,13 @@ class DevelopmentModeCommands extends Tasks
     {
         $this->io()->title('refresh tugboat databases.');
         foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
-            $dbPath = $this->databaseDownload($siteName);
+            try {
+                $dbPath = $this->databaseDownload($siteName);
+            } catch (TaskException $e) {
+                $this->yell("$siteName: No database configured. Download/import skipped.");
+                // @todo: Should we run a site-install by default?
+                continue;
+            }
             if (empty($dbPath)) {
                 $this->yell("'$siteName' database path not found.");
                 continue;
