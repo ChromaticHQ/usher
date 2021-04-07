@@ -18,6 +18,8 @@ class DevelopmentModeCommands extends Tasks
 {
     use SitesConfigTrait;
 
+    protected const S3_DEFAULT_REGION = 'us-east-1';
+
     /**
      * Drupal root directory.
      *
@@ -215,7 +217,7 @@ class DevelopmentModeCommands extends Tasks
             $this->say("'$siteName' database_s3_region set to $region.");
         } catch (TaskException $e) {
             // Set default region if one is not set.
-            $defaultRegion = 'us-east-1';
+            $defaultRegion = self::S3_DEFAULT_REGION;
             $this->say("'$siteName' database_s3_region not set. Defaulting to $defaultRegion.");
             $region = $defaultRegion;
         }
