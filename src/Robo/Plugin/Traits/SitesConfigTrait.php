@@ -81,7 +81,7 @@ trait SitesConfigTrait
     public function getConfig($key, $siteName = 'default')
     {
         $siteConfig = $this->getSiteConfig($siteName);
-        if (empty($siteConfig[$key])) {
+        if (!isset($siteConfig[$key])) {
             throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
         }
         return $siteConfig[$key];
