@@ -35,8 +35,13 @@ class ThemeCommands extends Tasks
      */
     public function themeBuild($siteName = 'default'): Result
     {
-        $themeBuildConfiguration = $this->getConfig('theme_build', $siteName);
-        $this->io()->title("theme build");
+        $result = $this->io()->title("theme build");
+        try {
+            $themeBuildConfiguration = $this->getConfig('theme_build', $siteName);
+        } catch (TaskException $e) {
+            $this->say("'$siteName' theme_build confguration not set.");
+            return $this->taskExec('echo skipping')->run();
+        }
         foreach ($themeBuildConfiguration as $themeConfig) {
             $themePath = $themeConfig['theme_path'];
             $this->io()->section("building theme at $themePath");
