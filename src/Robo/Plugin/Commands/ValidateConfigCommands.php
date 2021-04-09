@@ -46,9 +46,9 @@ class ValidateConfigCommands extends Tasks
     public function validateDrupalConfig($siteDir = 'default')
     {
         $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush config:status --format=json")
-        ->dir("$this->drupalRoot/sites/$siteDir/")
-        ->printOutput(false)
-        ->run();
+            ->dir("$this->drupalRoot/sites/$siteDir/")
+            ->printOutput(false)
+            ->run();
         $drushOutput = trim($result->getOutputData());
         $configJson = json_decode($drushOutput);
         if (!empty($configJson)) {

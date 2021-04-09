@@ -2,8 +2,8 @@
 
 namespace ChqRobo\Robo\Plugin\Commands;
 
-use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use AsyncAws\S3\S3Client;
+use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
 use Robo\Result;
