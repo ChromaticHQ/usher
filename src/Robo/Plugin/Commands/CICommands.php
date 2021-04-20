@@ -50,6 +50,8 @@ class CICommands extends Tasks
     /**
      * Command to run unit tests.
      *
+     * @aliases punit
+     *
      * @return \Robo\Result
      *   The result of the collection of tasks.
      */
@@ -60,6 +62,8 @@ class CICommands extends Tasks
 
     /**
      * Run phpstan static analysis command.
+     *
+     * @aliases stan
      *
      * @return \Robo\Result
      *   The result of the collection of tasks.
@@ -76,6 +80,8 @@ class CICommands extends Tasks
 
     /**
      * Command to check coding standards.
+     *
+     * @aliases phpcs
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
@@ -95,6 +101,8 @@ class CICommands extends Tasks
 
     /**
      * Command to fix coding standards where possible.
+     *
+     * @aliases phpfix
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
