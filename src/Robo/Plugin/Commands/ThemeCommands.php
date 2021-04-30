@@ -30,6 +30,8 @@ class ThemeCommands extends Tasks
      * Configure theme build command(s) to be run using the 'theme_build' key
      * in your .sites.config.yml file.
      *
+     * @aliases tb
+     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */

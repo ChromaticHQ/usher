@@ -55,6 +55,8 @@ class DeployCommands extends Tasks
      * @param string $docroot
      *   The Drupal document root directory. Optional.
      *
+     * @aliases deployd
+     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */

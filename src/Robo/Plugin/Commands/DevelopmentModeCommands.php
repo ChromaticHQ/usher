@@ -86,6 +86,8 @@ class DevelopmentModeCommands extends Tasks
      * @param string $siteName
      *   The site name.
      *
+     * @aliases dbdl
+     *
      * @return string
      *   The path of the last downloaded database.
      *
