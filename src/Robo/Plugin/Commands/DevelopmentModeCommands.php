@@ -109,6 +109,9 @@ class DevelopmentModeCommands extends Tasks
         ]);
         $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
+        if (empty($objects)) {
+             throw new TaskException($this, "No database dumps found for '$siteName'.");
+        }
         // Ensure objects are sorted by last modified date.
         usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
         $latestDatabaseDump = array_pop($objects);
