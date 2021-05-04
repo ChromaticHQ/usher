@@ -5,7 +5,6 @@ namespace ChqRobo\Robo\Plugin\Commands;
 use AsyncAws\S3\S3Client;
 use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use DrupalFinder\DrupalFinder;
-use Drush\Commands\core\DeployCommands;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
@@ -383,7 +382,7 @@ class DevelopmentModeCommands extends Tasks
     protected function drushDeployLando($siteDir = 'default'): Result
     {
         $this->io()->section('drush deploy.');
-        if (!class_exists('DeployCommands')) {
+        if (!class_exists('Drush\Commands\core\DeployCommands')) {
             throw new TaskException(
                 $this,
                 "'drush deploy' command not found. Further work is neccesary to support this version of Drush."
