@@ -460,6 +460,7 @@ class DevelopmentModeCommands extends Tasks
             ->to('$settings[\'cache\'][\'bins\'][\'page\'] = ')
             ->taskWriteToFile($devSettingsPath)
             ->append(TRUE)
+            ->line('')
             ->line('/**')
             ->line(' *  Disable advagg module.')
             ->line('*/')
