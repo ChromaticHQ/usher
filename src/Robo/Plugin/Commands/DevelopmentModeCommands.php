@@ -462,7 +462,7 @@ class DevelopmentModeCommands extends Tasks
             ->line('/**')
             ->line(' *  Disable advagg module.')
             ->line('*/')
-            ->line(date('$config[\'advagg.settings\'][\'enabled\'] = FALSE;')
+            ->line('$config[\'advagg.settings\'][\'enabled\'] = FALSE;')
             ->run();
         return $result;
     }
