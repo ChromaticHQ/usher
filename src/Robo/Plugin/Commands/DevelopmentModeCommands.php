@@ -314,8 +314,10 @@ class DevelopmentModeCommands extends Tasks
                 );
             }
             // Detect multi-site configurations.
+            // We look for the $siteDir to be at the beginning of the appserver
+            // proxy URL.
             $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
-                strpos($domain, $siteDir) !== false);
+                strpos($domain, $siteDir) == 0);
             if (count($siteDomains) > 1) {
                 $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
             } elseif (count($siteDomains) == 1) {
