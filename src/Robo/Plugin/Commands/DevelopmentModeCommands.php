@@ -275,6 +275,7 @@ class DevelopmentModeCommands extends Tasks
     public function drupalLoginLink($siteDir = 'default', $lando = true): Result
     {
         $this->io()->section("create login link.");
+        $docRootDir = Robo::config()->get('drupal_document_root') ?? 'web';
         if ($lando) {
             $uri = $this->landoUri($siteDir);
             $this->say("Lando URI detected: $uri");
@@ -282,12 +283,12 @@ class DevelopmentModeCommands extends Tasks
                 ->arg('drush')
                 ->arg('user:login')
                 ->option('--uri', $uri)
-                ->dir("web/sites/$siteDir")
+                ->dir("$docRootDir/sites/$siteDir")
                 ->run();
         }
         return $this->taskExec('../../../drush')
             ->arg('user:login')
-            ->dir("web/sites/$siteDir")
+            ->dir("$docRootDir/sites/$siteDir")
             ->run();
     }
 
@@ -388,8 +389,9 @@ class DevelopmentModeCommands extends Tasks
                 "'drush deploy' command not found. Further work is neccesary to support this version of Drush."
             );
         }
+        $docRootDir = Robo::config()->get('drupal_document_root') ?? 'web';
         return $this->taskExecStack()
-            ->dir("web/sites/$siteDir")
+            ->dir("$docRootDir/sites/$siteDir")
             ->exec("lando drush deploy --yes")
             // Import the latest configuration again. This includes the latest
             // configuration_split configuration. Importing this twice ensures that

@@ -11,3 +11,4 @@ phpcs_ignore_paths:
   - '*/themes/*/libraries/'
 phpcs_standards:
   - PSR12
+drupal_document_root: web
