@@ -96,6 +96,7 @@ class CICommands extends Tasks
             ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
             ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
                 --ignore=$ignorePaths $this->customCodePaths")
+            ->exec("vendor/bin/twigcs $this->customCodePaths")
             ->run();
     }
 
