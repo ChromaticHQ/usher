@@ -96,6 +96,7 @@ class CICommands extends Tasks
             ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
             ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
                 --ignore=$ignorePaths $this->customCodePaths")
+            ->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths")
             ->run();
     }
 
@@ -117,6 +118,7 @@ class CICommands extends Tasks
             ->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer')
             ->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
                 --ignore=$ignorePaths $this->customCodePaths")
+          ->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths --fix")
             ->run();
     }
 
