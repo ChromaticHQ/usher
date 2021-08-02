@@ -35,7 +35,7 @@ class CICommands extends Tasks
     protected $customCodePaths;
 
     /**
-     * Boolean indicating if Twig files should be linted.
+     * Boolean indicating whether Twig files should be linted.
      *
      * @var bool
      */
@@ -103,7 +103,7 @@ class CICommands extends Tasks
         $stack = $this->taskExecStack()->stopOnFail();
         $stack->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer');
         $stack->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
-                --ignore=$ignorePaths $this->customCodePaths");
+            --ignore=$ignorePaths $this->customCodePaths");
         if ($this->lintTwigFiles) {
             $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths");
         }
@@ -127,7 +127,7 @@ class CICommands extends Tasks
         $stack = $this->taskExecStack()->stopOnFail();
         $stack->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer');
         $stack->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
-                    --ignore=$ignorePaths $this->customCodePaths");
+                --ignore=$ignorePaths $this->customCodePaths");
         if ($this->lintTwigFiles) {
             $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths --fix");
         }
