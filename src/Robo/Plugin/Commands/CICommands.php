@@ -89,7 +89,7 @@ class CICommands extends Tasks
     /**
      * Command to check coding standards.
      *
-     * @aliases phpcs
+     * @aliases phpcs twigcs
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
