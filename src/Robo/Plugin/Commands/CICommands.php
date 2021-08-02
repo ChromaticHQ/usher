@@ -99,13 +99,15 @@ class CICommands extends Tasks
         $standards = implode(',', $this->getCodingStandards());
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        return $this->taskExecStack()
-            ->stopOnFail()
-            ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-            ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
-                --ignore=$ignorePaths $this->customCodePaths")
-            ->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths")
-            ->run();
+        /** @var \Robo\Task\CommandStack $stack */
+        $stack = $this->taskExecStack()->stopOnFail();
+        $stack->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer');
+        $stack->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
+                --ignore=$ignorePaths $this->customCodePaths");
+        if ($this->lintTwigFiles) {
+            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths");
+        }
+        return $stack->run();
     }
 
     /**
