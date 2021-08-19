@@ -35,6 +35,13 @@ class CICommands extends Tasks
     protected $customCodePaths;
 
     /**
+     * Boolean indicating whether Twig files should be linted.
+     *
+     * @var bool
+     */
+    protected $lintTwigFiles;
+
+    /**
      * RoboFile constructor.
      */
     public function __construct()
@@ -45,6 +52,7 @@ class CICommands extends Tasks
         $this->phpcsCheckExtensions = Robo::config()->get('phpcs_check_extensions');
         $this->phpcsIgnorePaths = Robo::config()->get('phpcs_ignore_paths');
         $this->customCodePaths = implode(' ', $this->getCustomCodePaths());
+        $this->lintTwigFiles = Robo::config()->get('twig_lint_enable', true);
     }
 
     /**
@@ -81,7 +89,7 @@ class CICommands extends Tasks
     /**
      * Command to check coding standards.
      *
-     * @aliases phpcs
+     * @aliases phpcs twigcs
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
@@ -91,12 +99,15 @@ class CICommands extends Tasks
         $standards = implode(',', $this->getCodingStandards());
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        return $this->taskExecStack()
-            ->stopOnFail()
-            ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-            ->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
-                --ignore=$ignorePaths $this->customCodePaths")
-            ->run();
+        /** @var \Robo\Task\CommandStack $stack */
+        $stack = $this->taskExecStack()->stopOnFail();
+        $stack->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer');
+        $stack->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
+            --ignore=$ignorePaths $this->customCodePaths");
+        if ($this->lintTwigFiles) {
+            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths");
+        }
+        return $stack->run();
     }
 
     /**
@@ -112,12 +123,16 @@ class CICommands extends Tasks
         $standards = implode(',', $this->getCodingStandards());
         $extensions = implode(',', $this->phpcsCheckExtensions);
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        return $this->taskExecStack()
-            ->stopOnFail()
-            ->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer')
-            ->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
-                --ignore=$ignorePaths $this->customCodePaths")
-            ->run();
+        /** @var \Robo\Task\CommandStack $stack */
+        $stack = $this->taskExecStack()->stopOnFail();
+        $stack->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer');
+        $stack->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
+                --ignore=$ignorePaths $this->customCodePaths");
+        if ($this->lintTwigFiles) {
+            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths --fix");
+        }
+
+        return $stack->run();
     }
 
     /**
