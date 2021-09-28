@@ -514,7 +514,7 @@ class DevelopmentModeCommands extends Tasks
      */
     public function setupCodespaces()
     {
-        $codespaces_directory = getenv('OLDPWD');
+        $codespaces_directory = getenv('PWD') . '/web';
         if (empty($codespaces_directory)) {
             throw new TaskException($this, 'Codespaces directory is unavailable.');
         }
