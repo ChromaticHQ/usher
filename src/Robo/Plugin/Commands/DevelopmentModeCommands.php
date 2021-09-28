@@ -506,4 +506,39 @@ class DevelopmentModeCommands extends Tasks
             ->remove($this->devServicesPath)
             ->run();
     }
+
+    /**
+     * Setup a site in GitHub Codespaces.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    public function setupCodespaces()
+    {
+        $codespaces_directory = getenv('OLDPWD');
+        if (empty($codespaces_directory)) {
+            throw new TaskException($this, 'Codespaces directory is unavailable.');
+        }
+        $result = $this->taskExec('rm /var/www/html')->run();
+        $result = $this->taskExec("ln -s $codespaces_directory /var/www/html")->run();
+
+        $this->io()->title('Start apache, forwarding port 80.');
+        $result = $this->taskExec('service apache2 start')->run();
+
+        $this->io()->title('Download database.');
+        $dbPath = $this->databaseDownload();
+        if (empty($dbPath)) {
+            throw new TaskException($this, 'Database download failed.');
+        }
+
+        $this->io()->section('Importing database.');
+        $result = $this->taskExec("zcat $dbPath | mysql -h db -u mariadb -pmariadb mariadb")->run();
+        $result = $this->taskExec('rm')->args($dbPath)->run();
+
+        $this->io()->section('Building theme.');
+        $result = $this->taskExec('composer robo theme:build')->run();
+
+        $this->io()->section('Clearing Drupal cache.');
+        $result = $this->taskExec('vendor/bin/drush cr')->run();
+        return $result;
+    }
 }
