@@ -514,11 +514,13 @@ class DevelopmentModeCommands extends Tasks
      */
     public function setupCodespaces()
     {
-        $codespaces_directory = getenv('PWD') . '/web';
+        $this->io()->title('Symlinking file system.');
+        $docRootDir = Robo::config()->get('drupal_document_root') ?? 'web';
+        $codespaces_directory = getenv('PWD') . '/' .$docRootDir;
         if (empty($codespaces_directory)) {
             throw new TaskException($this, 'Codespaces directory is unavailable.');
         }
-        $result = $this->taskExec('rm /var/www/html')->run();
+        $this->taskDeleteDir('/var/www/html')->run();
         $result = $this->taskExec("ln -s $codespaces_directory /var/www/html")->run();
 
         $this->io()->title('Start apache, forwarding port 80.');
