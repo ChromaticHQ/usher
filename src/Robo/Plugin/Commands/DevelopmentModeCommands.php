@@ -541,9 +541,6 @@ class DevelopmentModeCommands extends Tasks
 
         $this->io()->section('Clearing Drupal cache.');
         $result = $this->taskExec('vendor/bin/drush cr')->run();
-
-        $this->io()->section('Starting front-end development.');
-        $result = $this->taskExec('yarn --cwd web/themes/chromatic/ start')->run();
         return $result;
     }
 }
