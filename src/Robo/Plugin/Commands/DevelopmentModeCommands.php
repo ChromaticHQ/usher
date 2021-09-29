@@ -516,7 +516,7 @@ class DevelopmentModeCommands extends Tasks
     {
         $this->io()->title('Symlinking file system.');
         $docRootDir = Robo::config()->get('drupal_document_root') ?? 'web';
-        $codespaces_directory = getenv('PWD') . '/' .$docRootDir;
+        $codespaces_directory = getenv('PWD') . '/' . $docRootDir;
         if (empty($codespaces_directory)) {
             throw new TaskException($this, 'Codespaces directory is unavailable.');
         }
