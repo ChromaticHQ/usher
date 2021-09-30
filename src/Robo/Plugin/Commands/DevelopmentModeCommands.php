@@ -543,8 +543,8 @@ class DevelopmentModeCommands extends Tasks
         $this->io()->section('Building theme.');
         $result = $this->taskExec('composer robo theme:build')->run();
 
-        $this->io()->section('Clearing Drupal cache.');
-        $result = $this->taskExec('vendor/bin/drush cr')->run();
+        $this->io()->section('Drush deploy.');
+        $result = $this->taskExec('vendor/bin/drush deploy --yes')->run();
         return $result;
     }
 }
