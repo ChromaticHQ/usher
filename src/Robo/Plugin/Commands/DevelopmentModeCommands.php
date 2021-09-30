@@ -510,9 +510,13 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Setup a site in GitHub Codespaces.
      *
+     * @return \Robo\Result
+     *   The result of the set of tasks.
+     *
      * @throws \Robo\Exception\TaskException
+     *
      */
-    public function setupCodespaces()
+    public function setupCodespaces(): Result
     {
         $this->io()->title('Symlinking file system.');
         $docRootDir = Robo::config()->get('drupal_document_root') ?? 'web';
