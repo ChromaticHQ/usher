@@ -544,7 +544,16 @@ class DevelopmentModeCommands extends Tasks
         $result = $this->taskExec('composer robo theme:build')->run();
 
         $this->io()->section('Drush deploy.');
-        $result = $this->taskExec('vendor/bin/drush deploy --yes')->run();
+        $result = $this->taskExecStack()
+            ->exec("vendor/bin/drush deploy --yes")
+            // Import the latest configuration again. This includes the latest
+            // configuration_split configuration. Importing this twice ensures that
+            // the latter command enables and disables modules based upon the most up
+            // to date configuration. Additional information and discussion can be
+            // found here:
+            // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
+            ->exec("drush config:import --yes")
+            ->run();
         return $result;
     }
 }
