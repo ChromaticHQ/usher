@@ -105,7 +105,8 @@ class CICommands extends Tasks
         $stack->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
             --ignore=$ignorePaths $this->customCodePaths");
         if ($this->lintTwigFiles) {
-            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths --config=vendor/chromatichq/chq-robo/.twig-cs-fixer.php");
+            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths
+                --config=vendor/chromatichq/chq-robo/.twig-cs-fixer.php");
         }
         return $stack->run();
     }
@@ -129,7 +130,9 @@ class CICommands extends Tasks
         $stack->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
                 --ignore=$ignorePaths $this->customCodePaths");
         if ($this->lintTwigFiles) {
-            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths --fix --config=vendor/chromatichq/chq-robo/.twig-cs-fixer.php");
+            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths
+                --fix
+                --config=vendor/chromatichq/chq-robo/.twig-cs-fixer.php");
         }
 
         return $stack->run();
