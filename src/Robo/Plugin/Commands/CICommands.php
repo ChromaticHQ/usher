@@ -42,6 +42,13 @@ class CICommands extends Tasks
     protected $lintTwigFiles;
 
     /**
+     * Boolean indicating whether architecture checks should be run.
+     *
+     * @var bool
+     */
+    protected $runArchitectureAnalysis;
+
+    /**
      * RoboFile constructor.
      */
     public function __construct()
@@ -53,6 +60,7 @@ class CICommands extends Tasks
         $this->phpcsIgnorePaths = Robo::config()->get('phpcs_ignore_paths');
         $this->customCodePaths = implode(' ', $this->getCustomCodePaths());
         $this->lintTwigFiles = Robo::config()->get('twig_lint_enable', true);
+        $this->runArchitectureAnalysis = Robo::config()->get('architecture_analysis_enable', true);
     }
 
     /**
@@ -107,6 +115,9 @@ class CICommands extends Tasks
         if ($this->lintTwigFiles) {
             $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths");
         }
+        if ($this->runArchitectureAnalysis) {
+            $this->runArchitectureAnalysis();
+        }
         return $stack->run();
     }
 
@@ -133,6 +144,18 @@ class CICommands extends Tasks
         }
 
         return $stack->run();
+    }
+
+    /**
+     * Command to run architecture analysis.
+     *
+     * @return \Robo\Result
+     *   The result of the collection of tasks.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    public function jobRunArchitectureAnalysis(): Result {
+        return $this->runArchitectureAnalysis();
     }
 
     /**
@@ -165,5 +188,21 @@ class CICommands extends Tasks
             throw new TaskException($this, 'Expected Robo configuration not present: phpcs_standards');
         }
         return $phpcsStandards;
+    }
+
+    /**
+     * Run architecture checks.
+     *
+     * @return null|\Robo\Result
+     *   The result of the set of tasks.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    protected function runArchitectureAnalysis(): Result
+    {
+        return $this->taskExecStack()
+            ->stopOnFail()
+            ->exec("./vendor/bin/phpinsights analyse --no-interaction $this->customCodePaths --min-quality=100 --min-complexity=100 --min-architecture=100 --min-style=100")
+            ->run();
     }
 }
