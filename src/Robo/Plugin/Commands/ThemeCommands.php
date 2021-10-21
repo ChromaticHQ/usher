@@ -48,7 +48,10 @@ class ThemeCommands extends Tasks
             $themePath = $themeConfig['theme_path'];
             $this->io()->section("building theme at $themePath");
             foreach ($themeConfig['theme_build_commands'] as $themeBuildCommand) {
-                $result = $this->taskExec($themeBuildCommand)
+                // Run theme build commands in a Bash subshell with login mode
+                // enabled to ensure nvm is loaded prior to running any
+                // Node-based commands.
+                $result = $this->taskExec("bash -lc \"$themeBuildCommand\"")
                     ->dir($themePath)
                     ->run();
             }
