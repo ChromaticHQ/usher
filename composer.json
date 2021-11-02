@@ -12,7 +12,6 @@
     "require": {
         "consolidation/robo": "^1.4 || ^2 || ^3",
         "squizlabs/php_codesniffer": "^3.5",
-        "phpstan/phpstan": "^0.12.77",
         "phpstan/phpstan-deprecation-rules": "^0.12.6",
         "async-aws/s3": "^1.8",
         "php": ">=7.4",
