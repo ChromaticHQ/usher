@@ -441,8 +441,7 @@ class DevelopmentModeCommands extends Tasks
             $result = $this->taskFilesystemStack()
                 ->copy($example_local_settings_file, $devSettingsPath)
                 ->run();
-        }
-        else {
+        } else {
             $this->yell("The \"$example_local_settings_file\" file was not found.", '40', 'yellow');
         }
         // Copy the development services file.
@@ -451,8 +450,7 @@ class DevelopmentModeCommands extends Tasks
             $result = $this->taskFilesystemStack()
                 ->copy($development_services_file, $this->devServicesPath, true)
                 ->run();
-        }
-        else {
+        } else {
             $this->yell("The \"$development_services_file\" file was not found.", '40', 'yellow');
         }
 
