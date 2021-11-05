@@ -436,6 +436,7 @@ class DevelopmentModeCommands extends Tasks
         $this->say("copying settings.local.php and development.services.yml into sites/$siteDir.");
 
         $result = $this->taskFilesystemStack()
+            ->stopOnFail(false)
             ->copy("$this->drupalRoot/sites/example.settings.local.php", $devSettingsPath, true)
             ->copy("$this->drupalRoot/sites/development.services.yml", $this->devServicesPath, true)
             ->run();
