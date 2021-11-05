@@ -111,7 +111,7 @@ class DevelopmentModeCommands extends Tasks
         $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
         if (empty($objects)) {
-             throw new TaskException($this, "No database dumps found for '$siteName'.");
+            throw new TaskException($this, "No database dumps found for '$siteName'.");
         }
         // Ensure objects are sorted by last modified date.
         usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
@@ -435,11 +435,26 @@ class DevelopmentModeCommands extends Tasks
         $this->io()->title('enabling front-end development mode.');
         $this->say("copying settings.local.php and development.services.yml into sites/$siteDir.");
 
-        $result = $this->taskFilesystemStack()
-            ->stopOnFail(false)
-            ->copy("$this->drupalRoot/sites/example.settings.local.php", $devSettingsPath, true)
-            ->copy("$this->drupalRoot/sites/development.services.yml", $this->devServicesPath, true)
-            ->run();
+        // Copy the example local settings file.
+        $example_local_settings_file = "$this->drupalRoot/sites/example.settings.local.php";
+        if (file_exists($example_local_settings_file)) {
+            $result = $this->taskFilesystemStack()
+                ->copy($example_local_settings_file, $devSettingsPath)
+                ->run();
+        }
+        else {
+            $this->yell("The \"$example_local_settings_file\" file was not found.", '40', 'yellow');
+        }
+        // Copy the development services file.
+        $development_services_file = "$this->drupalRoot/sites/development.services.yml";
+        if (file_exists($development_services_file)) {
+            $result = $this->taskFilesystemStack()
+                ->copy($development_services_file, $this->devServicesPath, true)
+                ->run();
+        }
+        else {
+            $this->yell("The \"$development_services_file\" file was not found.", '40', 'yellow');
+        }
 
         $this->say("enablig twig.debug in development.services.yml.");
         $devServices = Yaml::parseFile($this->devServicesPath);
@@ -453,6 +468,8 @@ class DevelopmentModeCommands extends Tasks
         $result = $this->collectionBuilder()
             ->taskReplaceInFile($devSettingsPath)
             ->from('/sites/development.services.yml')
+            // @todo This is failing now too. We make a big assumption that this
+            //   is only being used for Drupal 8+.
             ->to("/sites/fe.development.services.yml")
             ->taskReplaceInFile($devSettingsPath)
             ->from('# $settings[\'cache\'][\'bins\'][\'render\']')
