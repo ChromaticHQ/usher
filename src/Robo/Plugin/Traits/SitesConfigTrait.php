@@ -90,7 +90,7 @@ trait SitesConfigTrait
     /**
      * Write sites configuration file.
      */
-    public function writeSitesConfig(array $sitesConfig)
+    protected function writeSitesConfig(array $sitesConfig)
     {
         ksort($sitesConfig);
         file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
