@@ -1,5 +1,6 @@
 parameters:
   customRulesetUsed: true
+  level: 1
   reportUnmatchedIgnoredErrors: true
   ignoreErrors:
     - message: '#\Call to deprecated method io\(\) of class Robo\\Tasks#'
