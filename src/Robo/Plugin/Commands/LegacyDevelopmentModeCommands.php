@@ -42,7 +42,7 @@ class LegacyDevelopmentModeCommands extends DevelopmentModeCommands
     }
 
     /**
-     * Deploy Drush via Lando.
+     * Deploy with Drush via Lando.
      *
      * @param string $siteDir
      *   The Drupal site directory name.
