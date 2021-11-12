@@ -440,7 +440,10 @@ class DevelopmentModeCommands extends Tasks
                 ->copy($example_local_settings_file, $devSettingsPath)
                 ->run();
         } else {
-            $this->yell("The \"$example_local_settings_file\" file was not found.", '40', 'yellow');
+            throw new TaskException(
+                $this,
+                "The \"$example_local_settings_file\" file was not found."
+            );
         }
         // Copy the development services file.
         $development_services_file = "$this->drupalRoot/sites/development.services.yml";
@@ -449,7 +452,10 @@ class DevelopmentModeCommands extends Tasks
                 ->copy($development_services_file, $this->devServicesPath, true)
                 ->run();
         } else {
-            $this->yell("The \"$development_services_file\" file was not found.", '40', 'yellow');
+            throw new TaskException(
+                $this,
+                "The \"$development_services_file\" file was not found."
+            );
         }
 
         $this->say("enablig twig.debug in development.services.yml.");
@@ -464,8 +470,6 @@ class DevelopmentModeCommands extends Tasks
         $result = $this->collectionBuilder()
             ->taskReplaceInFile($devSettingsPath)
             ->from('/sites/development.services.yml')
-            // @todo This is failing now too. We make a big assumption that this
-            //   is only being used for Drupal 8+.
             ->to("/sites/fe.development.services.yml")
             ->taskReplaceInFile($devSettingsPath)
             ->from('# $settings[\'cache\'][\'bins\'][\'render\']')
