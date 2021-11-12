@@ -29,7 +29,7 @@ class DeployCommands extends Tasks
      * @param string $siteName
      *   The Drupal site shortname. Optional.
      * @param string $docroot
-     *   The drupal document root directory. Optional.
+     *   The Drupal document root directory. Optional.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.

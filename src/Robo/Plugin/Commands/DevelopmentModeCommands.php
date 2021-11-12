@@ -387,7 +387,7 @@ class DevelopmentModeCommands extends Tasks
         if (!class_exists('Drush\Commands\core\DeployCommands')) {
             throw new TaskException(
                 $this,
-                "'drush deploy' command not found. Further work is neccesary to support this version of Drush."
+                "'drush deploy' command not found. Further work is necessary to support this version of Drush."
             );
         }
         return $this->taskExecStack()
