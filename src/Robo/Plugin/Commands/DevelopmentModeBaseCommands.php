@@ -396,7 +396,7 @@ class DevelopmentModeBaseCommands extends Tasks
             return $uri;
         } else {
             // Our final fallback.
-            return 'http://' . $landoCfg['name'] . 'lndo.site';
+            return 'http://' . $landoCfg['name'] . '.' . 'lndo.site';
         }
         throw new TaskException($this, 'Unable to determine URI.');
     }
