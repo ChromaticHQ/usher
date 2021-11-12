@@ -8,7 +8,7 @@ use Robo\Result;
 /**
  * Robo commands related to changing development modes for Drupal 7.
  */
-class LegacyDevelopmentModeCommands extends DevelopmentModeCommands
+class LegacyDevelopmentModeCommands extends DevelopmentModeBaseCommands
 {
     /**
      * Refreshes a Drupal 7 development environment.
@@ -20,48 +20,12 @@ class LegacyDevelopmentModeCommands extends DevelopmentModeCommands
      * @param string $siteName
      *   The Drupal site name.
      *
-     * @aliases magic
-     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function devRefreshLegacy($siteName = 'default'): Result
+    public function devRefreshLegacy(string $siteName = 'default'): Result
     {
-        $this->io()->title('development environment refresh. 🦄✨');
-        $result = $this->taskComposerInstall()->run();
-        // $result = $this->taskExec('lando')->arg('start')->run();
-        // There isn't a great way to call a command in one class from another.
-        // https://github.com/consolidation/Robo/issues/743
-        // For now, it seems like calling robo from within robo works.
-        $result = $this->taskExec("composer robo theme:build $siteName")
-            ->run();
-        $result = $this->frontendDevEnableDrupal7($siteName, ['yes' => true]);
-        $result = $this->databaseRefreshLando($siteName);
-        $result = $this->drupalLoginLink($siteName);
-        return $result;
-    }
-
-    /**
-     * Deploy with Drush via Lando.
-     *
-     * @param string $siteDir
-     *   The Drupal site directory name.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
-     *
-     * @see https://www.drush.org/deploycommand
-     */
-    protected function drushDeployLando($siteDir = 'default'): Result
-    {
-        $this->io()->section('drush updatedb & drush cach-clear.');
-        return $this->taskExecStack()
-            ->dir("$this->drupalRoot/sites/$siteDir")
-            ->exec("lando drush cache-clear all")
-            ->exec("lando drush updatedb --yes")
-            ->exec("lando drush fra --yes")
-            ->exec("lando drush cache-clear all")
-            ->run();
+        return $this->devRefreshDrupal($siteName);
     }
 
     /**
@@ -73,12 +37,19 @@ class LegacyDevelopmentModeCommands extends DevelopmentModeCommands
      *   The options.
      *
      * @option boolean $yes Default answers to yes.
-     * @aliases fede
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function frontendDevEnableDrupal7($siteDir = 'default', array $opts = ['yes|y' => false])
+    public function frontendDevEnableLegacy(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
+    {
+        return $this->frontendDevEnableDrupal($siteDir, $opts);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function frontendDevEnableDrupal(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
     {
         $devSettingsPath = "$this->drupalRoot/sites/$siteDir/settings.local.php";
 
@@ -110,5 +81,20 @@ class LegacyDevelopmentModeCommands extends DevelopmentModeCommands
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function drushDeployLando($siteDir = 'default'): Result
+    {
+        $this->io()->section('drush updatedb & drush cach-clear.');
+        return $this->taskExecStack()
+            ->dir("$this->drupalRoot/sites/$siteDir")
+            ->exec("lando drush cache-clear all")
+            ->exec("lando drush updatedb --yes")
+            ->exec("lando drush fra --yes")
+            ->exec("lando drush cache-clear all")
+            ->run();
     }
 }
