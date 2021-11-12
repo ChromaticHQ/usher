@@ -448,7 +448,7 @@ class DevelopmentModeBaseCommands extends Tasks
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    protected function frontendDevEnableDrupal($siteDir = 'default', array $opts = ['yes|y' => false]): Result
+    protected function frontendDevEnableDrupal(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
     {
         $devSettingsPath = "$this->drupalRoot/sites/$siteDir/settings.local.php";
 
