@@ -87,7 +87,7 @@ class DevelopmentModeCommands extends Tasks
      *
      * @aliases dbdl
      *
-     * @return string
+     * @return string|\Robo\Result
      *   The path of the last downloaded database.
      *
      * @throws \Robo\Exception\TaskException
@@ -337,7 +337,7 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Refresh database on Tugboat.
      *
-     * @return null|\Robo\Result
+     * @return \Robo\Result
      *   The task result.
      */
     public function databaseRefreshTugboat(): Result
