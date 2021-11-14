@@ -11,6 +11,11 @@ use Symfony\Component\Yaml\Yaml;
 trait SitesConfigTrait
 {
 
+    /**
+     * Filename for a sites configuration file.
+     *
+     * @var string
+     */
     protected $sitesConfigFile = '.sites.config.yml';
 
     /**
