@@ -1,10 +1,11 @@
 parameters:
+  checkMissingIterableValueType: false
   customRulesetUsed: true
-  level: 5
-  reportUnmatchedIgnoredErrors: true
   ignoreErrors:
     - message: '#\Call to deprecated method io\(\) of class Robo\\Tasks#'
       paths:
         - 'src/'
+  level: 6
+  reportUnmatchedIgnoredErrors: true
 includes:
   - vendor/phpstan/phpstan-deprecation-rules/rules.neon
