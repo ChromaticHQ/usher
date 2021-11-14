@@ -52,7 +52,7 @@ class CICommands extends Tasks
         $this->phpcsCheckExtensions = Robo::config()->get('phpcs_check_extensions');
         $this->phpcsIgnorePaths = Robo::config()->get('phpcs_ignore_paths');
         $this->customCodePaths = implode(' ', $this->getCustomCodePaths());
-        $this->lintTwigFiles = Robo::config()->get('twig_lint_enable', true);
+        $this->lintTwigFiles = Robo::config()->get('twig_lint_enable') ?? true;
     }
 
     /**
