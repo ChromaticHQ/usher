@@ -98,7 +98,7 @@ trait SitesConfigTrait
      * @param string[] $sitesConfig
      *   An array of site config data to be written as Yaml.
      */
-    protected function writeSitesConfig(array $sitesConfig)
+    protected function writeSitesConfig(array $sitesConfig): void
     {
         ksort($sitesConfig);
         file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
