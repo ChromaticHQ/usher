@@ -16,14 +16,14 @@ class CICommands extends Tasks
     /**
      * Array containing the file extensions PHPCS should check.
      *
-     * @var array
+     * @var string[]
      */
     protected $phpcsCheckExtensions;
 
     /**
      * Array containing paths PHPCS should ignore.
      *
-     * @var array
+     * @var string[]
      */
     protected $phpcsIgnorePaths;
 
