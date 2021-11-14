@@ -35,7 +35,7 @@ class ThemeCommands extends Tasks
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function themeBuild($siteName = 'default'): Result
+    public function themeBuild(string $siteName = 'default'): Result
     {
         $result = $this->io()->title("theme build");
         try {

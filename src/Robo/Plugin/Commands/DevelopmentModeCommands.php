@@ -139,8 +139,10 @@ class DevelopmentModeCommands extends Tasks
      *   Path to the AWS configuration directory.
      * @param string $awsConfigFilePath
      *   Path to the AWS configuration file.
+     *
+     * @return \Robo\Result
      */
-    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath)
+    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath): Result
     {
         $yes = $this->io()->confirm('AWS S3 credentials not detected. Do you wish to configure them?');
         if (!$yes) {

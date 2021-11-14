@@ -21,7 +21,7 @@ trait SitesConfigTrait
     /**
      * Load configuration for all sites.
      *
-     * @return string[]
+     * @return mixed[]
      *   A configuration array for all sites.
      */
     public function getAllSitesConfig(): array
