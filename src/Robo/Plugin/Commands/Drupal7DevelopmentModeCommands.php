@@ -8,7 +8,7 @@ use Robo\Result;
 /**
  * Robo commands related to changing development modes for Drupal 7.
  */
-class LegacyDevelopmentModeCommands extends DevelopmentModeBaseCommands
+class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
 {
     /**
      * Refreshes a Drupal 7 development environment.
