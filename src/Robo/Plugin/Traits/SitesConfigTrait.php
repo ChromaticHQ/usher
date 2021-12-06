@@ -11,12 +11,17 @@ use Symfony\Component\Yaml\Yaml;
 trait SitesConfigTrait
 {
 
+    /**
+     * Filename for a site's configuration file.
+     *
+     * @var string
+     */
     protected $sitesConfigFile = '.sites.config.yml';
 
     /**
      * Load configuration for all sites.
      *
-     * @return array
+     * @return mixed[]
      *   A configuration array for all sites.
      */
     public function getAllSitesConfig(): array
@@ -30,7 +35,7 @@ trait SitesConfigTrait
     /**
      * Get all site names from configuration.
      *
-     * @return array
+     * @return string[]
      *   An array of all site names.
      */
     public function getAllSiteNames(): array
@@ -55,7 +60,7 @@ trait SitesConfigTrait
      * @param string $siteName
      *   The site name.
      *
-     * @return array
+     * @return mixed[]
      *   The specified site configuration array.
      */
     protected function getSiteConfig($siteName = 'default'): array
@@ -89,8 +94,11 @@ trait SitesConfigTrait
 
     /**
      * Write sites configuration file.
+     *
+     * @param string[] $sitesConfig
+     *   An array of site config data to be written as Yaml.
      */
-    protected function writeSitesConfig(array $sitesConfig)
+    protected function writeSitesConfig(array $sitesConfig): void
     {
         ksort($sitesConfig);
         file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));

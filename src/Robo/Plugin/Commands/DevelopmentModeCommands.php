@@ -87,7 +87,7 @@ class DevelopmentModeCommands extends Tasks
      *
      * @aliases dbdl
      *
-     * @return string
+     * @return string|\Robo\Result
      *   The path of the last downloaded database.
      *
      * @throws \Robo\Exception\TaskException
@@ -139,8 +139,10 @@ class DevelopmentModeCommands extends Tasks
      *   Path to the AWS configuration directory.
      * @param string $awsConfigFilePath
      *   Path to the AWS configuration file.
+     *
+     * @return \Robo\Result
      */
-    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath)
+    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath): Result
     {
         $yes = $this->io()->confirm('AWS S3 credentials not detected. Do you wish to configure them?');
         if (!$yes) {
@@ -337,12 +339,13 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Refresh database on Tugboat.
      *
-     * @return null|\Robo\Result
+     * @return \Robo\Result
      *   The task result.
      */
     public function databaseRefreshTugboat(): Result
     {
         $this->io()->title('refresh tugboat databases.');
+        $result = null;
         foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
             try {
                 $dbPath = $this->databaseDownload($siteName);
@@ -449,6 +452,8 @@ class DevelopmentModeCommands extends Tasks
         file_put_contents($this->devServicesPath, Yaml::dump($devServices));
 
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
+        // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
+        // @phpstan-ignore-next-line
         $result = $this->collectionBuilder()
             ->taskReplaceInFile($devSettingsPath)
             ->from('/sites/development.services.yml')
@@ -500,6 +505,8 @@ class DevelopmentModeCommands extends Tasks
         }
 
         $this->io()->title('disabling front-end development mode.');
+        // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
+        // @phpstan-ignore-next-line
         return $this->collectionBuilder()
             ->taskFilesystemStack()
             ->remove($devSettingsPath)

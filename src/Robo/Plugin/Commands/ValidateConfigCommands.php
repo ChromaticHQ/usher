@@ -43,7 +43,7 @@ class ValidateConfigCommands extends Tasks
      *
      * @throws \Robo\Exception\TaskException
      */
-    public function validateDrupalConfig($siteDir = 'default')
+    public function validateDrupalConfig($siteDir = 'default'): void
     {
         $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush config:status --format=json")
             ->dir("$this->drupalRoot/sites/$siteDir/")

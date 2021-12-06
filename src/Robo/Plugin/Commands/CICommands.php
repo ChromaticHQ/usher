@@ -16,14 +16,14 @@ class CICommands extends Tasks
     /**
      * Array containing the file extensions PHPCS should check.
      *
-     * @var array
+     * @var string[]
      */
     protected $phpcsCheckExtensions;
 
     /**
      * Array containing paths PHPCS should ignore.
      *
-     * @var array
+     * @var string[]
      */
     protected $phpcsIgnorePaths;
 
@@ -52,7 +52,7 @@ class CICommands extends Tasks
         $this->phpcsCheckExtensions = Robo::config()->get('phpcs_check_extensions');
         $this->phpcsIgnorePaths = Robo::config()->get('phpcs_ignore_paths');
         $this->customCodePaths = implode(' ', $this->getCustomCodePaths());
-        $this->lintTwigFiles = Robo::config()->get('twig_lint_enable', true);
+        $this->lintTwigFiles = Robo::config()->get('twig_lint_enable') ?? true;
     }
 
     /**
