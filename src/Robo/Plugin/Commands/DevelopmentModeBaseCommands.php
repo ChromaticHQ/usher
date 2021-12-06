@@ -59,7 +59,7 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @aliases dbdl
      *
-     * @return string
+     * @return string|\Robo\Result
      *   The path of the last downloaded database.
      *
      * @throws \Robo\Exception\TaskException
@@ -137,12 +137,13 @@ class DevelopmentModeBaseCommands extends Tasks
     /**
      * Refresh database on Tugboat.
      *
-     * @return null|\Robo\Result
+     * @return \Robo\Result
      *   The result of the set of tasks.
      */
     public function databaseRefreshTugboat(): Result
     {
         $this->io()->title('refresh tugboat databases.');
+        $result = null;
         foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
             try {
                 $dbPath = $this->databaseDownload($siteName);
@@ -228,8 +229,9 @@ class DevelopmentModeBaseCommands extends Tasks
                 return Result::cancelled();
             }
         }
-
         $this->io()->title('disabling front-end development mode.');
+        // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
+        // @phpstan-ignore-next-line
         return $this->collectionBuilder()
             ->taskFilesystemStack()
             ->remove($devSettingsPath)
@@ -269,6 +271,8 @@ class DevelopmentModeBaseCommands extends Tasks
      *   Path to the AWS configuration directory.
      * @param string $awsConfigFilePath
      *   Path to the AWS configuration file.
+     *
+     * @return \Robo\Result
      */
     protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath)
     {
@@ -496,8 +500,9 @@ class DevelopmentModeBaseCommands extends Tasks
             'auto_reload' => true,
         ];
         file_put_contents($this->devServicesPath, Yaml::dump($devServices));
-
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
+        // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
+        // @phpstan-ignore-next-line
         $result = $this->collectionBuilder()
             ->taskReplaceInFile($devSettingsPath)
             ->from('/sites/development.services.yml')
