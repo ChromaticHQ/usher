@@ -12,7 +12,7 @@ trait SitesConfigTrait
 {
 
     /**
-     * Filename for a sites configuration file.
+     * Filename for a site's configuration file.
      *
      * @var string
      */
