@@ -33,7 +33,7 @@ trait DatabaseDownloadTrait
      */
     public function databaseDownload(string $siteName = 'default')
     {
-        $this->io()->title('database download. TK');
+        $this->io()->title('database download.');
 
         $awsConfigDirPath = getenv('HOME') . '/.aws';
         $awsConfigFilePath = "$awsConfigDirPath/credentials";
