@@ -23,7 +23,7 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function devRefreshLegacy(string $siteName = 'default'): Result
+    public function devRefreshDrupal7(string $siteName = 'default'): Result
     {
         return $this->devRefreshDrupal($siteName);
     }
