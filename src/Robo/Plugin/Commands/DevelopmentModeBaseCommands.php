@@ -29,6 +29,13 @@ class DevelopmentModeBaseCommands extends Tasks
     protected $drupalRoot;
 
     /**
+     * Composer vendor directory.
+     *
+     * @var string
+     */
+    protected $vendorDirectory;
+
+    /**
      * Path to front-end development services path.
      *
      * @var string
@@ -47,6 +54,7 @@ class DevelopmentModeBaseCommands extends Tasks
         $drupalFinder = new DrupalFinder();
         $drupalFinder->locateRoot(getcwd());
         $this->drupalRoot = $drupalFinder->getDrupalRoot();
+        $this->vendorDirectory = $drupalFinder->getVendorDir();
         $this->devServicesPath = "$this->drupalRoot/sites/fe.development.services.yml";
     }
 
@@ -144,7 +152,7 @@ class DevelopmentModeBaseCommands extends Tasks
                 ->dir("$this->drupalRoot/sites/$siteDir")
                 ->run();
         }
-        return $this->taskExec('../../../drush')
+        return $this->taskExec("$this->vendorDirectory/bin/drush")
             ->arg('user:login')
             ->dir("$this->drupalRoot/sites/$siteDir")
             ->run();
