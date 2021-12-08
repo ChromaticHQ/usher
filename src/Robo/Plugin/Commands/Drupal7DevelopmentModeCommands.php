@@ -41,7 +41,7 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function frontendDevEnableLegacy(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
+    public function frontendDevEnableDrupal7(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
     {
         return $this->frontendDevEnableDrupal($siteDir, $opts);
     }
