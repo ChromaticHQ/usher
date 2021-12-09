@@ -129,20 +129,23 @@ class DevelopmentModeBaseCommands extends Tasks
     /**
      * Generate Drupal login link.
      *
+     * @command drupal:login-link
+     * @aliases uli
+     *
      * @param string $siteDir
      *   The Drupal site directory name.
-     * @param bool $lando
-     *   Use lando to call drush, else call drush directly.
+     * @param array $options
+     *   Array of options as described below.
      *
-     * @aliases uli
+     * @option lando Whether to run the automatic fixer or not.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function drupalLoginLink($siteDir = 'default', $lando = true): Result
+    public function drupalLoginLink($siteDir = 'default', array $options = ['lando' => true]): Result
     {
         $this->io()->section("create login link.");
-        if ($lando) {
+        if ($options['lando']) {
             $uri = $this->landoUri($siteDir);
             $this->say("Lando URI detected: $uri");
             return $this->taskExec('lando')
