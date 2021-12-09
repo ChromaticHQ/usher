@@ -134,18 +134,14 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteDir
      *   The Drupal site directory name.
-     * @param array $options
-     *   Array of options as described below.
-     *
-     * @option lando Whether to run the automatic fixer or not.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function drupalLoginLink($siteDir = 'default', array $options = ['lando' => true]): Result
+    public function drupalLoginLink($siteDir = 'default'): Result
     {
         $this->io()->section("create login link.");
-        if ($options['lando']) {
+        if (getenv('LANDO_INFO')) {
             $uri = $this->landoUri($siteDir);
             $this->say("Lando URI detected: $uri");
             return $this->taskExec('lando')
