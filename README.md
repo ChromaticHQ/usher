@@ -6,7 +6,7 @@ and can be extended in downstream repos.
 
 ## Installation
 
-`composer require chromatichq/chq-robo`
+`composer require chromatichq/usher`
 
 ## Configuration
 
