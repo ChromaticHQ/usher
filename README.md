@@ -4,6 +4,8 @@ This repo is intended for use on Chromatic repositories to supplement use of the
 [Robo](https://robo.li/) PHP task runner. It contains a number of basic commands
 and can be extended in downstream repos.
 
+![Usher in a tuxedo](/assets/usher-in-a-tux.jpg]
+
 ## Installation
 
 `composer require chromatichq/usher`
