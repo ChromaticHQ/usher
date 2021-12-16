@@ -10,7 +10,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 trait SitesConfigTrait
 {
-
     /**
      * Filename for a site's configuration file.
      *

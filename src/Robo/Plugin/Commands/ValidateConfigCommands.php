@@ -11,7 +11,6 @@ use Robo\Tasks;
  */
 class ValidateConfigCommands extends Tasks
 {
-
     /**
      * Drupal root directory.
      *

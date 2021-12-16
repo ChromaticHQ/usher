@@ -16,7 +16,6 @@ use Usher\Robo\Plugin\Traits\SitesConfigTrait;
  */
 class DevelopmentModeCommands extends DevelopmentModeBaseCommands
 {
-
     /**
      * Refreshes a development environment.
      *

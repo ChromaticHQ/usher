@@ -12,7 +12,6 @@ use Robo\Tasks;
  */
 class CICommands extends Tasks
 {
-
     /**
      * Array containing the file extensions PHPCS should check.
      *
