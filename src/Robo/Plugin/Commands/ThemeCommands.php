@@ -1,12 +1,12 @@
 <?php
 
-namespace ChqRobo\Robo\Plugin\Commands;
+namespace Usher\Robo\Plugin\Commands;
 
-use ChqRobo\Robo\Plugin\Traits\SitesConfigTrait;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
+use Usher\Robo\Plugin\Traits\SitesConfigTrait;
 
 /**
  * Robo commands related to theme operations.
