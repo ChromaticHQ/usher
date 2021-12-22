@@ -1,5 +1,5 @@
 {
-    "name": "chromatichq/usher",
+    "name": "chromatic/usher",
     "description": "Custom Robo commands for use on Chromatic projects.",
     "type": "library",
     "license": "MIT",
