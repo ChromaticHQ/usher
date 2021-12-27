@@ -1,6 +1,6 @@
 <?php
 
-namespace ChqRobo\Robo\Plugin\Commands;
+namespace Usher\Robo\Plugin\Commands;
 
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
@@ -11,7 +11,6 @@ use Robo\Tasks;
  */
 class ValidateConfigCommands extends Tasks
 {
-
     /**
      * Drupal root directory.
      *

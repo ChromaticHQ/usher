@@ -1,12 +1,18 @@
-# Chromatic Robo
+# Usher
 
-This repo is intended for use on Chromatic repositories to supplement use of the
-[Robo](https://robo.li/) PHP task runner. It contains a number of basic commands
-and can be extended in downstream repos.
+Usher is intended for use on Chromatic repositories to supplement the use of the
+[Robo](https://robo.li/) PHP task runner. It contains a number of commands to
+assist in development, builds, and deployments, and can be extended in
+downstream repos.
+
+* ush·er _(verb)_: to show or guide (someone) somewhere.
+* ush·er _(noun)_: American singer, songwriter, businessman, and dancer.
+
+![Usher in a tuxedo](https://user-images.githubusercontent.com/20355/146567165-6a9a6dc5-66cd-4f7c-8e39-69de09365bfd.jpg)
 
 ## Installation
 
-`composer require chromatichq/chq-robo`
+`composer require chromatichq/usher`
 
 ## Configuration
 

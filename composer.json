@@ -1,5 +1,5 @@
 {
-    "name": "chromatichq/chq-robo",
+    "name": "chromatic/usher",
     "description": "Custom Robo commands for use on Chromatic projects.",
     "type": "library",
     "license": "MIT",
@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ChqRobo\\": "src"
+            "Usher\\": "src"
         }
     },
     "scripts": {

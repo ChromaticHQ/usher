@@ -1,6 +1,6 @@
 <?php
 
-namespace ChqRobo\Robo\Plugin\Commands;
+namespace Usher\Robo\Plugin\Commands;
 
 use Robo\Exception\TaskException;
 use Robo\Result;

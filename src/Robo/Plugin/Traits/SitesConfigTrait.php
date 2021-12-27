@@ -1,6 +1,6 @@
 <?php
 
-namespace ChqRobo\Robo\Plugin\Traits;
+namespace Usher\Robo\Plugin\Traits;
 
 use Robo\Exception\TaskException;
 use Symfony\Component\Yaml\Yaml;
@@ -10,7 +10,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 trait SitesConfigTrait
 {
-
     /**
      * Filename for a site's configuration file.
      *

@@ -1,6 +1,6 @@
 <?php
 
-namespace ChqRobo\Robo\Plugin\Traits;
+namespace Usher\Robo\Plugin\Traits;
 
 use AsyncAws\S3\S3Client;
 use Robo\Exception\TaskException;
