@@ -100,7 +100,6 @@ class CICommands extends Tasks
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
         /** @var \Robo\Task\CommandStack $stack */
         $stack = $this->taskExecStack()->stopOnFail();
-        $stack->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer');
         $stack->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
             --ignore=$ignorePaths $this->customCodePaths");
         if ($this->lintTwigFiles) {
@@ -124,7 +123,6 @@ class CICommands extends Tasks
         $ignorePaths = implode(',', $this->phpcsIgnorePaths);
         /** @var \Robo\Task\CommandStack $stack */
         $stack = $this->taskExecStack()->stopOnFail();
-        $stack->exec('vendor/bin/phpcbf --config-set installed_paths vendor/drupal/coder/coder_sniffer');
         $stack->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
                 --ignore=$ignorePaths $this->customCodePaths");
         if ($this->lintTwigFiles) {
