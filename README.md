@@ -12,7 +12,7 @@ downstream repos.
 
 ## Installation
 
-`composer require chromatichq/usher`
+`composer require chromatic/usher`
 
 ## Configuration
 
