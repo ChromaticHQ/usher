@@ -55,7 +55,7 @@ trait DatabaseDownloadTrait
         // Ensure objects are sorted by last modified date.
         usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
         $latestDatabaseDump = array_pop($objects);
-        $dbFilename = $latestDatabaseDump->getKey();
+        $dbFilename = $this->sanitizeFileNameForWindows($latestDatabaseDump->getKey());
 
         if (file_exists($dbFilename)) {
             $this->say("Skipping download. Latest database dump file exists >>> $dbFilename");
@@ -168,5 +168,35 @@ trait DatabaseDownloadTrait
             $region = $defaultRegion;
         }
         return $region;
+    }
+
+    /**
+     * Sanitizes a file name for the Windows file system.
+     *
+     * @param string $fileName
+     *   The file name to sanitize.
+     *
+     * @return string
+     *   The sanitized filename.
+     */
+    public function sanitizeFileNameForWindows(string $fileName): string
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $fileName = preg_replace(
+                '~
+                # File system reserved characters.
+                # @link https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
+                [<>:"/\\\|?*]|
+                # Control characters.
+                # @link https://docs.microsoft.com/en-gb/windows/win32/fileio/naming-a-file
+                [\x00-\x1F]|
+                # Non-printing characters DEL, NO-BREAK SPACE, SOFT HYPHEN.
+                [\x7F\xA0\xAD]
+                ~x',
+                '_',
+                $fileName
+            );
+        }
+        return $fileName;
     }
 }
