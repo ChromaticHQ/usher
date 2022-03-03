@@ -55,20 +55,21 @@ trait DatabaseDownloadTrait
         // Ensure objects are sorted by last modified date.
         usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
         $latestDatabaseDump = array_pop($objects);
-        $dbFilename = $this->sanitizeFileNameForWindows($latestDatabaseDump->getKey());
+        $dbFilename = $latestDatabaseDump->getKey();
+        $localFilename = $this->sanitizeFileNameForWindows($dbFilename);
 
-        if (file_exists($dbFilename)) {
-            $this->say("Skipping download. Latest database dump file exists >>> $dbFilename");
+        if (file_exists($localFilename)) {
+            $this->say("Skipping download. Latest database dump file exists >>> $localFilename");
         } else {
             $result = $s3->GetObject([
                 'Bucket' => $this->s3BucketForSite($siteName),
                 'Key' => $dbFilename,
             ]);
-            $fp = fopen($dbFilename, 'wb');
+            $fp = fopen($localFilename, 'wb');
             stream_copy_to_stream($result->getBody()->getContentAsResource(), $fp);
-            $this->say("Database dump file downloaded >>> $dbFilename");
+            $this->say("Database dump file downloaded >>> $localFilename");
         }
-        return $dbFilename;
+        return $localFilename;
     }
 
     /**
