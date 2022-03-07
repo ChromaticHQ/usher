@@ -5,12 +5,10 @@ updates:
     directory: "/"
     schedule:
       interval: daily
-    open-pull-requests-limit: 10
     reviewers:
       - markdorison
     assignees:
       - markdorison
-    versioning-strategy: auto
     labels:
       - "dependencies"
       - "php"
