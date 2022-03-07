@@ -60,7 +60,7 @@ trait DatabaseDownloadTrait
         if (file_exists($dbFilename)) {
             $this->say("Skipping download. Latest database dump file exists >>> $dbFilename");
         } else {
-            $result = $s3->GetObject([
+            $result = $s3->getObject([
                 'Bucket' => $this->s3BucketForSite($siteName),
                 'Key' => $dbFilename,
             ]);
