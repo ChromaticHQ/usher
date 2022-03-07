@@ -56,20 +56,20 @@ trait DatabaseDownloadTrait
         usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
         $latestDatabaseDump = array_pop($objects);
         $dbFilename = $latestDatabaseDump->getKey();
-        $localFilename = $this->sanitizeFileNameForWindows($dbFilename);
+        $downloadFileName = $this->sanitizeFileNameForWindows($dbFilename);
 
-        if (file_exists($localFilename)) {
-            $this->say("Skipping download. Latest database dump file exists >>> $localFilename");
+        if (file_exists($downloadFileName)) {
+            $this->say("Skipping download. Latest database dump file exists >>> $downloadFileName");
         } else {
             $result = $s3->GetObject([
                 'Bucket' => $this->s3BucketForSite($siteName),
                 'Key' => $dbFilename,
             ]);
-            $fp = fopen($localFilename, 'wb');
+            $fp = fopen($downloadFileName, 'wb');
             stream_copy_to_stream($result->getBody()->getContentAsResource(), $fp);
-            $this->say("Database dump file downloaded >>> $localFilename");
+            $this->say("Database dump file downloaded >>> $downloadFileName");
         }
-        return $localFilename;
+        return $downloadFileName;
     }
 
     /**
