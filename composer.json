@@ -18,7 +18,8 @@
         "drush/drush": "^8 || ^10 || ^11",
         "webflo/drupal-finder": "^1.2",
         "vincentlanglet/twig-cs-fixer": "^0.4.1",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2"
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+        "phpstan/extension-installer": "^1.1"
     },
     "autoload": {
         "psr-4": {
@@ -40,8 +41,5 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true
         }
-    },
-    "require-dev": {
-        "phpstan/extension-installer": "^1.1"
     }
 }
