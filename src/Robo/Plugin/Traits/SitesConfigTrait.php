@@ -66,7 +66,10 @@ trait SitesConfigTrait
     {
         $allSitesConfig = $this->getAllSitesConfig();
         if (!is_array($allSitesConfig[$siteName])) {
-            throw new TaskException($this, "Configuration for '$siteName' missing or malformed in $this->sitesConfigFile.");
+            throw new TaskException(
+                $this,
+                "Configuration for '$siteName' missing or malformed in $this->sitesConfigFile."
+            );
         }
         return $allSitesConfig[$siteName];
     }

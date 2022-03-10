@@ -141,7 +141,7 @@ trait DatabaseDownloadTrait
      */
     protected function s3BucketForSite(string $siteName): string
     {
-        if (!$bucket = $this->getConfig('database_s3_bucket', $siteName)) {
+        if (!is_string($bucket = $this->getConfig('database_s3_bucket', $siteName))) {
             throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
         }
         $this->say("'$siteName' S3 bucket: $bucket");

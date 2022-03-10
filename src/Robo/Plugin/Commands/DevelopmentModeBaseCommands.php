@@ -253,7 +253,9 @@ class DevelopmentModeBaseCommands extends Tasks
                 $domain = array_pop($siteDomains);
                 return "http://$domain";
             }
-        } elseif ($uri = $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'] ?? null) {
+        } elseif (
+            is_string($uri = $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'])
+        ) {
             // If a Drush URI is explicitly set, use that.
             return $uri;
         } else {

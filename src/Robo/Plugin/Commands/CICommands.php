@@ -142,7 +142,7 @@ class CICommands extends Tasks
      */
     protected function getCustomCodePaths(): array
     {
-        if (!$customCodePaths = Robo::config()->get('custom_code_paths')) {
+        if (!is_array($customCodePaths = Robo::config()->get('custom_code_paths'))) {
             throw new TaskException($this, 'Expected Robo configuration not present: custom_code_paths');
         }
         return $customCodePaths;
@@ -158,7 +158,7 @@ class CICommands extends Tasks
      */
     protected function getCodingStandards(): array
     {
-        if (!$phpcsStandards = Robo::config()->get('phpcs_standards')) {
+        if (!is_array($phpcsStandards = Robo::config()->get('phpcs_standards'))) {
             throw new TaskException($this, 'Expected Robo configuration not present: phpcs_standards');
         }
         return $phpcsStandards;
