@@ -49,7 +49,7 @@ trait DatabaseDownloadTrait
         ]);
         $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
-        if (empty($objects)) {
+        if (count($objects) == 0) {
             throw new TaskException($this, "No database dumps found for '$siteName'.");
         }
         // Ensure objects are sorted by last modified date.
