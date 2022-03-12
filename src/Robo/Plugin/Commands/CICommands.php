@@ -13,16 +13,16 @@ use Robo\Tasks;
 class CICommands extends Tasks
 {
     /**
-     * Array containing the file extensions PHPCS should check.
+     * A comma separated list of the file extensions PHPCS should check.
      *
-     * @var string[]
+     * @var string
      */
     protected $phpcsCheckExtensions;
 
     /**
-     * Array containing paths PHPCS should ignore.
+     * A comma separated list of the paths PHPCS should ignore.
      *
-     * @var string[]
+     * @var string
      */
     protected $phpcsIgnorePaths;
 
@@ -32,6 +32,13 @@ class CICommands extends Tasks
      * @var string
      */
     protected $customCodePaths;
+
+    /**
+     * A comma separated list of PHPCS standards.
+     *
+     * @var string
+     */
+    protected $phpcsStandards;
 
     /**
      * Boolean indicating whether Twig files should be linted.
@@ -48,9 +55,10 @@ class CICommands extends Tasks
         // Treat this command like bash -e and exit as soon as there's a failure.
         $this->stopOnFail();
 
-        $this->phpcsCheckExtensions = Robo::config()->get('phpcs_check_extensions');
-        $this->phpcsIgnorePaths = Robo::config()->get('phpcs_ignore_paths');
-        $this->customCodePaths = implode(' ', $this->getCustomCodePaths());
+        $this->phpcsCheckExtensions = implode(',', Robo::config()->get('phpcs_check_extensions'));
+        $this->phpcsIgnorePaths = implode(',', Robo::config()->get('phpcs_ignore_paths'));
+        $this->customCodePaths = implode(' ', $this->getConfigurationValues('custom_code_paths'));
+        $this->phpcsStandards = implode(',', $this->getConfigurationValues('phpcs_standards'));
         $this->lintTwigFiles = Robo::config()->get('twig_lint_enable') ?? true;
     }
 
@@ -95,17 +103,7 @@ class CICommands extends Tasks
      */
     public function jobCheckCodingStandards(): Result
     {
-        $standards = implode(',', $this->getCodingStandards());
-        $extensions = implode(',', $this->phpcsCheckExtensions);
-        $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        /** @var \Robo\Task\CommandStack $stack */
-        $stack = $this->taskExecStack()->stopOnFail();
-        $stack->exec("vendor/bin/phpcs --standard=$standards --extensions=$extensions \
-            --ignore=$ignorePaths $this->customCodePaths");
-        if ($this->lintTwigFiles) {
-            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths");
-        }
-        return $stack->run();
+        return $this->jobRunCodingStandards(false);
     }
 
     /**
@@ -118,34 +116,28 @@ class CICommands extends Tasks
      */
     public function jobFixCodingStandards(): Result
     {
-        $standards = implode(',', $this->getCodingStandards());
-        $extensions = implode(',', $this->phpcsCheckExtensions);
-        $ignorePaths = implode(',', $this->phpcsIgnorePaths);
-        /** @var \Robo\Task\CommandStack $stack */
-        $stack = $this->taskExecStack()->stopOnFail();
-        $stack->exec("vendor/bin/phpcbf --standard=$standards --extensions=$extensions \
-                --ignore=$ignorePaths $this->customCodePaths");
-        if ($this->lintTwigFiles) {
-            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths --fix");
-        }
-
-        return $stack->run();
+        return $this->jobRunCodingStandards(true);
     }
 
     /**
-     * Get custom code paths for static analysis tools to use.
+     * Command to fix coding standards where possible.
      *
-     * @return array
-     *   An array containing application custom code paths.
-     *
-     * @throws \Robo\Exception\TaskException
+     * @return \Robo\Result
+     *   The result of the set of tasks.
      */
-    protected function getCustomCodePaths(): array
+    protected function jobRunCodingStandards(bool $applyFixes = false): Result
     {
-        if (!is_array($customCodePaths = Robo::config()->get('custom_code_paths'))) {
-            throw new TaskException($this, 'Expected Robo configuration not present: custom_code_paths');
+        /** @var \Robo\Task\CommandStack $stack */
+        $stack = $this->taskExecStack()->stopOnFail();
+        $phpBinary = $applyFixes ? 'phpcbf' : 'phpcs';
+        $stack->exec("vendor/bin/$phpBinary --standard=$this->phpcsStandards --extensions=$this->phpcsCheckExtensions \
+                --ignore=$this->phpcsIgnorePaths $this->customCodePaths");
+        if ($this->lintTwigFiles) {
+            $fixFlag = $applyFixes ? '--fix' : '';
+            $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths $fixFlag");
         }
-        return $customCodePaths;
+
+        return $stack->run();
     }
 
     /**
@@ -156,11 +148,11 @@ class CICommands extends Tasks
      *
      * @throws \Robo\Exception\TaskException
      */
-    protected function getCodingStandards(): array
+    protected function getConfigurationValues(string $key): array
     {
-        if (!is_array($phpcsStandards = Robo::config()->get('phpcs_standards'))) {
-            throw new TaskException($this, 'Expected Robo configuration not present: phpcs_standards');
+        if (!is_array($configurationValues = Robo::config()->get($key))) {
+            throw new TaskException($this, "Expected Robo configuration not or malfomed present: $key");
         }
-        return $phpcsStandards;
+        return $configurationValues;
     }
 }
