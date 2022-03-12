@@ -120,7 +120,10 @@ class CICommands extends Tasks
     }
 
     /**
-     * Command to fix coding standards where possible.
+     * Determine whether to check or fix coding standard issues and run as requested.
+     *
+     * @param bool $applyFixes
+     *   FALSE if phpcs should be run, else phpcbf.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
