@@ -106,7 +106,7 @@ class DevelopmentModeBaseCommands extends Tasks
                 // @todo: Should we run a site-install by default?
                 continue;
             }
-            if (empty($dbPath)) {
+            if (!is_string($dbPath) || strlen($dbPath) == 0) {
                 $this->yell("'$siteName' database path not found.");
                 continue;
             }
@@ -253,9 +253,9 @@ class DevelopmentModeBaseCommands extends Tasks
                 $domain = array_pop($siteDomains);
                 return "http://$domain";
             }
-        } elseif ($uri = $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'] ?? null) {
+        } elseif (isset($landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'])) {
             // If a Drush URI is explicitly set, use that.
-            return $uri;
+            return $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'];
         } else {
             // Our final fallback.
             return 'http://' . $landoCfg['name'] . '.' . 'lndo.site';

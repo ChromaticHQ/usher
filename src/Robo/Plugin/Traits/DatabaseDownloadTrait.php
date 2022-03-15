@@ -49,7 +49,7 @@ trait DatabaseDownloadTrait
         ]);
         $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
-        if (empty($objects)) {
+        if (count($objects) == 0) {
             throw new TaskException($this, "No database dumps found for '$siteName'.");
         }
         // Ensure objects are sorted by last modified date.
@@ -141,7 +141,7 @@ trait DatabaseDownloadTrait
      */
     protected function s3BucketForSite(string $siteName): string
     {
-        if (!$bucket = $this->getConfig('database_s3_bucket', $siteName)) {
+        if (!is_string($bucket = $this->getConfig('database_s3_bucket', $siteName))) {
             throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
         }
         $this->say("'$siteName' S3 bucket: $bucket");

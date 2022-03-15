@@ -65,8 +65,11 @@ trait SitesConfigTrait
     protected function getSiteConfig($siteName = 'default'): array
     {
         $allSitesConfig = $this->getAllSitesConfig();
-        if (empty($allSitesConfig[$siteName])) {
-            throw new TaskException($this, "Configuration for '$siteName' not found in $this->sitesConfigFile.");
+        if (!is_array($allSitesConfig[$siteName])) {
+            throw new TaskException(
+                $this,
+                "Configuration for '$siteName' missing or malformed in $this->sitesConfigFile."
+            );
         }
         return $allSitesConfig[$siteName];
     }
