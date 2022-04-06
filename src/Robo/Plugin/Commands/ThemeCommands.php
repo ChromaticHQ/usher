@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Commands;
 
 use Robo\Exception\TaskException;
 use Robo\Result;
+use Robo\Robo;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
 
