@@ -233,14 +233,25 @@ class DevelopmentModeBaseCommands extends Tasks
      */
     protected function landoUri($siteDir): string
     {
-        try {
-            $landoConfigPath = "$this->drupalRoot/../.lando.yml";
-            $landoCfg = Yaml::parseFile($landoConfigPath);
-        } catch (ParseException $exception) {
-            // This site could have a Front- and Back-end site in different
-            // sub-directories with a the lando.yml in the root directory.
-            $landoConfigPath = "$this->drupalRoot/../../.lando.yml";
-            $landoCfg = Yaml::parseFile($landoConfigPath);
+        $landoCfg = false;
+        $possibleLandoConfigPaths = [
+            // The usual suspect.
+            "$this->drupalRoot/../.lando.yml",
+            // The site could have a front-end and back-end site in different
+            // subdirectories with the lando.yml in the root directory.
+            "$this->drupalRoot/../../.lando.yml",
+        ];
+        foreach ($possibleLandoConfigPaths as $landoConfigPath) {
+            try {
+                $landoCfg = Yaml::parseFile($landoConfigPath);
+            } catch (ParseException $exception) {
+                $this->say("Unable to load Lando config from $landoConfigPath.");
+            }
+            // Break out of the loop if valid configuration was found.
+            if ($landoCfg) {
+                $this->say("Found Lando config at $landoConfigPath.");
+                break;
+            }
         }
         // First, check for multisite proxy configuration.
         if (isset($landoCfg['proxy']['appserver'])) {
