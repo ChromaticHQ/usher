@@ -7,6 +7,7 @@ use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Usher\Robo\Plugin\Traits\DatabaseDownloadTrait;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
@@ -232,9 +233,11 @@ class DevelopmentModeBaseCommands extends Tasks
      */
     protected function landoUri($siteDir): string
     {
+        $landoConfigPath = "$this->drupalRoot/../.lando.yml";
         try {
             $landoCfg = Yaml::parseFile($landoConfigPath);
-        } catch (ParseException $exception) {
+        }
+        catch (ParseException $exception) {
             // This site could have a Front- and Back-end site in different
             // sub-directories with a the lando.yml in the root directory.
             $landoConfigPath = "$this->drupalRoot/../../.lando.yml";
