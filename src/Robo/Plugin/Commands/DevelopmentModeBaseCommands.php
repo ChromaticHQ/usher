@@ -248,7 +248,7 @@ class DevelopmentModeBaseCommands extends Tasks
                 $this->say("Unable to load Lando config from $landoConfigPath.");
             }
             // Break out of the loop if valid configuration was found.
-            if ($landoCfg) {
+            if ($landoCfg === true) {
                 $this->say("Found Lando config at $landoConfigPath.");
                 break;
             }
