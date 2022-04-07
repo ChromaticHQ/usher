@@ -233,11 +233,10 @@ class DevelopmentModeBaseCommands extends Tasks
      */
     protected function landoUri($siteDir): string
     {
-        $landoConfigPath = "$this->drupalRoot/../.lando.yml";
         try {
+            $landoConfigPath = "$this->drupalRoot/../.lando.yml";
             $landoCfg = Yaml::parseFile($landoConfigPath);
-        }
-        catch (ParseException $exception) {
+        } catch (ParseException $exception) {
             // This site could have a Front- and Back-end site in different
             // sub-directories with a the lando.yml in the root directory.
             $landoConfigPath = "$this->drupalRoot/../../.lando.yml";
