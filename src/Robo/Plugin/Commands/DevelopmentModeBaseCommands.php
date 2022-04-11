@@ -7,6 +7,7 @@ use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Usher\Robo\Plugin\Traits\DatabaseDownloadTrait;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
@@ -232,8 +233,32 @@ class DevelopmentModeBaseCommands extends Tasks
      */
     protected function landoUri($siteDir): string
     {
-        $landoConfigPath = "$this->drupalRoot/../.lando.yml";
-        $landoCfg = Yaml::parseFile($landoConfigPath);
+        $landoCfg = false;
+        $possibleLandoConfigPaths = [
+            // The usual suspect.
+            "$this->drupalRoot/../.lando.yml",
+            // The site could have a front-end and back-end site in different
+            // subdirectories with the lando.yml in the root directory.
+            "$this->drupalRoot/../../.lando.yml",
+        ];
+        foreach ($possibleLandoConfigPaths as $landoConfigPath) {
+            try {
+                $landoCfg = Yaml::parseFile($landoConfigPath);
+            } catch (ParseException $exception) {
+                $this->say("Unable to load Lando config from $landoConfigPath.");
+            }
+            // Break out of the loop if valid configuration was found.
+            if ($landoCfg !== false) {
+                $this->say("Found Lando config at $landoConfigPath.");
+                break;
+            }
+        }
+        if ($landoCfg === false) {
+            throw new TaskException(
+                $this,
+                'Unable to determine where the .lando.yml file is located.'
+            );
+        }
         // First, check for multisite proxy configuration.
         if (isset($landoCfg['proxy']['appserver'])) {
             if ($siteDir === 'default') {
