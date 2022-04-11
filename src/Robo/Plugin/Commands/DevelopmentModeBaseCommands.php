@@ -251,14 +251,14 @@ class DevelopmentModeBaseCommands extends Tasks
                 $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
             } elseif (count($siteDomains) == 1) {
                 $domain = array_pop($siteDomains);
-                return "http://$domain";
+                return "https://$domain";
             }
         } elseif (isset($landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'])) {
             // If a Drush URI is explicitly set, use that.
             return $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'];
         } else {
             // Our final fallback.
-            return 'http://' . $landoCfg['name'] . '.' . 'lndo.site';
+            return 'https://' . $landoCfg['name'] . '.' . 'lndo.site';
         }
         throw new TaskException($this, 'Unable to determine URI.');
     }
