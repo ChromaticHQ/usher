@@ -248,10 +248,16 @@ class DevelopmentModeBaseCommands extends Tasks
                 $this->say("Unable to load Lando config from $landoConfigPath.");
             }
             // Break out of the loop if valid configuration was found.
-            if ($landoCfg === true) {
+            if ($landoCfg !== false) {
                 $this->say("Found Lando config at $landoConfigPath.");
                 break;
             }
+        }
+        if ($landoCfg === false) {
+            throw new TaskException(
+                $this,
+                'Unable to determine where the .lando.yml file is located.'
+            );
         }
         // First, check for multisite proxy configuration.
         if (isset($landoCfg['proxy']['appserver'])) {
