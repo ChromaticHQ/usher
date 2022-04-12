@@ -50,7 +50,7 @@ class ValidateConfigCommands extends Tasks
             ->run();
         $drushOutput = trim($result->getOutputData());
         $configJson = json_decode($drushOutput);
-        if (!is_null($configJson)) {
+        if (!empty($configJson)) {
             $this->say($drushOutput);
             throw new TaskException(
                 $this,
