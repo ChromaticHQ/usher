@@ -48,8 +48,9 @@ class ValidateConfigCommands extends Tasks
             ->dir("$this->drupalRoot/sites/$siteDir/")
             ->printOutput(false)
             ->run();
-        $configDiff = trim($result->getOutputData());
-        if (!is_array($configDiff) || !empty($configDiff)) {
+        $drushOutput = trim($result->getOutputData());
+        $configJson = json_decode($drushOutput);
+        if (!is_array($configJson) || count($configJson) > 0) {
             $this->say($drushOutput);
             throw new TaskException(
                 $this,
