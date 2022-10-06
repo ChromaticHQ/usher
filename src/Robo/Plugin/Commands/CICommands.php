@@ -12,13 +12,12 @@ use Robo\Tasks;
  */
 class CICommands extends Tasks
 {
-
     /**
      * The default PHP version to lint against.
      *
      * @var string
      */
-    const PHPCS_DEFAULT_PHP_VERSION = '8.0';
+    protected const PHPCS_DEFAULT_PHP_VERSION = '8.0';
 
     /**
      * A comma separated list of the file extensions PHPCS should check.
