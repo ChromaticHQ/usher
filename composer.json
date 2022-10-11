@@ -19,7 +19,8 @@
         "webflo/drupal-finder": "^1.2",
         "vincentlanglet/twig-cs-fixer": "^0.4.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-        "phpstan/extension-installer": "^1.1"
+        "phpstan/extension-installer": "^1.1",
+        "phpcompatibility/php-compatibility": "^9.3"
     },
     "autoload": {
         "psr-4": {
