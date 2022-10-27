@@ -92,10 +92,13 @@ class DevelopmentModeBaseCommands extends Tasks
     /**
      * Refresh database on Tugboat.
      *
+     * @param bool $drupal7
+     *   TRUE if running against a Drupal 7 site.
+     *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function databaseRefreshTugboat(): Result
+    public function databaseRefreshTugboat(bool $drupal7 = false): Result
     {
         $this->io()->title('refresh tugboat databases.');
         $result = null;
@@ -124,10 +127,17 @@ class DevelopmentModeBaseCommands extends Tasks
                 ->run();
             $result = $this->taskExec('rm')->args($dbPath)->run();
 
-            $result = $this->taskExec("$this->vendorDirectory/bin/drush")
-                ->arg('cache:rebuild')
-                ->dir("$this->drupalRoot/sites/$siteName")
-                ->run();
+            if ($drupal7) {
+                $result = $this->taskExec("$this->vendorDirectory/bin/drush")
+                    ->arg('cache:rebuild')
+                    ->dir("$this->drupalRoot/sites/$siteName")
+                    ->run();
+            } else {
+                $result = $this->taskExec("$this->vendorDirectory/bin/drush")
+                    ->arg('cache-clear all')
+                    ->dir("$this->drupalRoot/sites/$siteName")
+                    ->run();
+            }
         }
         return $result;
     }
