@@ -2,6 +2,7 @@
 
 namespace Usher\Robo\Plugin\Commands;
 
+use GuzzleHttp\Client;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
@@ -73,5 +74,69 @@ class DeployCommands extends Tasks
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
+    }
+
+    /**
+     * Run a Drupal 8/9 deployment for Tugboat.
+     *
+     * @param string $appDirPath
+     *   The app directory path.
+     * @param string $siteName
+     *   The Drupal site shortname. Optional.
+     * @param string $docroot
+     *   The Drupal document root directory. Optional.
+     *
+     * @return \Robo\Result
+     *   The result of the set of tasks.
+     */
+    public function deployDrupalTugboat(
+        string $appDirPath,
+        string $siteName = 'default',
+        string $docroot = 'web'
+    ): Result {
+        $result = $this->deployDrupal($appDirPath, $siteName, $docroot);
+        $this->notifySlackOnFailedBasePreviewBuild($result);
+        return $result;
+    }
+
+    /**
+     * Notify Slack if a base preview build failed.
+     *
+     * @param \Robo\Result $result
+     *   The result of the task to check.
+     *
+     * @see https://docs.tugboatqa.com/starter-configs/code-snippets/slack-integration/
+     */
+    protected function notifySlackOnFailedBasePreviewBuild(Result $result): void
+    {
+        // Determine if we are building a base preview.
+        if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID')) {
+            return;
+        }
+        // If everything went well there is nothing to do.
+        if ($result->wasSuccessful()) {
+            return;
+        }
+        // Verify that a Slack webhook URL was provided.
+        $slack_webhook_url = getenv('SLACK_WEBHOOK_URL');
+        if ($slack_webhook_url === false || $slack_webhook_url === '') {
+            $this->yell('Missing Slack Webhook URL from the "SLACK_WEBHOOK_URL" environment variable.');
+            return;
+        }
+        // Build various variables and URLs for the Slack message.
+        $dashboard_url = sprintf(
+            'https://dashboard.tugboatqa.com/%s',
+            getenv('TUGBOAT_PREVIEW_ID'),
+        );
+        // Send the Slack webhook call.
+        $client = new Client();
+        $client->post($slack_webhook_url, [
+            'username' => 'Tugboat',
+            'text' => sprintf(
+                '*Tugboat URL:* %s\n*Dashboard:* %s',
+                getenv('TUGBOAT_SERVICE_URL'),
+                $dashboard_url,
+            ),
+        ]);
     }
 }
