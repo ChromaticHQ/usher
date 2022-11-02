@@ -84,6 +84,9 @@ class DeployCommands extends Tasks
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
+        // @todo Do we want/need this option if we can just check for environment variables?
+        // @todo This could be useful if a site wanted to opt out of this functionality.
+        // @todo Perhaps we should rename this option then to be more generic?
         if ($opts['tugboat']) {
             $this->notifySlackOnFailedBasePreviewBuild($result);
         }
@@ -105,7 +108,8 @@ class DeployCommands extends Tasks
             return;
         }
         // Determine if we are building a base preview.
-        if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID')) {
+        // @todo Remove the testing override condition at the end before merging.
+        if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID') || getenv('TUGBOAT_PREVIEW_ID') !== '') {
             return;
         }
         // If everything went well there is nothing to do.

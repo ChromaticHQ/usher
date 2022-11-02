@@ -23,7 +23,6 @@ trait ResultCheckTrait
     public function resultTasksSuccessful(Result $result): bool
     {
         // Loop through the accumulated results and check for failures.
-        /** @var \Robo\Result $taskResult */
         foreach ($result->getIterator() as $taskResult) {
             // Ignore items that are not results.
             if (!$taskResult instanceof Result) {
