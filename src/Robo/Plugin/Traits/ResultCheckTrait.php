@@ -5,7 +5,7 @@ namespace Usher\Robo\Plugin\Traits;
 use Robo\Result;
 
 /**
- * Trait to provide database download functionality to Robo commands.
+ * Trait to provide result checking functionality.
  */
 trait ResultCheckTrait
 {
