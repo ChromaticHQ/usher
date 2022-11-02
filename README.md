@@ -46,6 +46,15 @@ which includes:
 1. `drush deploy`
 1. Generating a login link.
 
+### `robo deploy:drupal`
+
+The `deploy:drupal` command (often available in downstream repos as
+`composer robo deploy:drupal SITENAME DOCROOT`) deploys Drupal in a standardized way
+which includes:
+
+1. `drush deploy`
+1. `drush config:import`
+
 ## Extending
 
 You can use this package for the basics and then build upon it. New commands

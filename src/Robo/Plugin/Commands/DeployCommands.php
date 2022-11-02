@@ -7,12 +7,15 @@ use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
+use Usher\Robo\Plugin\Traits\ResultCheckTrait;
 
 /**
  * Robo commands related to continuous integration.
  */
 class DeployCommands extends Tasks
 {
+    use ResultCheckTrait;
+
     /**
      * RoboFile constructor.
      */
@@ -106,7 +109,7 @@ class DeployCommands extends Tasks
             return;
         }
         // If everything went well there is nothing to do.
-        if ($result->wasSuccessful()) {
+        if ($this->resultTasksSuccessful($result)) {
             return;
         }
         // Verify that a Slack webhook URL was provided.
