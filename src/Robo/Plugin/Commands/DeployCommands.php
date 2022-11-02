@@ -55,15 +55,22 @@ class DeployCommands extends Tasks
      *   The Drupal site shortname. Optional.
      * @param string $docroot
      *   The Drupal document root directory. Optional.
+     * @param array $opts
+     *   The array of command line options.
+     *     - 'tugboat': Run additional Tugboat specific logic.
      *
      * @aliases deployd
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function deployDrupal(string $appDirPath, string $siteName = 'default', string $docroot = 'web'): Result
-    {
-        return $this->taskExecStack()
+    public function deployDrupal(
+        string $appDirPath,
+        string $siteName = 'default',
+        string $docroot = 'web',
+        array $opts = ['tugboat' => false]
+    ): Result {
+        $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
             ->exec("$appDirPath/vendor/bin/drush deploy --yes")
             // Import the latest configuration again. This includes the latest
@@ -74,28 +81,9 @@ class DeployCommands extends Tasks
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
-    }
-
-    /**
-     * Run a Drupal 8/9 deployment for Tugboat.
-     *
-     * @param string $appDirPath
-     *   The app directory path.
-     * @param string $siteName
-     *   The Drupal site shortname. Optional.
-     * @param string $docroot
-     *   The Drupal document root directory. Optional.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
-     */
-    public function deployDrupalTugboat(
-        string $appDirPath,
-        string $siteName = 'default',
-        string $docroot = 'web'
-    ): Result {
-        $result = $this->deployDrupal($appDirPath, $siteName, $docroot);
-        $this->notifySlackOnFailedBasePreviewBuild($result);
+        if ($opts['tugboat']) {
+            $this->notifySlackOnFailedBasePreviewBuild($result);
+        }
         return $result;
     }
 
@@ -109,6 +97,10 @@ class DeployCommands extends Tasks
      */
     protected function notifySlackOnFailedBasePreviewBuild(Result $result): void
     {
+        // Confirm we are in a Tugboat environment.
+        if (getenv('TUGBOAT_PREVIEW_ID') === false) {
+            return;
+        }
         // Determine if we are building a base preview.
         if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID')) {
             return;
