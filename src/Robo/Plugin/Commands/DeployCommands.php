@@ -2,12 +2,12 @@
 
 namespace Usher\Robo\Plugin\Commands;
 
-use GuzzleHttp\Client;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\ResultCheckTrait;
+use Usher\Robo\Plugin\Traits\NotifierTrait;
 
 /**
  * Robo commands related to continuous integration.
@@ -15,6 +15,7 @@ use Usher\Robo\Plugin\Traits\ResultCheckTrait;
 class DeployCommands extends Tasks
 {
     use ResultCheckTrait;
+    use NotifierTrait;
 
     /**
      * RoboFile constructor.
@@ -116,26 +117,12 @@ class DeployCommands extends Tasks
         if ($this->resultTasksSuccessful($result)) {
             return;
         }
-        // Verify that a Slack webhook URL was provided.
-        $slack_webhook_url = getenv('SLACK_WEBHOOK_URL');
-        if ($slack_webhook_url === false || $slack_webhook_url === '') {
-            $this->yell('Missing Slack Webhook URL from the "SLACK_WEBHOOK_URL" environment variable.');
-            return;
-        }
         // Build various variables and URLs for the Slack message.
         $dashboard_url = sprintf(
             'https://dashboard.tugboatqa.com/%s',
             getenv('TUGBOAT_PREVIEW_ID'),
         );
-        // Send the Slack webhook call.
-        $client = new Client();
-        $client->post($slack_webhook_url, [
-            'username' => 'Tugboat',
-            'text' => sprintf(
-                '*Tugboat URL:* %s\n*Dashboard:* %s',
-                getenv('TUGBOAT_SERVICE_URL'),
-                $dashboard_url,
-            ),
-        ]);
+        $text = sprintf('*Tugboat URL:* %s\n*Dashboard:* %s', getenv('TUGBOAT_SERVICE_URL'), $dashboard_url);
+        $this->notifySlack('Tugboat', $text);
     }
 }
