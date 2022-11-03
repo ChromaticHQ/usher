@@ -11,10 +11,12 @@ use Robo\Result;
 trait NotifierTrait
 {
     /**
-     * Notify Slack TK.
+     * Notify Slack.
      *
-     * @param \Robo\Result $result
-     *   The result of the task to check.
+     * @param string $username
+     *   The username to pass to Slack.
+     * @param string $text
+     *   The text string to pass to the Slack API.
      *
      * @see https://docs.tugboatqa.com/starter-configs/code-snippets/slack-integration/
      */
