@@ -10,7 +10,6 @@ use Robo\Result;
  */
 trait NotifierTrait
 {
-
     /**
      * Notify Slack TK.
      *
