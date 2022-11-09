@@ -108,15 +108,21 @@ class DeployCommands extends Tasks
         $this->yell('Notify Slack');
         // Confirm we are in a Tugboat environment.
         if (getenv('TUGBOAT_PREVIEW_ID') === false) {
+            // @todo Remove this.
+            $this->yell('No preview ID found');
             return;
         }
         // Determine if we are building a base preview.
         // @todo Remove the testing override condition at the end before merging.
         if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID') || getenv('TUGBOAT_PREVIEW_ID') !== '') {
+            // @todo Remove this.
+            $this->yell('Not a base preview.');
             return;
         }
         // If everything went well there is nothing to do.
         if ($this->resultTasksSuccessful($result)) {
+            // @todo Remove this.
+            $this->yell('Everything went fine.');
             return;
         }
         // Build various variables and URLs for the Slack message.
