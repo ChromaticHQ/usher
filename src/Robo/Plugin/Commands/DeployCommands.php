@@ -104,6 +104,8 @@ class DeployCommands extends Tasks
      */
     protected function notifySlackOnFailedBasePreviewBuild(Result $result): void
     {
+        // @todo Remove this.
+        $this->yell('Notify Slack');
         // Confirm we are in a Tugboat environment.
         if (getenv('TUGBOAT_PREVIEW_ID') === false) {
             return;
