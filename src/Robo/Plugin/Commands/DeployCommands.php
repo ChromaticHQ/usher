@@ -114,7 +114,7 @@ class DeployCommands extends Tasks
         }
         // Determine if we are building a base preview.
         // @todo Remove the testing override condition at the end before merging.
-        if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID') || getenv('TUGBOAT_PREVIEW_ID') !== '') {
+        if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID') && getenv('TUGBOAT_PREVIEW_ID') === '') {
             // @todo Remove this.
             $this->yell('Not a base preview.');
             return;
