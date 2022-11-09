@@ -14,7 +14,6 @@ use Usher\Robo\Plugin\Traits\NotifierTrait;
  */
 class DeployCommands extends Tasks
 {
-    use ResultCheckTrait;
     use NotifierTrait;
 
     /**
@@ -104,25 +103,20 @@ class DeployCommands extends Tasks
      */
     protected function notifySlackOnFailedBasePreviewBuild(Result $result): void
     {
-        // @todo Remove this.
-        $this->yell('Notify Slack');
         // Confirm we are in a Tugboat environment.
         if (getenv('TUGBOAT_PREVIEW_ID') === false) {
-            // @todo Remove this.
-            $this->yell('No preview ID found');
+            $this->say('Skipping Slack notification since no Tugboat preview ID was found.');
             return;
         }
         // Determine if we are building a base preview.
         // @todo Remove the testing override condition at the end before merging.
         if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID') && getenv('TUGBOAT_PREVIEW_ID') === '') {
-            // @todo Remove this.
-            $this->yell('Not a base preview.');
+            $this->say('Skipping Slack notification since this is not a base preview.');
             return;
         }
         // If everything went well there is nothing to do.
-        if ($this->resultTasksSuccessful($result)) {
-            // @todo Remove this.
-            $this->yell('Everything went fine.');
+        if ($result->wasSuccessful()) {
+            $this->say('Skipping Slack notification since all tasks completed successfully.');
             return;
         }
         // Build various variables and URLs for the Slack message.
