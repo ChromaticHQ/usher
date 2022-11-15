@@ -6,7 +6,6 @@ use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
-use Usher\Robo\Plugin\Traits\ResultCheckTrait;
 use Usher\Robo\Plugin\Traits\NotifierTrait;
 
 /**
