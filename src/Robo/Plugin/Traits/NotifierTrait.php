@@ -34,7 +34,6 @@ trait NotifierTrait
         $client->post($slack_webhook_url, [
             'username' => $username,
             'text' => $text,
-
         ]);
     }
 }
