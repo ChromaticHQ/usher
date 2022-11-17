@@ -34,6 +34,6 @@ trait SlackNotifierTrait
         ];
         // Send the Slack webhook call.
         $client = new Client(['timeout' => 5]);
-        $client->post($slack_webhook_url, json_encode(['body' => $payload]));
+        $client->post($slack_webhook_url, ['body' => json_encode($payload)]);
     }
 }
