@@ -3,12 +3,12 @@
 namespace Usher\Robo\Plugin\Traits;
 
 use GuzzleHttp\Client;
-use Robo\Result;
+use NotifierInterface;
 
 /**
  * Trait to provide notification functionality.
  */
-trait NotifierTrait
+trait SlackNotifierTrait
 {
     /**
      * Notify Slack.
@@ -28,12 +28,12 @@ trait NotifierTrait
             $this->yell('Missing Slack Webhook URL from the "SLACK_WEBHOOK_URL" environment variable.');
             return;
         }
-
-        // Send the Slack webhook call.
-        $client = new Client(['timeout' => 5]);
-        $client->post($slack_webhook_url, [
+        $payload = [
             'username' => $username,
             'text' => $text,
-        ]);
+        ];
+        // Send the Slack webhook call.
+        $client = new Client(['timeout' => 5]);
+        $client->post($slack_webhook_url, json_encode(['body' => $payload]));
     }
 }

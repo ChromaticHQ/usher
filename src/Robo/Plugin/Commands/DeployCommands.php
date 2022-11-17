@@ -2,18 +2,19 @@
 
 namespace Usher\Robo\Plugin\Commands;
 
-use Robo\Exception\TaskException;
 use Robo\Result;
-use Robo\Robo;
 use Robo\Tasks;
-use Usher\Robo\Plugin\Traits\NotifierTrait;
+use Usher\Robo\Plugin\Traits\ResultCheckTrait;
+use Usher\Robo\Plugin\Traits\SlackNotifierTrait;
 
 /**
  * Robo commands related to continuous integration.
  */
 class DeployCommands extends Tasks
 {
-    use NotifierTrait;
+    use SlackNotifierTrait;
+
+    public const TUGBOAT_DASHBOARD_URL = 'https://dashboard.tugboatqa.com';
 
     /**
      * RoboFile constructor.
@@ -120,7 +121,8 @@ class DeployCommands extends Tasks
         }
         // Build various variables and URLs for the Slack message.
         $dashboard_url = sprintf(
-            'https://dashboard.tugboatqa.com/%s',
+            '%s/%s',
+            self::TUGBOAT_DASHBOARD_URL,
             getenv('TUGBOAT_PREVIEW_ID'),
         );
         $text = sprintf('*Tugboat URL:* %s\n*Dashboard:* %s', getenv('TUGBOAT_SERVICE_URL'), $dashboard_url);
