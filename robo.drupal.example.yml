@@ -22,6 +22,7 @@ phpcs_ignore_paths:
   - '*/themes/*/js/'
   - '*/themes/*/node_modules'
   - '*/themes/*/libraries/'
+phpcs_php_version: '8.1'
 phpcs_standards:
   - Drupal
   - DrupalPractice

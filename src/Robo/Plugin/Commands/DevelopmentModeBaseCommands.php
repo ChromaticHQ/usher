@@ -123,6 +123,11 @@ class DevelopmentModeBaseCommands extends Tasks
             $result = $this->taskExec("zcat $dbPath | mysql -h mariadb -u tugboat -ptugboat $dbName")
                 ->run();
             $result = $this->taskExec('rm')->args($dbPath)->run();
+
+            $result = $this->taskExec("$this->vendorDirectory/bin/drush")
+                ->arg('cache:rebuild')
+                ->dir("$this->drupalRoot/sites/$siteName")
+                ->run();
         }
         return $result;
     }

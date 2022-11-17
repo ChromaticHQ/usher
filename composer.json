@@ -18,7 +18,8 @@
         "drush/drush": "^8 || ^10 || ^11",
         "webflo/drupal-finder": "^1.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-        "phpstan/extension-installer": "^1.1"
+        "phpstan/extension-installer": "^1.1",
+        "phpcompatibility/php-compatibility": "^9.3"
     },
     "autoload": {
         "psr-4": {

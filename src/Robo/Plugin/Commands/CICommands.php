@@ -13,6 +13,13 @@ use Robo\Tasks;
 class CICommands extends Tasks
 {
     /**
+     * The default PHP version to lint against.
+     *
+     * @var string
+     */
+    protected const PHPCS_DEFAULT_PHP_VERSION = '8.0';
+
+    /**
      * A comma separated list of the file extensions PHPCS should check.
      *
      * @var string
@@ -41,6 +48,13 @@ class CICommands extends Tasks
     protected $phpcsStandards;
 
     /**
+     * The PHP version to lint against for support.
+     *
+     * @var string
+     */
+    protected $phpcsPhpVersion;
+
+    /**
      * Boolean indicating whether Twig files should be linted.
      *
      * @var bool
@@ -60,6 +74,7 @@ class CICommands extends Tasks
         $this->customCodePaths = implode(' ', $this->getConfigurationValues('custom_code_paths'));
         $this->phpcsStandards = implode(',', $this->getConfigurationValues('phpcs_standards'));
         $this->lintTwigFiles = Robo::config()->get('twig_lint_enable') ?? true;
+        $this->phpcsPhpVersion = Robo::config()->get('phpcs_php_version', $this::PHPCS_DEFAULT_PHP_VERSION);
     }
 
     /**
@@ -133,8 +148,14 @@ class CICommands extends Tasks
         /** @var \Robo\Task\CommandStack $stack */
         $stack = $this->taskExecStack()->stopOnFail();
         $phpBinary = $applyFixes ? 'phpcbf' : 'phpcs';
+        // General PHP linting.
         $stack->exec("vendor/bin/$phpBinary --standard=$this->phpcsStandards --extensions=$this->phpcsCheckExtensions \
                 --ignore=$this->phpcsIgnorePaths $this->customCodePaths");
+        // Check for PHP version compatibility.
+        $stack->exec("vendor/bin/phpcs --standard=PHPCompatibility --severity=1 \
+                --ignore=$this->phpcsIgnorePaths --extensions=php,module,theme \
+                --runtime-set testVersion $this->phpcsPhpVersion- $this->customCodePaths");
+        // Lint Twig files.
         if ($this->lintTwigFiles) {
             $fixFlag = $applyFixes ? '--fix' : '';
             $stack->exec("vendor/bin/twig-cs-fixer lint $this->customCodePaths $fixFlag");
