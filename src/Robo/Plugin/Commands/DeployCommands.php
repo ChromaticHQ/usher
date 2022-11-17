@@ -125,7 +125,7 @@ class DeployCommands extends Tasks
             self::TUGBOAT_DASHBOARD_URL,
             getenv('TUGBOAT_PREVIEW_ID'),
         );
-        $text = sprintf('*Tugboat URL:* %s\n*Dashboard:* %s', getenv('TUGBOAT_SERVICE_URL'), $dashboard_url);
+        $text = sprintf('*Tugboat URL:* %s \n*Dashboard:* %s', getenv('TUGBOAT_SERVICE_URL'), $dashboard_url);
         $this->notifySlack('Tugboat', $text);
     }
 }
