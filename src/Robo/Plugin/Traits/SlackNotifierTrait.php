@@ -22,17 +22,19 @@ trait SlackNotifierTrait
      *
      * @param \Robo\Result $result
      *   The result of the task to check.
+     * @param bool $force
+     *   If the notification should be forced.
      *
      * @see https://docs.tugboatqa.com/starter-configs/code-snippets/slack-integration/
      */
-    public function notifySlackOnFailedBasePreviewBuild(Result $result): void
+    public function notifySlackOnFailedBasePreviewBuild(Result $result, bool $force = FALSE): void
     {
         // Confirm we are in a base preview.
-        if (!$this->isTugboatBasePreview()) {
+        if (!$this->isTugboatBasePreview() && !$force) {
             return;
         }
         // If everything went well there is nothing to do.
-        if ($result->wasSuccessful()) {
+        if ($result->wasSuccessful() && !$force) {
             $this->say('Skipping Slack notification since all tasks completed successfully.');
             return;
         }

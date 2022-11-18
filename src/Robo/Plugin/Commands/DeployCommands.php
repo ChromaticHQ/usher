@@ -58,6 +58,7 @@ class DeployCommands extends Tasks
      * @param array $opts
      *   The array of command line options.
      *     - 'tugboat': Run additional Tugboat specific logic.
+     *     - 'notify': Force the notification to Slack.
      *
      * @aliases deployd
      *
@@ -68,7 +69,7 @@ class DeployCommands extends Tasks
         string $appDirPath,
         string $siteName = 'default',
         string $docroot = 'web',
-        array $opts = ['tugboat' => false]
+        array $opts = ['tugboat' => false, 'notify' => false]
     ): Result {
         $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
@@ -83,7 +84,7 @@ class DeployCommands extends Tasks
             ->run();
         // Attempt to notify Slack if the "tugboat" option is supplied.
         if ($opts['tugboat']) {
-            $this->notifySlackOnFailedBasePreviewBuild($result);
+            $this->notifySlackOnFailedBasePreviewBuild($result, $opts['notify']);
         }
         return $result;
     }
