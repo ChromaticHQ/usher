@@ -126,7 +126,8 @@ class DeployCommands extends Tasks
             getenv('TUGBOAT_PREVIEW_ID'),
         );
         $text = sprintf(
-            "Tugboat URL: %s\nDashboard: %s",
+            "Tugboat Base Preview failed to build for %s\nPreview: %s\nDashboard: %s",
+            getenv('TUGBOAT_REPO'),
             getenv('TUGBOAT_SERVICE_URL'),
             $dashboard_url
         );
