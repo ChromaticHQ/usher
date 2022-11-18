@@ -125,7 +125,8 @@ class DeployCommands extends Tasks
             self::TUGBOAT_DASHBOARD_URL,
             getenv('TUGBOAT_PREVIEW_ID'),
         );
-        $text = sprintf("Tugboat URL: %s\nDashboard: %s",
+        $text = sprintf(
+            "Tugboat URL: %s\nDashboard: %s",
             getenv('TUGBOAT_SERVICE_URL'),
             $dashboard_url
         );
