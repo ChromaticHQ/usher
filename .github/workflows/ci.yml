@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        php: [7.4, 8.0, 8.1]
+        php: [7.4, 8.0, 8.1, 8.2]
 
     steps:
       - uses: actions/checkout@v3
@@ -26,20 +26,8 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install composer dependencies
-        run: composer install --no-progress
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v2"
 
       - name: PHP coding standards
         run: composer php-check
