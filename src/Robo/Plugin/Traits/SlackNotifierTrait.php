@@ -27,7 +27,7 @@ trait SlackNotifierTrait
      *
      * @see https://docs.tugboatqa.com/starter-configs/code-snippets/slack-integration/
      */
-    public function notifySlackOnFailedBasePreviewBuild(Result $result, bool $force): void
+    protected function notifySlackOnFailedBasePreviewBuild(Result $result, bool $force = false): void
     {
         // Confirm we are in a base preview.
         if (!$this->isTugboatBasePreview() && !$force) {

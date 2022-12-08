@@ -55,10 +55,13 @@ class DeployCommands extends Tasks
      *   The Drupal site shortname. Optional.
      * @param string $docroot
      *   The Drupal document root directory. Optional.
-     * @param array $opts
-     *   The array of command line options.
-     *     - 'tugboat': Run additional Tugboat specific logic.
-     *     - 'notify': Force the notification to Slack.
+     * @param array $options
+     *   The options.
+     *
+     * @option boolean $tugboat Default to false. Forces the command run as if
+     *   it was operating in a Tugboat base preview.
+     * @option boolean $notify Default to false. Forces the command to attempt
+     *   to notify Slack about a failed deployment.
      *
      * @aliases deployd
      *
@@ -69,7 +72,7 @@ class DeployCommands extends Tasks
         string $appDirPath,
         string $siteName = 'default',
         string $docroot = 'web',
-        array $opts = ['tugboat' => false, 'notify' => false]
+        array $options = ['tugboat' => false, 'notify' => false]
     ): Result {
         $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
@@ -83,8 +86,8 @@ class DeployCommands extends Tasks
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
         // Attempt to notify Slack if the "tugboat" option is supplied.
-        if ($opts['tugboat']) {
-            $this->notifySlackOnFailedBasePreviewBuild($result, $opts['notify']);
+        if ($options['tugboat']) {
+            $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify']);
         }
         return $result;
     }
