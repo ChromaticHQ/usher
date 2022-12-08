@@ -90,7 +90,6 @@ trait SlackNotifierTrait
     {
         // Confirm we are in a Tugboat environment.
         if (getenv('TUGBOAT_PREVIEW_ID') === false) {
-            $this->say('No Tugboat preview ID was found.');
             return false;
         }
         // Determine if we are building a base preview.
