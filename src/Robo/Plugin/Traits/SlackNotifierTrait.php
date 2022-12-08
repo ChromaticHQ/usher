@@ -45,7 +45,7 @@ trait SlackNotifierTrait
             getenv('TUGBOAT_PREVIEW_ID'),
         );
         $text = sprintf(
-            "Tugboat Base Preview failed to build for %s\nPreview: %s\nDashboard: %s",
+            "Tugboat Base Preview failed to build for *%s*\n*Preview*: %s\n*Dashboard*: %s",
             getenv('TUGBOAT_REPO'),
             getenv('TUGBOAT_SERVICE_URL'),
             $dashboard_url
@@ -84,6 +84,7 @@ trait SlackNotifierTrait
      * Determine if we are in a Tugboat base preview.
      *
      * @return bool
+     *   Boolean indicating if we are interacting with a Tugboat base preview.
      */
     protected function isTugboatBasePreview(): bool
     {

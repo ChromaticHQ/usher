@@ -58,10 +58,10 @@ class DeployCommands extends Tasks
      * @param array $options
      *   The options.
      *
-     * @option boolean $tugboat Default to false. Forces the command run as if
-     *   it was operating in a Tugboat base preview.
-     * @option boolean $notify Default to false. Forces the command to attempt
-     *   to notify Slack about a failed deployment.
+     * @option bool $notify-slack Default to true. If false, the Slack
+     *   notification will not be sent on build failure.
+     * @option bool $notify-slack-force Default to false. If true, it will force
+     *   an attempt to notify Slack about the build regardless of what happened.
      *
      * @aliases deployd
      *
@@ -72,22 +72,22 @@ class DeployCommands extends Tasks
         string $appDirPath,
         string $siteName = 'default',
         string $docroot = 'web',
-        array $options = ['tugboat' => false, 'notify' => false]
+        array $options = ['notify-slack' => true, 'notify-slack-force' => false]
     ): Result {
         $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
             ->exec("$appDirPath/vendor/bin/drush deploy --yes")
             // Import the latest configuration again. This includes the latest
-            // configuration_split configuration. Importing this twice ensures that
-            // the latter command enables and disables modules based upon the most up
-            // to date configuration. Additional information and discussion can be
-            // found here:
+            // configuration_split configuration. Importing this twice ensures
+            // that the latter command enables and disables modules based upon
+            // the most up-to-date configuration. Additional information and
+            // discussion can be found here:
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
-        // Attempt to notify Slack if the "tugboat" option is supplied.
-        if ($options['tugboat']) {
-            $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify']);
+        // Trigger notifications if the build fails in Tugboat.
+        if ($options['notify-slack'] || $options['notify-slack-force']) {
+            $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify-slack-force']);
         }
         return $result;
     }
