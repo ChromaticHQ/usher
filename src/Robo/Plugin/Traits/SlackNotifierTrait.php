@@ -45,10 +45,9 @@ trait SlackNotifierTrait
             getenv('TUGBOAT_PREVIEW_ID'),
         );
         $text = sprintf(
-            "Tugboat Base Preview failed to build for *%s*\n*Preview*: %s\n*Dashboard*: %s",
-            getenv('TUGBOAT_REPO'),
-            getenv('TUGBOAT_SERVICE_URL'),
-            $dashboard_url
+            "Tugboat [Base Preview](%s) failed to build for *%s*.",
+            $dashboard_url,
+            getenv('TUGBOAT_REPO')
         );
         $this->sendSlackNotification('Tugboat', $text);
     }

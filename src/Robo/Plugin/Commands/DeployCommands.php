@@ -85,10 +85,6 @@ class DeployCommands extends Tasks
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
-        // Trigger notifications if the build fails in Tugboat.
-        if ($options['notify-slack'] || $options['notify-slack-force']) {
-            $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify-slack-force']);
-        }
         return $result;
     }
 }
