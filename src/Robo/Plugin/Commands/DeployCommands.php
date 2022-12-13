@@ -72,7 +72,7 @@ class DeployCommands extends Tasks
         string $appDirPath,
         string $siteName = 'default',
         string $docroot = 'web',
-        array $options = ['notify-slack' => true, 'notify-slack-force' => false]
+        array $options = ['notify-slack' => false, 'notify-slack-force' => false]
     ): Result {
         $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
@@ -85,6 +85,10 @@ class DeployCommands extends Tasks
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
+        // Notify Slack about the failed deployment if the option was provided.
+        if ($options['notify-slack'] || $options['notify-slack-force']) {
+            $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify-slack-force']);
+        }
         return $result;
     }
 }

@@ -3,6 +3,7 @@
 namespace Usher\Robo\Plugin\Traits;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Robo\Result;
 
 /**
@@ -75,8 +76,13 @@ trait SlackNotifierTrait
             'text' => $text,
         ];
         // Send the Slack webhook call.
-        $client = new Client(['timeout' => 5]);
-        $client->post($slack_webhook_url, ['body' => json_encode($payload)]);
+        try {
+            $client = new Client(['timeout' => 5]);
+            $client->post($slack_webhook_url, ['body' => json_encode($payload)]);
+        }
+        catch (RequestException $exception) {
+            $this->yell('Slack webhook request failed.');
+        }
     }
 
     /**
