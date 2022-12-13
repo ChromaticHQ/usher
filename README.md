@@ -55,6 +55,10 @@ which includes:
 1. `drush deploy`
 1. `drush config:import`
 
+#### Options
+- `notify-slack` - Default to false. If true, Slack notification will be sent on build failure in Tugboat.
+- `notify-slack-force` - Default to false. If true, it will force an attempt to notify Slack about the build regardless of what happened.
+
 ## Extending
 
 You can use this package for the basics and then build upon it. New commands

@@ -58,8 +58,8 @@ class DeployCommands extends Tasks
      * @param array $options
      *   The options.
      *
-     * @option bool $notify-slack Default to true. If false, the Slack
-     *   notification will not be sent on build failure.
+     * @option bool $notify-slack Default to false. If true, Slack
+     *   notification will be sent on build failure in Tugboat.
      * @option bool $notify-slack-force Default to false. If true, it will force
      *   an attempt to notify Slack about the build regardless of what happened.
      *
