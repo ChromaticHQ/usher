@@ -55,9 +55,14 @@ which includes:
 1. `drush deploy`
 1. `drush config:import`
 
-#### Options
-- `notify-slack` - Default to false. If true, Slack notification will be sent on build failure in Tugboat.
-- `notify-slack-force` - Default to false. If true, it will force an attempt to notify Slack about the build regardless of what happened.
+#### Slack Notification Options
+
+If you would like to have Usher send a notification to Slack, you need to [create a Slack app in your workspace](https://api.slack.com/apps), and then add an "incoming webhook" for the channel where you would like the notification sent. When you create the webhook, Slack will provide you with a unique URL for that channel. You must then set the `SLACK_WEBHOOK_URL` environment variable to the Slack webhook URL in whatever environment Usher is running in.
+
+Sample webhook URL: `https://hooks.slack.com/services/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`
+
+- `notify-slack` - Default to `false`. If `true`, Slack notification will be sent on build failure in Tugboat.
+- `notify-slack-force` - Default to `false`. If `true`, it will force an attempt to notify Slack about the build regardless of what happened.
 
 ## Extending
 
