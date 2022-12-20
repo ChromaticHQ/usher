@@ -4,7 +4,7 @@ on:  # yamllint disable-line rule:truthy
   # Trigger the workflow on pushes to the main branch and all pull requests.
   push:
     branches:
-      - 2.x
+      - **.x
   pull_request:
 
 jobs:
