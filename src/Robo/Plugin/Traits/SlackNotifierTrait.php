@@ -98,7 +98,6 @@ trait SlackNotifierTrait
         }
         // Determine if we are building a base preview.
         if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID')) {
-            $this->say('No Tugboat base preview found.');
             return false;
         }
         return true;
