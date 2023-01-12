@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Commands;
 
 use Robo\Result;
 use Robo\Tasks;
+use Usher\Robo\Plugin\Traits\GitHubNotifierTrait;
 use Usher\Robo\Plugin\Traits\SlackNotifierTrait;
 
 /**
@@ -11,6 +12,7 @@ use Usher\Robo\Plugin\Traits\SlackNotifierTrait;
  */
 class DeployCommands extends Tasks
 {
+    use GitHubNotifierTrait;
     use SlackNotifierTrait;
 
     /**
@@ -74,6 +76,14 @@ class DeployCommands extends Tasks
         string $docroot = 'web',
         array $options = ['notify-slack' => false, 'notify-slack-force' => false]
     ): Result {
+        $requiredButDisabled = $this->validateGDSupport();
+        if (count($requiredButDisabled) > 0) {
+            $errorMessage = 'The following GD libraries are not enabled in this environment: \n';
+            foreach ($requiredButDisabled as $item) {
+                $errorMessage += "* $item\n";
+            }
+            $this->notifyGitHubPR($errorMessage);
+        }
         $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
             ->exec("$appDirPath/vendor/bin/drush deploy --yes")
@@ -90,5 +100,25 @@ class DeployCommands extends Tasks
             $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify-slack-force']);
         }
         return $result;
+    }
+
+    protected function validateGDSupport(): array
+    {
+        $requiredSupport = [
+            'FreeType Support',
+            'JPEG Support',
+            'PNG Support',
+            'WebP Support',
+        ];
+        $gdInfo = gd_info();
+        // @TODO: Remove test failure.
+        $gdInfo['JPEG Support'] = false;
+        $unsupportedTypes = [];
+        foreach ($gdInfo as $type => $supported) {
+            if ($supported == false) {
+                $unsupportedTypes[] = $type;
+            }
+        }
+        return array_intersect($requiredSupport, $unsupportedTypes);
     }
 }
