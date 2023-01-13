@@ -80,7 +80,7 @@ class DeployCommands extends Tasks
         if (count($requiredButDisabled) > 0) {
             $errorMessage = 'The following GD libraries are not enabled in this environment: \n';
             foreach ($requiredButDisabled as $item) {
-                $errorMessage += "* $item\n";
+                $errorMessage .= "* $item\n";
             }
             $this->notifyGitHubPR($errorMessage);
         }
