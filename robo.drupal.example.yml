@@ -5,6 +5,8 @@ custom_code_paths:
   - 'web/modules/custom'
   - 'web/themes/custom'
   - 'web/sites/*/themes'
+drupal_status_report_ignore_checks:
+  - update_core
 phpcs_check_extensions:
   - php
   - module
