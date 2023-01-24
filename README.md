@@ -33,8 +33,8 @@ can call robo easily with `composer robo`:
 
 ### `robo dev:refresh`
 
-The `dev:refresh` command (often available in downstream repos as
-`composer robo dev:refresh SITENAME`) refreshes your local Lando environment
+The `dev:refresh` command, often available in downstream repos as
+`composer robo dev:refresh SITENAME`, refreshes your local Lando environment
 which includes:
 
 1. `composer install`
@@ -48,12 +48,28 @@ which includes:
 
 ### `robo deploy:drupal`
 
-The `deploy:drupal` command (often available in downstream repos as
-`composer robo deploy:drupal SITENAME DOCROOT`) deploys Drupal in a standardized way
+The `deploy:drupal` command, often available in downstream repos as
+`composer robo deploy:drupal SITENAME DOCROOT`, deploys Drupal in a standardized way
 which includes:
 
 1. `drush deploy`
 1. `drush config:import`
+
+### `robo drupal:status-report`
+
+The `drupal:status-report` command, often available in downstream repos as
+`composer robo drupal:status-report`, checks Drupal's status report and reports
+warnings and errors. Specific warnings or errors can be ignored by adding the
+warning/error ID to the `drupal_status_report_ignore_checks` key in the
+downstream repository's `robo.yml` config file. For example:
+
+```yaml
+drupal_status_report_ignore_checks:
+  - update_core
+```
+
+To identify the ID's in question, run `drush status-report --format=yaml`. The
+output will include the ID's.
 
 #### Slack Notification Options
 
