@@ -45,9 +45,17 @@ class DrupalStatusReportCommands extends Tasks
      */
     public function drupalStatusReport($siteDir = 'default', $severity = 1): void
     {
-        $ignoreList = implode(',', Robo::config()->get('drupal_status_report_ignore_checks'));
-        $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush status-report --format=json
-            --severity=$severity --ignore=$ignoreList")
+        $cmd = [
+            "$this->drupalRoot/../vendor/bin/drush",
+            "status-report",
+            "--format=json",
+            "--severity=$severity",
+        ];
+        if (is_array($ignoreArray = Robo::config()->get('drupal_status_report_ignore_checks'))) {
+            $ignoreList = implode(',', $ignoreArray);
+            $cmd[] = "--ignore=$ignoreList";
+        }
+        $result = $this->taskExec(implode(' ', $cmd))
             ->dir("$this->drupalRoot/sites/$siteDir/")
             ->printOutput(false)
             ->run();
