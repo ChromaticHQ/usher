@@ -6,18 +6,28 @@ use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
 use Robo\Robo;
 use Robo\Tasks;
+use Usher\Robo\Plugin\Traits\GitHubStatusTrait;
 
 /**
  * Robo commands to work with Drupal's status report.
  */
 class DrupalStatusReportCommands extends Tasks
 {
+    use GitHubStatusTrait;
+
     /**
      * Drupal root directory.
      *
      * @var string
      */
     protected $drupalRoot;
+
+    /**
+     * The name of the GitHub status check, if set.
+     *
+     * @var string
+     */
+    protected $gitHubStatusCheckName = 'ci/drupal-status-report';
 
     /**
      * Class constructor.
@@ -43,8 +53,14 @@ class DrupalStatusReportCommands extends Tasks
      *
      * @throws \Robo\Exception\TaskException
      */
-    public function drupalStatusReport($siteDir = 'default', $severity = 1): void
-    {
+    public function drupalStatusReport(
+        $siteDir = 'default',
+        $severity = 1,
+        array $options = ['set-pr-status' => false]
+    ): void {
+        if ($options['set-pr-status']) {
+            $this->setGitHubStatusPending($this->gitHubStatusCheckName);
+        }
         $cmd = [
             "$this->drupalRoot/../vendor/bin/drush",
             "status-report",
@@ -63,11 +79,17 @@ class DrupalStatusReportCommands extends Tasks
         $reportJson = json_decode($drushOutput);
         if (!is_array($reportJson) || count($reportJson) > 0) {
             $this->say($drushOutput);
+            if ($options['set-pr-status']) {
+                $this->setGitHubStatusError($this->gitHubStatusCheckName);
+            }
             throw new TaskException(
                 $this,
                 'Drupal status report shows one or more unexpected warnings or errors!'
             );
         }
         $this->say('Drupal status report shows no unexpected warnings or errors.');
+        if ($options['set-pr-status']) {
+            $this->setGitHubStatusSuccess($this->gitHubStatusCheckName);
+        }
     }
 }
