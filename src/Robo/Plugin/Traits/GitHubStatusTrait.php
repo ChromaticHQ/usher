@@ -13,18 +13,24 @@ trait GitHubStatusTrait
 {
     /**
      * The error value when setting a GitHub check status.
+     *
+     * @var string
      */
-    protected const CHECK_STATUS_ERROR = 'error';
+    protected $checkStatusError = 'error';
 
     /**
      * The pending value when setting a GitHub check status.
+     *
+     * @var string
      */
-    protected const CHECK_STATUS_PENDING = 'pending';
+    protected $checkStatusPending = 'pending';
 
     /**
      * The success value when setting a GitHub check status.
+     *
+     * @var string
      */
-    protected const CHECK_STATUS_SUCCESS = 'success';
+    protected $checkStatusSuccess = 'success';
 
     /**
      * The GitHub API Base URL.
@@ -49,7 +55,7 @@ trait GitHubStatusTrait
     protected function setGitHubStatusPending(string $gitHubCheckName): void
     {
         $this->say('Setting pending status.');
-        $this->setGitHubStatus(self::CHECK_STATUS_PENDING, $gitHubCheckName);
+        $this->setGitHubStatus($this->checkStatusPending, $gitHubCheckName);
     }
 
     /**
@@ -62,7 +68,7 @@ trait GitHubStatusTrait
     {
         $this->say('Setting success status.');
         $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
-        $this->setGitHubStatus(self::CHECK_STATUS_SUCCESS, $gitHubCheckName, $checkDescription);
+        $this->setGitHubStatus($this->checkStatusSuccess, $gitHubCheckName, $checkDescription);
     }
 
     /**
@@ -75,7 +81,7 @@ trait GitHubStatusTrait
     {
         $this->say('Setting failure status.');
         $checkDescription = 'Drupal status report shows one or more unexpected warnings or errors.';
-        $this->setGitHubStatus(self::CHECK_STATUS_ERROR, $gitHubCheckName, $checkDescription);
+        $this->setGitHubStatus($this->checkStatusError, $gitHubCheckName, $checkDescription);
     }
 
     /**
