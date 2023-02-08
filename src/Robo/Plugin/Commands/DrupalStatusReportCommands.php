@@ -46,48 +46,54 @@ class DrupalStatusReportCommands extends Tasks
     /**
      * Validate Drupal status report.
      *
-     * @param string $siteDir
-     *   The Drupal site directory.
+     * @param string $siteDirs
+     *   A comma separated list of Drupal site directories.
      * @param int $severity
      *   The minimum severity level to show. Defaults to 1 (warning).
+     * @option set-pr-status
+     *   Use this flag in Tugboat environments to set .
      *
      * @throws \Robo\Exception\TaskException
      */
     public function drupalStatusReport(
-        $siteDir = 'default',
+        $siteDirs = 'default',
         $severity = 1,
         array $options = ['set-pr-status' => false]
     ): void {
         if ($options['set-pr-status']) {
             $this->setGitHubStatusPending($this->gitHubStatusCheckName);
         }
-        $cmd = [
-            "$this->drupalRoot/../vendor/bin/drush",
-            "status-report",
-            "--format=json",
-            "--severity=$severity",
-        ];
-        if (is_array($ignoreArray = Robo::config()->get('drupal_status_report_ignore_checks'))) {
-            $ignoreList = implode(',', $ignoreArray);
-            $cmd[] = "--ignore=$ignoreList";
-        }
-        $result = $this->taskExec(implode(' ', $cmd))
-            ->dir("$this->drupalRoot/sites/$siteDir/")
-            ->printOutput(false)
-            ->run();
-        $drushOutput = trim($result->getOutputData());
-        $reportJson = json_decode($drushOutput);
-        if (!is_array($reportJson) || count($reportJson) > 0) {
-            $this->say($drushOutput);
-            if ($options['set-pr-status']) {
-                $this->setGitHubStatusError($this->gitHubStatusCheckName);
+        $sites = explode(',', $siteDirs);
+        foreach ($sites as $siteDir) {
+            $cmd = [
+                "$this->drupalRoot/../vendor/bin/drush",
+                "status-report",
+                "--format=json",
+                "--severity=$severity",
+            ];
+            if (is_array($ignoreArray = Robo::config()->get('drupal_status_report_ignore_checks'))) {
+                $ignoreList = implode(',', $ignoreArray);
+                $cmd[] = "--ignore=$ignoreList";
             }
-            throw new TaskException(
-                $this,
-                'Drupal status report shows one or more unexpected warnings or errors!'
-            );
+            $result = $this->taskExec(implode(' ', $cmd))
+                ->dir("$this->drupalRoot/sites/$siteDir/")
+                ->printOutput(false)
+                ->run();
+            $drushOutput = trim($result->getOutputData());
+            $reportJson = json_decode($drushOutput);
+            if (!is_array($reportJson) || count($reportJson) > 0) {
+                $this->say($drushOutput);
+                if ($options['set-pr-status']) {
+                    $this->setGitHubStatusError($this->gitHubStatusCheckName);
+                }
+                throw new TaskException(
+                    $this,
+                    'Drupal status report shows one or more unexpected warnings or errors!'
+                );
+            }
         }
-        $this->say('Drupal status report shows no unexpected warnings or errors.');
+
+        $this->say('Drupal status report(s) show no unexpected warnings or errors.');
         if ($options['set-pr-status']) {
             $this->setGitHubStatusSuccess($this->gitHubStatusCheckName);
         }
