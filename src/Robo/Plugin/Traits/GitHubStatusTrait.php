@@ -78,7 +78,7 @@ trait GitHubStatusTrait
     private function setGitHubStatus(
         string $state,
         string $gitHubCheckName,
-        string $checkDescription = '',
+        string $checkDescription = ''
     ): void {
         $tugboatPreviewID = getenv('TUGBOAT_PREVIEW_ID');
         $tugboatPreviewSHA = getenv('TUGBOAT_PREVIEW_SHA');
