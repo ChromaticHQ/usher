@@ -12,6 +12,21 @@ use Robo\Result;
 trait GitHubStatusTrait
 {
     /**
+     * The error value when setting a GitHub check status.
+     */
+    protected const CHECK_STATUS_ERROR = 'error';
+
+    /**
+     * The pending value when setting a GitHub check status.
+     */
+    protected const CHECK_STATUS_PENDING = 'pending';
+
+    /**
+     * The success value when setting a GitHub check status.
+     */
+    protected const CHECK_STATUS_SUCCESS = 'success';
+
+    /**
      * The GitHub API Base URL.
      *
      * @var string
@@ -34,7 +49,7 @@ trait GitHubStatusTrait
     protected function setGitHubStatusPending(string $gitHubCheckName): void
     {
         $this->say('Setting pending status.');
-        $this->setGitHubStatus('pending', $gitHubCheckName);
+        $this->setGitHubStatus(self::CHECK_STATUS_PENDING, $gitHubCheckName);
     }
 
     /**
@@ -47,7 +62,7 @@ trait GitHubStatusTrait
     {
         $this->say('Setting success status.');
         $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
-        $this->setGitHubStatus('success', $gitHubCheckName, $checkDescription);
+        $this->setGitHubStatus(self::CHECK_STATUS_SUCCESS, $gitHubCheckName, $checkDescription);
     }
 
     /**
@@ -60,7 +75,7 @@ trait GitHubStatusTrait
     {
         $this->say('Setting failure status.');
         $checkDescription = 'Drupal status report shows one or more unexpected warnings or errors.';
-        $this->setGitHubStatus('error', $gitHubCheckName, $checkDescription);
+        $this->setGitHubStatus(self::CHECK_STATUS_ERROR, $gitHubCheckName, $checkDescription);
     }
 
     /**
