@@ -5,6 +5,7 @@ namespace Usher\Robo\Plugin\Commands;
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
 use Robo\Robo;
+use Robo\Result;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\GitHubStatusTrait;
 
@@ -54,18 +55,23 @@ class DrupalStatusReportCommands extends Tasks
      *   Use this flag in Tugboat environments to set the GitHub status check
      *   on the associated pull request.
      *
+     * @return \Robo\Result
+     *   The result of the collection of tasks.
+     *
      * @throws \Robo\Exception\TaskException
      */
     public function drupalStatusReport(
         $siteDirs = 'default',
         $severity = 1,
         array $options = ['set-pr-status' => false],
-    ): void {
+    ): Result {
         $this->io()->title('drupal status report.');
 
         if ($options['set-pr-status']) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }
+
+        $result = null;
         $sites = explode(',', $siteDirs);
         foreach ($sites as $siteDir) {
             $cmd = [
@@ -104,5 +110,6 @@ class DrupalStatusReportCommands extends Tasks
             $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
             $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, $checkDescription);
         }
+        return $result;
     }
 }

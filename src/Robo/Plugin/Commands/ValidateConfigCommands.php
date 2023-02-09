@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Commands;
 
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
+use Robo\Result;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\GitHubStatusTrait;
 
@@ -52,15 +53,20 @@ class ValidateConfigCommands extends Tasks
      *   on the associated pull request.
      * @aliases vdc
      *
+     * @return \Robo\Result
+     *   The result of the collection of tasks.
+     *
      * @throws \Robo\Exception\TaskException
      */
-    public function validateDrupalConfig($siteDirs = 'default', array $options = ['set-pr-status' => false]): void
+    public function validateDrupalConfig($siteDirs = 'default', array $options = ['set-pr-status' => false]): Result
     {
         $this->io()->title('validate drupal configuration.');
 
         if ($options['set-pr-status']) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }
+
+        $result = null;
         $sites = explode(',', $siteDirs);
         foreach ($sites as $siteDir) {
             // Clear the "config" cache bin before we verify config status to
@@ -92,5 +98,6 @@ class ValidateConfigCommands extends Tasks
         if ($options['set-pr-status']) {
             $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation passed!');
         }
+        return $result;
     }
 }
