@@ -17,7 +17,7 @@ class CICommands extends Tasks
      *
      * @var string
      */
-    protected const PHPCS_DEFAULT_PHP_VERSION = '8.0';
+    protected const PHPCS_DEFAULT_PHP_VERSION = '8.1';
 
     /**
      * A comma separated list of the file extensions PHPCS should check.
@@ -152,6 +152,9 @@ class CICommands extends Tasks
         $stack->exec("vendor/bin/$phpBinary --standard=$this->phpcsStandards --extensions=$this->phpcsCheckExtensions \
                 --ignore=$this->phpcsIgnorePaths $this->customCodePaths");
         // Check for PHP version compatibility.
+        // The trailing dash after the version runs checks for the specified
+        // version and above.
+        // @see https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions
         $stack->exec("vendor/bin/phpcs --standard=PHPCompatibility --severity=1 \
                 --ignore=$this->phpcsIgnorePaths --extensions=php,module,theme \
                 --runtime-set testVersion $this->phpcsPhpVersion- $this->customCodePaths");
