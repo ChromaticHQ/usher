@@ -63,12 +63,13 @@ trait GitHubStatusTrait
      *
      * @param string $gitHubCheckName
      *   The name of the status check.
+     * @param string $gitHubCheckDescription
+     *   The description text to associate with the status check.
      */
-    protected function setGitHubStatusSuccess(string $gitHubCheckName): void
+    protected function setGitHubStatusSuccess(string $gitHubCheckName, string $gitHubCheckDescription): void
     {
         $this->say('Setting success status.');
-        $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
-        $this->setGitHubStatus($this->checkStatusSuccess, $gitHubCheckName, $checkDescription);
+        $this->setGitHubStatus($this->checkStatusSuccess, $gitHubCheckName, $gitHubCheckDescription);
     }
 
     /**
@@ -76,12 +77,13 @@ trait GitHubStatusTrait
      *
      * @param string $gitHubCheckName
      *   The name of the status check.
+     * @param string $gitHubCheckDescription
+     *   The description text to associate with the status check.
      */
-    protected function setGitHubStatusError(string $gitHubCheckName): void
+    protected function setGitHubStatusError(string $gitHubCheckName, string $gitHubCheckDescription): void
     {
         $this->say('Setting failure status.');
-        $checkDescription = 'Drupal status report shows one or more unexpected warnings or errors.';
-        $this->setGitHubStatus($this->checkStatusError, $gitHubCheckName, $checkDescription);
+        $this->setGitHubStatus($this->checkStatusError, $gitHubCheckName, $gitHubCheckDescription);
     }
 
     /**

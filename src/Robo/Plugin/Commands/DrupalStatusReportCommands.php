@@ -27,6 +27,7 @@ class DrupalStatusReportCommands extends Tasks
      *
      * @var string
      */
+    // @TODO: switch to constant.
     protected $gitHubStatusCheckName = 'ci/drupal-status-report';
 
     /**
@@ -51,7 +52,8 @@ class DrupalStatusReportCommands extends Tasks
      * @param int $severity
      *   The minimum severity level to show. Defaults to 1 (warning).
      * @option set-pr-status
-     *   Use this flag in Tugboat environments to set .
+     *   Use this flag in Tugboat environments to set the GitHub status check
+     *   on the associated pull request.
      *
      * @throws \Robo\Exception\TaskException
      */
@@ -84,7 +86,10 @@ class DrupalStatusReportCommands extends Tasks
             if (!is_array($reportJson) || count($reportJson) > 0) {
                 $this->say($drushOutput);
                 if ($options['set-pr-status']) {
-                    $this->setGitHubStatusError($this->gitHubStatusCheckName);
+                    $this->setGitHubStatusError(
+                        $this->gitHubStatusCheckName,
+                        'Drupal status report shows one or more unexpected warnings or errors.'
+                    );
                 }
                 throw new TaskException(
                     $this,
@@ -95,7 +100,8 @@ class DrupalStatusReportCommands extends Tasks
 
         $this->say('Drupal status report(s) show no unexpected warnings or errors.');
         if ($options['set-pr-status']) {
-            $this->setGitHubStatusSuccess($this->gitHubStatusCheckName);
+            $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
+            $this->setGitHubStatusSuccess($this->gitHubStatusCheckName, $checkDescription);
         }
     }
 }
