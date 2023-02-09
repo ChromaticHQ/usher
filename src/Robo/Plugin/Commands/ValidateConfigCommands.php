@@ -56,6 +56,8 @@ class ValidateConfigCommands extends Tasks
      */
     public function validateDrupalConfig($siteDirs = 'default', array $options = ['set-pr-status' => false]): void
     {
+        $this->io()->title('validate drupal configuration.');
+
         if ($options['set-pr-status']) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }

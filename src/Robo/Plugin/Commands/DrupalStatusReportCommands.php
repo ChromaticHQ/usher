@@ -61,6 +61,8 @@ class DrupalStatusReportCommands extends Tasks
         $severity = 1,
         array $options = ['set-pr-status' => false]
     ): void {
+        $this->io()->title('drupal status report.');
+
         if ($options['set-pr-status']) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }

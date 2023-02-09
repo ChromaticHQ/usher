@@ -54,7 +54,7 @@ trait GitHubStatusTrait
      */
     protected function setGitHubStatusPending(string $gitHubCheckName): void
     {
-        $this->say('Setting pending status.');
+        $this->yell("Setting pending status: $gitHubCheckName");
         $this->setGitHubStatus($this->checkStatusPending, $gitHubCheckName);
     }
 
@@ -68,7 +68,8 @@ trait GitHubStatusTrait
      */
     protected function setGitHubStatusSuccess(string $gitHubCheckName, string $gitHubCheckDescription): void
     {
-        $this->say('Setting success status.');
+        $this->yell("Setting success status: $gitHubCheckName");
+        $this->say($gitHubCheckDescription);
         $this->setGitHubStatus($this->checkStatusSuccess, $gitHubCheckName, $gitHubCheckDescription);
     }
 
@@ -82,7 +83,8 @@ trait GitHubStatusTrait
      */
     protected function setGitHubStatusError(string $gitHubCheckName, string $gitHubCheckDescription): void
     {
-        $this->say('Setting failure status.');
+        $this->yell("Setting failure status: $gitHubCheckName");
+        $this->say($gitHubCheckDescription);
         $this->setGitHubStatus($this->checkStatusError, $gitHubCheckName, $gitHubCheckDescription);
     }
 
