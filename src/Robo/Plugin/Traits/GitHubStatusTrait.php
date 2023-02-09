@@ -125,7 +125,9 @@ trait GitHubStatusTrait
             $client = new Client(['timeout' => 5]);
             $client->post($githubStatusUrl, [
                 'headers' => [
-                    'Authorization:' => "token $gitHubAccessToken"
+                    'Accept' => 'application/vnd.github+json',
+                    'Authorization' => "Bearer $gitHubAccessToken",
+                    'X-GitHub-Api-Version' => '2022-11-28',
                 ],
                 'body' => json_encode($payload),
             ]);
