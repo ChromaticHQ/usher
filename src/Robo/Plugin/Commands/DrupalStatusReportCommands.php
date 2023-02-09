@@ -59,7 +59,7 @@ class DrupalStatusReportCommands extends Tasks
     public function drupalStatusReport(
         $siteDirs = 'default',
         $severity = 1,
-        array $options = ['set-pr-status' => false]
+        array $options = ['set-pr-status' => false],
     ): void {
         $this->io()->title('drupal status report.');
 

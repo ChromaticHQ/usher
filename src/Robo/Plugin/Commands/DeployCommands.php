@@ -72,7 +72,7 @@ class DeployCommands extends Tasks
         string $appDirPath,
         string $siteName = 'default',
         string $docroot = 'web',
-        array $options = ['notify-slack' => false, 'notify-slack-force' => false]
+        array $options = ['notify-slack' => false, 'notify-slack-force' => false],
     ): Result {
         $result = $this->taskExecStack()
             ->dir("$appDirPath/$docroot/sites/$siteName")
