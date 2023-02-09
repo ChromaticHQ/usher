@@ -16,19 +16,18 @@ class DrupalStatusReportCommands extends Tasks
     use GitHubStatusTrait;
 
     /**
+     * The name of the GitHub status check, if set.
+     *
+     * @var string
+     */
+    protected const GITHUB_STATUS_CHECK_NAME = 'ci/drupal-status-report';
+
+    /**
      * Drupal root directory.
      *
      * @var string
      */
     protected $drupalRoot;
-
-    /**
-     * The name of the GitHub status check, if set.
-     *
-     * @var string
-     */
-    // @TODO: switch to constant.
-    protected $gitHubStatusCheckName = 'ci/drupal-status-report';
 
     /**
      * Class constructor.
@@ -63,7 +62,7 @@ class DrupalStatusReportCommands extends Tasks
         array $options = ['set-pr-status' => false]
     ): void {
         if ($options['set-pr-status']) {
-            $this->setGitHubStatusPending($this->gitHubStatusCheckName);
+            $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }
         $sites = explode(',', $siteDirs);
         foreach ($sites as $siteDir) {
@@ -87,7 +86,7 @@ class DrupalStatusReportCommands extends Tasks
                 $this->say($drushOutput);
                 if ($options['set-pr-status']) {
                     $this->setGitHubStatusError(
-                        $this->gitHubStatusCheckName,
+                        self::GITHUB_STATUS_CHECK_NAME,
                         'Drupal status report shows one or more unexpected warnings or errors.'
                     );
                 }
@@ -101,7 +100,7 @@ class DrupalStatusReportCommands extends Tasks
         $this->say('Drupal status report(s) show no unexpected warnings or errors.');
         if ($options['set-pr-status']) {
             $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
-            $this->setGitHubStatusSuccess($this->gitHubStatusCheckName, $checkDescription);
+            $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, $checkDescription);
         }
     }
 }
