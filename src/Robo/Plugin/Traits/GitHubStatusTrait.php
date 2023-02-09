@@ -100,7 +100,7 @@ trait GitHubStatusTrait
      *
      * @see https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28#create-a-commit-status
      */
-    private function setGitHubStatus(
+    protected function setGitHubStatus(
         string $state,
         string $gitHubCheckName,
         string $checkDescription = ''
@@ -113,13 +113,13 @@ trait GitHubStatusTrait
         $githubStatusUrl = "$this->githuApiBaseUrl/repos/$gitHubOrg/$gitHubRepo/statuses/$tugboatPreviewSHA";
 
         $gitHubAccessToken = getenv('GITHUB_ACCESS_TOKEN');
-        $payload = [
+        $body = [
             'state' => $state,
-            'context', "ci\\$gitHubCheckName",
+            'context', $gitHubCheckName,
         ];
         if (strlen($checkDescription) > 0) {
-            $payload['description'] = $checkDescription;
-            $payload['target_url'] = "$this->tugboatDashboardUrl/$tugboatPreviewID";
+            $body['description'] = $checkDescription;
+            $body['target_url'] = "$this->tugboatDashboardUrl/$tugboatPreviewID";
         }
         try {
             $client = new Client(['timeout' => 5]);
@@ -130,6 +130,7 @@ trait GitHubStatusTrait
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
                 'body' => json_encode($payload),
+                'debug' => true,
             ]);
         } catch (RequestException $exception) {
             $this->yell('GitHub status request failed.');
