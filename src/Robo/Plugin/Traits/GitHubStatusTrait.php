@@ -129,7 +129,7 @@ trait GitHubStatusTrait
                     'Authorization' => "Bearer $gitHubAccessToken",
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
-                'body' => json_encode($payload),
+                'body' => $body,
                 'debug' => true,
             ]);
         } catch (RequestException $exception) {
