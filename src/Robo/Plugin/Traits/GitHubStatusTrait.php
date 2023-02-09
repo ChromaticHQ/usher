@@ -115,11 +115,11 @@ trait GitHubStatusTrait
         $gitHubAccessToken = getenv('GITHUB_ACCESS_TOKEN');
         $body = [
             'state' => $state,
-            'context', $gitHubCheckName,
+            'context' => $gitHubCheckName,
+            'target_url' => "$this->tugboatDashboardUrl/$tugboatPreviewID",
         ];
         if (strlen($checkDescription) > 0) {
             $body['description'] = $checkDescription;
-            $body['target_url'] = "$this->tugboatDashboardUrl/$tugboatPreviewID";
         }
         try {
             $client = new Client(['timeout' => 5]);
@@ -129,11 +129,12 @@ trait GitHubStatusTrait
                     'Authorization' => "Bearer $gitHubAccessToken",
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
-                'body' => $body,
+                'body' => json_encode($body),
                 'debug' => true,
             ]);
         } catch (RequestException $exception) {
             $this->yell('GitHub status request failed.');
+            $this->say($exception->getMessage());
         }
     }
 }
