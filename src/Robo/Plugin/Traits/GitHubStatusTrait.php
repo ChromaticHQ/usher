@@ -130,7 +130,6 @@ trait GitHubStatusTrait
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
                 'body' => json_encode($body),
-                'debug' => true,
             ]);
         } catch (RequestException $exception) {
             $this->yell('GitHub status request failed.');
