@@ -63,6 +63,11 @@ class ValidateConfigCommands extends Tasks
         }
         $sites = explode(',', $siteDirs);
         foreach ($sites as $siteDir) {
+            // Clear the "config" cache bin before we verify config status to
+            // improve the accuracy of this check.
+            // @see https://github.com/drush-ops/drush/pull/3861#issuecomment-453767694
+            // @see https://www.drush.org/11.x/commands/cache_clear/
+            $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush cache:clear bin config")->run();
             $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush config:status --format=json")
                 ->dir("$this->drupalRoot/sites/$siteDir/")
                 ->printOutput(false)
