@@ -67,7 +67,9 @@ class ValidateConfigCommands extends Tasks
             // improve the accuracy of this check.
             // @see https://github.com/drush-ops/drush/pull/3861#issuecomment-453767694
             // @see https://www.drush.org/11.x/commands/cache_clear/
-            $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush cache:clear bin config")->run();
+            $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush cache:clear bin config")
+                ->dir("$this->drupalRoot/sites/$siteDir/")
+                ->run();
             $result = $this->taskExec("$this->drupalRoot/../vendor/bin/drush config:status --format=json")
                 ->dir("$this->drupalRoot/sites/$siteDir/")
                 ->printOutput(false)
