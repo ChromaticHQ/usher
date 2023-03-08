@@ -1,6 +1,6 @@
 {
     "name": "chromatic/usher",
-    "description": "Custom Robo commands for use on Chromatic projects.",
+    "description": "A collection of Robo commands for use on Chromatic projects.",
     "type": "library",
     "license": "MIT",
     "authors": [
