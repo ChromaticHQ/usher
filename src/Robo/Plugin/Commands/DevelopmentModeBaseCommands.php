@@ -207,15 +207,19 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteName
      *   The Drupal site name.
+     * @param bool $skipLandoStart
+     *   If TRUE, skip starting Lando.
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    protected function devRefreshDrupal(string $siteName = 'default'): Result
+    protected function devRefreshDrupal(string $siteName = 'default', bool $skipLandoStart = false): Result
     {
         $this->io()->title('development environment refresh. 🦄✨');
         $result = $this->taskComposerInstall()->run();
-        $result = $this->taskExec('lando')->arg('start')->run();
+        if (!$skipLandoStart) {
+            $result = $this->taskExec('lando')->arg('start')->run();
+        }
         // There isn't a great way to call a command in one class from another.
         // https://github.com/consolidation/Robo/issues/743
         // For now, it seems like calling robo from within robo works.

@@ -24,15 +24,48 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      *
      * @param string $siteName
      *   The Drupal site name.
+     * @option skip-lando-start
+     *   Skip starting Lando.
      *
      * @aliases magic
      *
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function devRefresh(string $siteName = 'default'): Result
+    public function devRefresh(string $siteName = 'default', array $options = ['skip-lando-start' => false]): Result
     {
-        return $this->devRefreshDrupal($siteName);
+        return $this->devRefreshDrupal($siteName, $options['skip-lando-start']);
+    }
+
+    /**
+     * Refreshes development environments for *all* sites.
+     *
+     * Completely refreshes a development environment including running 'composer install', starting Lando, downloading
+     * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
+     *
+     * Examples:
+     *   dev:refresh-all --skip-sites=common,example --skip-lando-start
+     *
+     * @option skip-sites
+     *   A comma separated list of sites to skip.
+     * @option skip-lando-start
+     *   Skip starting Lando.
+     *
+     * @return \Robo\Result
+     *   The result of the set of tasks.
+     */
+    public function devRefreshAll(array $options = ['skip-sites' => '', 'skip-lando-start' => false]): Result
+    {
+        $skipLandoStart = $options['skip-lando-start'];
+        $siteNames = $this->getAllSiteNames();
+        $result = null;
+        foreach ($siteNames as $siteName) {
+            if (in_array($siteName, explode(',', $options['skip-sites']), true)) {
+                continue;
+            }
+            $result = $this->devRefreshDrupal($siteName, $skipLandoStart);
+        }
+        return $result;
     }
 
     /**
