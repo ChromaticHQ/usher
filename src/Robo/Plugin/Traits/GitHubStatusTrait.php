@@ -9,7 +9,7 @@ use Robo\Result;
 /**
  * Trait to allow setting of status checks on GitHub PRs from Tugboat.
  *
- * The methods in this trait will only work as epected when run in a Tugboat
+ * The methods in this trait will only work as expected when run in a Tugboat
  * environment.
  */
 trait GitHubStatusTrait
