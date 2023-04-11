@@ -8,7 +8,7 @@ use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\GitHubStatusTrait;
 
 /**
- * Robo commands related to changing development modes.
+ * Robo commands related to validating Drupal configuration state.
  */
 class ValidateConfigCommands extends Tasks
 {
