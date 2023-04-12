@@ -16,18 +16,29 @@ downstream repos.
 
 ## Configuration
 
-1. Create a `robo.yml` file in the root of your codebase. `robo.drupal.example.yml`
+- Create a `robo.yml` file in the root of your codebase. `robo.drupal.example.yml`
 is provided as a starting point for Drupal projects.
-1. Create a `.sites.config.yml` file in the root of your codebase. See
+- Create a `.sites.config.yml` file in the root of your codebase. See
 `.sites.config.example.yml` for reference on what can/should be configured.
-1. Add the following to your repo's `composer.json` "scripts" section so that you
-can call robo easily with `composer robo`:
-
-```json
-"scripts": {
+- Add the following to your repo's `composer.json` "scripts" section so that you can call robo easily with `composer robo`:
+  ```json
+  "scripts": {
     "robo": "robo --ansi"
-}
-```
+  }
+  ```
+- If you are overriding any commands, add the following to your repo's `composer.json` file.
+  ```json
+  "autoload": {
+  "psr-4": {
+      "BPRobo\\": "robo/src"
+    }
+  }
+  ```
+  Then place the commands in `robo/src/Robo/Plugin/Commands` with the
+  `BPRobo\Robo\Plugin\Commands` namespace.
+- If you are using any of the commands that use the [`GitHubStatusTrait`](src/Robo/Plugin/Traits/GitHubStatusTrait.php), a personal access token must be configured in GitHub.
+   1. Create a [personal access token](https://github.com/settings/tokens/new) in GitHub.
+   1. Create an environment variable named `GITHUB_ACCESS_TOKEN` with the token value.
 
 ## Commands
 
