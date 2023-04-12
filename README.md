@@ -26,16 +26,16 @@ is provided as a starting point for Drupal projects.
     "robo": "robo --ansi"
   }
   ```
-- If you are overriding any commands, add the following to your repo's `composer.json` file.
+- If you are overriding any commands, add the following to your repo's `composer.json` file. Be sure to specify your own namespace prefix in place of `YOURPREFIX`.
   ```json
   "autoload": {
   "psr-4": {
-      "BPRobo\\": "robo/src"
+      "YOURPREFIXRobo\\": "robo/src"
     }
   }
   ```
   Then place the commands in `robo/src/Robo/Plugin/Commands` with the
-  `BPRobo\Robo\Plugin\Commands` namespace.
+  `YOURPREFIXRobo\Robo\Plugin\Commands` namespace.
 - If you are using any of the commands that use the [`GitHubStatusTrait`](src/Robo/Plugin/Traits/GitHubStatusTrait.php) to set status checks on your pull requests, a personal access token must be created in GitHub.
    1. Create a [personal access token](https://github.com/settings/tokens/new) in GitHub.
    1. Create an environment variable named `GITHUB_ACCESS_TOKEN` with the token value in the environment where the checks will run.
