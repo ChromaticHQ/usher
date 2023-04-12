@@ -38,7 +38,7 @@ is provided as a starting point for Drupal projects.
   `BPRobo\Robo\Plugin\Commands` namespace.
 - If you are using any of the commands that use the [`GitHubStatusTrait`](src/Robo/Plugin/Traits/GitHubStatusTrait.php) to set status checks on your pull requests, a personal access token must be created in GitHub.
    1. Create a [personal access token](https://github.com/settings/tokens/new) in GitHub.
-   1. Create an environment variable named `GITHUB_ACCESS_TOKEN` with the token value.
+   1. Create an environment variable named `GITHUB_ACCESS_TOKEN` with the token value in the environment where the checks will run.
 
 ## Commands
 
