@@ -68,9 +68,9 @@ class ToolingCommands extends Tasks
         $composerFilename = 'composer.json';
         foreach ($configFilePaths as $configPath) {
             $result = $this->taskReplaceInFile($configPath)
-            ->from($currentPhpVersion)
-            ->to($version)
-            ->run();
+                ->from($currentPhpVersion)
+                ->to($version)
+                ->run();
 
             if (str_contains($configPath, $composerFilename)) {
                 $this->say("Change to $composerFilename detected.");
