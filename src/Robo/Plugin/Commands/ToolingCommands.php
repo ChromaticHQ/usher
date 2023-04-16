@@ -80,9 +80,9 @@ class ToolingCommands extends Tasks
                 }
                 $this->yell('Updating composer.lock file.');
                 $this->taskComposerUpdate()
-                ->workingDir(rtrim($configPath, $composerFilename))
-                ->option('lock')
-                ->run();
+                    ->workingDir(rtrim($configPath, $composerFilename))
+                    ->option('lock')
+                    ->run();
                 $result = $this->taskComposerValidate()->run();
             }
         }
