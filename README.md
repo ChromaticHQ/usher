@@ -82,6 +82,20 @@ drupal_status_report_ignore_checks:
 To identify the ID's in question, run `drush status-report --format=yaml`. The
 output will include the ID's.
 
+### `robo config:update-php-version`
+
+Use the `config:update-php-version` command to update the PHP version configured
+for a project in files listed in the `php_version_config_paths` key of
+`robo.yml`:
+
+```yaml
+php_current_version: '8.1'
+php_version_config_paths:
+  - composer.json
+  - .tugboat/config.yml
+  - .platform.app.yaml
+```
+
 #### Slack Notification Options
 
 If you would like to have Usher send a notification to Slack, you need to [create a Slack app in your workspace](https://api.slack.com/apps), and then add an "incoming webhook" for the channel where you would like the notification sent. When you create the webhook, Slack will provide you with a unique URL for that channel. You must then set the `SLACK_WEBHOOK_URL` environment variable to the Slack webhook URL in whatever environment Usher is running in.
