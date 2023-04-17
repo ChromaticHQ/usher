@@ -28,4 +28,12 @@ phpcs_php_version: '8.1'
 phpcs_standards:
   - Drupal
   - DrupalPractice
+php_current_version: '8.1'
+php_version_config_paths:
+  - composer.json
+  - .lando.yml
+  - .tugboat/config.yml
+  - .platform.app.yaml
+  - .github/workflows/ci.yml
+  - README.md
 twig_lint_enable: true
