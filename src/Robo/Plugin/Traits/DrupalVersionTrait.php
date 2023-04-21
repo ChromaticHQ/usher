@@ -15,12 +15,11 @@ trait DrupalVersionTrait
      */
     protected function drupalVersionIsD7(string $drupalRootPath): bool
     {
-        // This line has not changed since 2013, so it seems safe to base our version check off of.
-        // https://git.drupalcode.org/project/drupal/-/blame/7.x/COPYRIGHT.txt
-        $copyrightString = 'All Drupal code is Copyright 2001 - 2013 by the original authors.';
-        $copyrightPath = "$drupalRootPath/COPYRIGHT.txt";
-        if (file_exists($copyrightPath) && $copyrightContents = file_get_contents($copyrightPath)) {
-            if (str_contains($copyrightContents, $copyrightString)) {
+         // @see https://git.drupalcode.org/project/drupal/-/blob/7.x/includes/bootstrap.inc
+        $bootstrapPath = "$drupalRootPath/includes/bootstrap.inc";
+        if (file_exists($bootstrapPath)) {
+            include_once($bootstrapPath);
+            if (substr(VERSION, 0, 2) === '7.') {
                 return true;
             }
         }
