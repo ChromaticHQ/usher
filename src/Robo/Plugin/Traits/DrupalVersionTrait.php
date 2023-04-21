@@ -15,7 +15,7 @@ trait DrupalVersionTrait
      */
     protected function drupalVersionIsD7(string $drupalRootPath): bool
     {
-         // @see https://git.drupalcode.org/project/drupal/-/blob/7.x/includes/bootstrap.inc
+        // @see https://git.drupalcode.org/project/drupal/-/blob/7.x/includes/bootstrap.inc
         $bootstrapPath = "$drupalRootPath/includes/bootstrap.inc";
         if (file_exists($bootstrapPath)) {
             include_once($bootstrapPath);
