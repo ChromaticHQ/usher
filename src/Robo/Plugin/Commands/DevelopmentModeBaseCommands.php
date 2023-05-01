@@ -10,6 +10,7 @@ use Robo\Tasks;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Usher\Robo\Plugin\Traits\DatabaseDownloadTrait;
+use Usher\Robo\Plugin\Traits\DrupalVersionTrait;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
 
 /**
@@ -21,6 +22,7 @@ class DevelopmentModeBaseCommands extends Tasks
 {
     use DatabaseDownloadTrait;
     use SitesConfigTrait;
+    use DrupalVersionTrait;
 
     /**
      * Drupal root directory.
@@ -124,10 +126,12 @@ class DevelopmentModeBaseCommands extends Tasks
                 ->run();
             $result = $this->taskExec('rm')->args($dbPath)->run();
 
-            $result = $this->taskExec("$this->vendorDirectory/bin/drush")
-                ->arg('cache:rebuild')
-                ->dir("$this->drupalRoot/sites/$siteName")
-                ->run();
+            if (!$this->drupalVersionIsD7($this->drupalRoot)) {
+                $result = $this->taskExec("$this->vendorDirectory/bin/drush")
+                    ->arg('cache:rebuild')
+                    ->dir("$this->drupalRoot/sites/$siteName")
+                    ->run();
+            }
         }
         return $result;
     }
