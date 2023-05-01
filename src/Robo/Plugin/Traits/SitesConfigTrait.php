@@ -85,7 +85,7 @@ trait SitesConfigTrait
      * @return mixed
      *   A configuration value.
      */
-    public function getConfig($key, $siteName = 'default')
+    public function getConfig($key, $siteName = 'default'): mixed
     {
         $siteConfig = $this->getSiteConfig($siteName);
         if (!isset($siteConfig[$key])) {
