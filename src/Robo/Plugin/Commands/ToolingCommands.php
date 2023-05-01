@@ -52,7 +52,10 @@ class ToolingCommands extends Tasks
     {
         $this->io()->title("Updating PHP version.");
 
-        $currentPhpVersion = Robo::config()->get('php_current_version');
+        $phpCurrentVersionConfigKey = 'php_current_version';
+        if (!$currentPhpVersion = Robo::config()->get($phpCurrentVersionConfigKey)) {
+            throw new TaskException($this, "$phpCurrentVersionConfigKey is not configured.");
+        }
         $this->say("Current PHP version: $currentPhpVersion");
         $this->say("New PHP version: $version");
         if ($currentPhpVersion == $version) {
