@@ -119,7 +119,7 @@ class ToolingCommands extends Tasks
     protected function getConfig(string $key)
     {
         $configValue = Robo::config()->get($key);
-        if (!isset($configValue)) {
+        if (empty($configValue)) {
             throw new TaskException($this, "Key $key not found in Robo config file robo.yml.");
         }
         return $configValue;
