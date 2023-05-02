@@ -52,7 +52,7 @@ class ToolingCommands extends Tasks
     {
         $this->io()->title("Updating PHP version.");
 
-        $currentPhpVersion = Robo::config()->get('php_current_version');
+        $currentPhpVersion = $this->getConfig('php_current_version');
         $this->say("Current PHP version: $currentPhpVersion");
         $this->say("New PHP version: $version");
         if ($currentPhpVersion == $version) {
@@ -61,7 +61,7 @@ class ToolingCommands extends Tasks
 
         $configFilePaths = array_map(
             fn(string $path): string => "$this->cwd/$path",
-            Robo::config()->get('php_version_config_paths')
+            $this->getConfig('php_version_config_paths')
         );
 
         $result = Result::cancelled();
@@ -105,5 +105,23 @@ class ToolingCommands extends Tasks
         $roboConfig = Yaml::parse(file_get_contents($roboConfigPath));
         $roboConfig[$key] = $value;
         file_put_contents($roboConfigPath, Yaml::dump($roboConfig));
+    }
+
+    /**
+     * Get Robo configuration value.
+     *
+     * @param string $key
+     *   The key of the configuration to load.
+     *
+     * @return mixed
+     *   A configuration value.
+     */
+    protected function getConfig(string $key)
+    {
+        $configValue = Robo::config()->get($key);
+        if (!isset($configValue)) {
+            throw new TaskException($this, "Key $key not found in Robo config file robo.yml.");
+        }
+        return $configValue;
     }
 }
