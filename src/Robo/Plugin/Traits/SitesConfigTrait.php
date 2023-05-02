@@ -87,6 +87,7 @@ trait SitesConfigTrait
      */
     public function getConfig($key, $siteName = 'default')
     {
+        // @TODO: Rename method.
         $siteConfig = $this->getSiteConfig($siteName);
         if (!isset($siteConfig[$key])) {
             throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");

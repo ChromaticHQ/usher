@@ -6,12 +6,15 @@ use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
+use Usher\Robo\Plugin\Traits\RoboConfigTrait;
 
 /**
  * Robo commands related to continuous integration.
  */
 class CICommands extends Tasks
 {
+    use RoboConfigTrait;
+
     /**
      * The default PHP version to lint against.
      *
@@ -70,9 +73,9 @@ class CICommands extends Tasks
         $this->stopOnFail();
 
         $this->phpcsCheckExtensions = implode(',', Robo::config()->get('phpcs_check_extensions'));
-        $this->phpcsIgnorePaths = implode(',', Robo::config()->get('phpcs_ignore_paths'));
-        $this->customCodePaths = implode(' ', $this->getConfigurationValues('custom_code_paths'));
-        $this->phpcsStandards = implode(',', $this->getConfigurationValues('phpcs_standards'));
+        $this->phpcsIgnorePaths = implode(',', $this->getRoboConfigArrayFor('phpcs_ignore_paths'));
+        $this->customCodePaths = implode(' ', $this->getRoboConfigArrayFor('custom_code_paths'));
+        $this->phpcsStandards = implode(',', $this->getRoboConfigArrayFor('phpcs_standards'));
         $this->lintTwigFiles = Robo::config()->get('twig_lint_enable') ?? true;
         $this->phpcsPhpVersion = Robo::config()->get('phpcs_php_version', $this::PHPCS_DEFAULT_PHP_VERSION);
     }
@@ -165,21 +168,5 @@ class CICommands extends Tasks
         }
 
         return $stack->run();
-    }
-
-    /**
-     * Get coding standard(s) to use in PHPCS checks.
-     *
-     * @return array
-     *   An array containing application custom code paths.
-     *
-     * @throws \Robo\Exception\TaskException
-     */
-    protected function getConfigurationValues(string $key): array
-    {
-        if (!is_array($configurationValues = Robo::config()->get($key))) {
-            throw new TaskException($this, "Expected Robo configuration not or malfomed present: $key");
-        }
-        return $configurationValues;
     }
 }
