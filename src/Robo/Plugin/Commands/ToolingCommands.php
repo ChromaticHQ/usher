@@ -116,7 +116,7 @@ class ToolingCommands extends Tasks
      * @return mixed
      *   A configuration value.
      */
-    protected function getConfig(string $key)
+    protected function getConfig(string $key): mixed
     {
         $configValue = Robo::config()->get($key);
         if (!isset($configValue)) {
