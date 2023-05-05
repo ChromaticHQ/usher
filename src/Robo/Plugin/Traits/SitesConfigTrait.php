@@ -54,7 +54,7 @@ trait SitesConfigTrait
     }
 
     /**
-     * Load sites configuration.
+     * Get the configuration for an entire site.
      *
      * @param string $siteName
      *   The site name.
@@ -75,7 +75,7 @@ trait SitesConfigTrait
     }
 
     /**
-     * Get site configuration value.
+     * Get an individual site configuration value.
      *
      * @param string $key
      *   The site configuration key to load.
@@ -85,9 +85,8 @@ trait SitesConfigTrait
      * @return mixed
      *   A configuration value.
      */
-    public function getConfig($key, $siteName = 'default')
+    public function getSiteConfigItem($key, $siteName = 'default')
     {
-        // @TODO: Rename method.
         $siteConfig = $this->getSiteConfig($siteName);
         if (!isset($siteConfig[$key])) {
             throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");

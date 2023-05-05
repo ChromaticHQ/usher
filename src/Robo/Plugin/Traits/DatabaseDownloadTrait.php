@@ -119,7 +119,7 @@ trait DatabaseDownloadTrait
     {
         $s3ConfigArray = ['Bucket' => $this->s3BucketForSite($siteName)];
         try {
-            $s3KeyPrefix = $this->getConfig('database_s3_key_prefix_string', $siteName);
+            $s3KeyPrefix = $this->getSiteConfigItem('database_s3_key_prefix_string', $siteName);
             $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
             $s3ConfigArray['Prefix'] = $s3KeyPrefix;
         } catch (TaskException $e) {
@@ -141,7 +141,7 @@ trait DatabaseDownloadTrait
      */
     protected function s3BucketForSite(string $siteName): string
     {
-        if (!is_string($bucket = $this->getConfig('database_s3_bucket', $siteName))) {
+        if (!is_string($bucket = $this->getSiteConfigItem('database_s3_bucket', $siteName))) {
             throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
         }
         $this->say("'$siteName' S3 bucket: $bucket");
@@ -160,7 +160,7 @@ trait DatabaseDownloadTrait
     protected function s3RegionForSite(string $siteName): string
     {
         try {
-            $region = $this->getConfig('database_s3_region', $siteName);
+            $region = $this->getSiteConfigItem('database_s3_region', $siteName);
             $this->say("'$siteName' database_s3_region set to $region.");
         } catch (TaskException $e) {
             // Set default region if one is not set.
