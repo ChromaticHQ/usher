@@ -19,9 +19,9 @@ trait RoboConfigTrait
      * @return array
      *   A configuration array.
      */
-    protected function getRoboConfigArrayFor(string $key): array
+    protected function getRequiredRoboConfigArrayFor(string $key): array
     {
-        $configValue = $this->getRoboConfigValueFor($key);
+        $configValue = $this->getRequiredRoboConfigValueFor($key);
         $this->validateRoboConfigValueMatchesType($configValue, 'array', $key);
         return $configValue;
     }
@@ -35,10 +35,26 @@ trait RoboConfigTrait
      * @return string
      *   A configuration string.
      */
-    protected function getRoboConfigStringFor(string $key): string
+    protected function getRequiredRoboConfigStringFor(string $key): string
     {
-        $configValue = $this->getRoboConfigValueFor($key);
+        $configValue = $this->getRequiredRoboConfigValueFor($key);
         $this->validateRoboConfigValueMatchesType($configValue, 'string', $key);
+        return $configValue;
+    }
+
+    /**
+     * Get Robo configuration boolean value.
+     *
+     * @param string $key
+     *   The key of the configuration to load.
+     *
+     * @return bool
+     *   A configuration value.
+     */
+    protected function getRequiredRoboConfigBoolFor(string $key): bool
+    {
+        $configValue = $this->getRequiredRoboConfigValueFor($key);
+        $this->validateRoboConfigValueMatchesType($configValue, 'boolean', $key);
         return $configValue;
     }
 
@@ -53,11 +69,11 @@ trait RoboConfigTrait
      *
      * @throws \Robo\Exception\TaskException
      */
-    private function getRoboConfigValueFor(string $key)
+    private function getRequiredRoboConfigValueFor(string $key)
     {
         $configValue = Robo::config()->get($key);
         if (!isset($configValue)) {
-            throw new TaskException($this, "Key $key not found in Robo config file robo.yml.");
+            throw new TaskException($this, "Required key $key not found in Robo config file robo.yml.");
         }
         return $configValue;
     }
