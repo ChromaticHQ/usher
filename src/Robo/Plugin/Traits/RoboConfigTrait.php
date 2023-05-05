@@ -93,7 +93,7 @@ trait RoboConfigTrait
      *
      * @throws \Robo\Exception\TaskException
      */
-    private function validateRoboConfigValueMatchesType(mixed $configValue, string $expectedType, string $key): bool
+    private function validateRoboConfigValueMatchesType($configValue, string $expectedType, string $key): bool
     {
         $foundType = gettype($configValue);
         if ($foundType != $expectedType) {
