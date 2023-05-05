@@ -21,7 +21,8 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2 || ^1.0.0",
         "phpstan/extension-installer": "^1.1",
         "phpcompatibility/php-compatibility": "^9.3",
-        "guzzlehttp/guzzle": "^5.0 || ^6.0 || ^7.0"
+        "guzzlehttp/guzzle": "^5.0 || ^6.0 || ^7.0",
+        "sentry/sdk": "^3.3"
     },
     "autoload": {
         "psr-4": {
@@ -41,7 +42,8 @@
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true
         }
     },
     "require-dev": {
