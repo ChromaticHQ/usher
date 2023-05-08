@@ -54,8 +54,10 @@ class ValidateConfigCommands extends Tasks
      *
      * @throws \Robo\Exception\TaskException
      */
-    public function validateDrupalConfig(string $siteDirs = 'default', array $options = ['set-pr-status' => false]): void
-    {
+    public function validateDrupalConfig(
+        string $siteDirs = 'default',
+        array $options = ['set-pr-status' => false]
+    ): void {
         $this->io()->title('validate drupal configuration.');
 
         if ($options['set-pr-status']) {
