@@ -62,7 +62,7 @@ trait SitesConfigTrait
      * @return mixed[]
      *   The specified site configuration array.
      */
-    protected function getSiteConfig($siteName = 'default'): array
+    protected function getSiteConfig(string $siteName = 'default'): array
     {
         $allSitesConfig = $this->getAllSitesConfig();
         if (!is_array($allSitesConfig[$siteName])) {
@@ -85,7 +85,7 @@ trait SitesConfigTrait
      * @return mixed
      *   A configuration value.
      */
-    public function getSiteConfigItem($key, $siteName = 'default')
+    public function getSiteConfigItem(string $key, string $siteName = 'default')
     {
         $siteConfig = $this->getSiteConfig($siteName);
         if (!isset($siteConfig[$key])) {
