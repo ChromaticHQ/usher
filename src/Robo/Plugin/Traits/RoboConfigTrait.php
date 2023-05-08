@@ -4,7 +4,6 @@ namespace Usher\Robo\Plugin\Traits;
 
 use Robo\Robo;
 use Robo\Exception\TaskException;
-use Usher\Robo\Plugin\Enums\ConfigTypes;
 
 /**
  * Trait to provide access to Robo configuration.
@@ -23,7 +22,7 @@ trait RoboConfigTrait
     protected function getRequiredRoboConfigArrayFor(string $key): array
     {
         $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, ConfigTypes::array, $key);
+        $this->validateRoboConfigValueMatchesType($configValue, 'array', $key);
         return $configValue;
     }
 
@@ -39,7 +38,7 @@ trait RoboConfigTrait
     protected function getRequiredRoboConfigStringFor(string $key): string
     {
         $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, ConfigTypes::string, $key);
+        $this->validateRoboConfigValueMatchesType($configValue, 'string', $key);
         return $configValue;
     }
 
@@ -55,7 +54,7 @@ trait RoboConfigTrait
     protected function getRequiredRoboConfigBoolFor(string $key): bool
     {
         $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, ConfigTypes::boolean, $key);
+        $this->validateRoboConfigValueMatchesType($configValue, 'boolean', $key);
         return $configValue;
     }
 
@@ -84,7 +83,7 @@ trait RoboConfigTrait
      *
      * @param mixed $configValue
      *   The configuration value.
-     * @param ConfigTypes $expectedType
+     * @param string $expectedType
      *   The type we are expecting the value to be of.
      * @param string $key
      *   The key of the configuration.
@@ -94,13 +93,13 @@ trait RoboConfigTrait
      *
      * @throws \Robo\Exception\TaskException
      */
-    private function validateRoboConfigValueMatchesType($configValue, ConfigTypes $expectedType, string $key): bool
+    private function validateRoboConfigValueMatchesType($configValue, string $expectedType, string $key): bool
     {
         $foundType = gettype($configValue);
-        if ($foundType != $expectedType->name) {
+        if ($foundType != $expectedType) {
             throw new TaskException(
                 $this,
-                "Key $key in Robo configuration does not match expected type: $expectedType->name. Found $foundType."
+                "Key $key in Robo configuration does not match expected type: $expectedType. Found $foundType."
             );
         }
         return true;
