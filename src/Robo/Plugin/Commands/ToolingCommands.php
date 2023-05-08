@@ -4,9 +4,9 @@ namespace Usher\Robo\Plugin\Commands;
 
 use Robo\Exception\TaskException;
 use Robo\Result;
-use Robo\Robo;
 use Robo\Tasks;
 use Symfony\Component\Yaml\Yaml;
+use Usher\Robo\Plugin\Traits\RoboConfigTrait;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
 
 /**
@@ -14,6 +14,7 @@ use Usher\Robo\Plugin\Traits\SitesConfigTrait;
  */
 class ToolingCommands extends Tasks
 {
+    use RoboConfigTrait;
     use SitesConfigTrait;
 
     /**
@@ -52,7 +53,7 @@ class ToolingCommands extends Tasks
     {
         $this->io()->title("Updating PHP version.");
 
-        $currentPhpVersion = $this->getConfig('php_current_version');
+        $currentPhpVersion = $this->getRequiredRoboConfigStringFor('php_current_version');
         $this->say("Current PHP version: $currentPhpVersion");
         $this->say("New PHP version: $version");
         if ($currentPhpVersion == $version) {
@@ -61,7 +62,7 @@ class ToolingCommands extends Tasks
 
         $configFilePaths = array_map(
             fn(string $path): string => "$this->cwd/$path",
-            $this->getConfig('php_version_config_paths')
+            $this->getRequiredRoboConfigArrayFor('php_version_config_paths')
         );
 
         $result = Result::cancelled();
@@ -105,23 +106,5 @@ class ToolingCommands extends Tasks
         $roboConfig = Yaml::parse(file_get_contents($roboConfigPath));
         $roboConfig[$key] = $value;
         file_put_contents($roboConfigPath, Yaml::dump($roboConfig));
-    }
-
-    /**
-     * Get Robo configuration value.
-     *
-     * @param string $key
-     *   The key of the configuration to load.
-     *
-     * @return mixed
-     *   A configuration value.
-     */
-    protected function getConfig(string $key)
-    {
-        $configValue = Robo::config()->get($key);
-        if (!isset($configValue)) {
-            throw new TaskException($this, "Key $key not found in Robo config file robo.yml.");
-        }
-        return $configValue;
     }
 }
