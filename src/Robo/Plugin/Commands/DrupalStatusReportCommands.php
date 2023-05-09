@@ -57,8 +57,8 @@ class DrupalStatusReportCommands extends Tasks
      * @throws \Robo\Exception\TaskException
      */
     public function drupalStatusReport(
-        $siteDirs = 'default',
-        $severity = 1,
+        string $siteDirs = 'default',
+        int $severity = 1,
         array $options = ['set-pr-status' => false]
     ): void {
         $this->io()->title('drupal status report.');
