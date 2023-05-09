@@ -10,6 +10,14 @@ downstream repos.
 
 ![Usher in a tuxedo](https://user-images.githubusercontent.com/20355/146567165-6a9a6dc5-66cd-4f7c-8e39-69de09365bfd.jpg)
 
+## Compatibility
+
+| Usher Version | PHP | Drupal | Notes |
+| --- | --- | --- | --- |
+| 3.x | 8.1+ | 9.5 - 10.1+ | **Active development**
+| 2.x | 7.4 - 8.1 | 7, 9.4 - 10.1 | **Minimally maintained**
+| 1.x | 7.4 | 7, 8 | **Unsupported**
+
 ## Installation
 
 `composer require chromatic/usher`
