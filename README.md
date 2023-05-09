@@ -14,8 +14,9 @@ downstream repos.
 
 | Usher Version | PHP | Drupal | Notes |
 | --- | --- | --- | --- |
-| 3.x | 8.1+ | 9.5 - 10.1+ | Active development
-| 2.x | 7.4 - 8.1 | 7, 9.4 - 10.1 | Minimally maintained
+| 3.x | 8.1+ | 9.5 - 10.1+ | **Active development**
+| 2.x | 7.4 - 8.1 | 7, 9.4 - 10.1 | **Minimally maintained**
+| 1.x | 7.4 | 7, 8 | **Unsupported**
 
 ## Installation
 
