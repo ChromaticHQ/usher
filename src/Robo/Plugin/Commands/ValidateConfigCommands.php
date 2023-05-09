@@ -60,7 +60,7 @@ class ValidateConfigCommands extends Tasks
      */
     public function validateDrupalConfig(
         string $siteDirs = 'default',
-        array $options = ['set-pr-status' => false]
+        array $options = ['set-pr-status' => false],
     ): Result {
         $this->io()->title('validate drupal configuration.');
 
