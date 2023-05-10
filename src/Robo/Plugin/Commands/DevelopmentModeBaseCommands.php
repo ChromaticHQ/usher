@@ -152,7 +152,7 @@ class DevelopmentModeBaseCommands extends Tasks
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function drupalLoginLink($siteDir = 'default', array $options = ['lando' => true]): Result
+    public function drupalLoginLink(string $siteDir = 'default', array $options = ['lando' => true]): Result
     {
         $this->io()->section("create login link.");
         if ($options['lando']) {
@@ -185,7 +185,7 @@ class DevelopmentModeBaseCommands extends Tasks
      * @return \Robo\Result
      *   The result of the set of tasks.
      */
-    public function frontendDevDisable($siteDir = 'default', array $opts = ['yes|y' => false])
+    public function frontendDevDisable(string $siteDir = 'default', array $opts = ['yes|y' => false])
     {
         $devSettingsPath = "$this->drupalRoot/sites/$siteDir/settings.local.php";
         if (!$opts['yes']) {
@@ -244,7 +244,7 @@ class DevelopmentModeBaseCommands extends Tasks
      * @return string
      *   The Lando URI.
      */
-    protected function landoUri($siteDir): string
+    protected function landoUri(string $siteDir): string
     {
         $landoCfg = false;
         $possibleLandoConfigPaths = [
@@ -312,7 +312,7 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @see https://www.drush.org/deploycommand
      */
-    protected function drushDeployLando($siteDir = 'default'): Result
+    protected function drushDeployLando(string $siteDir = 'default'): Result
     {
         $this->io()->section('drush deploy.');
         if (!class_exists('Drush\Commands\core\DeployCommands')) {
