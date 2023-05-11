@@ -33,9 +33,6 @@ class ValidateConfigCommands extends Tasks
      */
     public function __construct()
     {
-        // Treat this command like bash -e and exit as soon as there's a failure.
-        $this->stopOnFail();
-
         // Find Drupal root path.
         $drupalFinder = new DrupalFinder();
         $drupalFinder->locateRoot(getcwd());
@@ -56,11 +53,16 @@ class ValidateConfigCommands extends Tasks
      */
     public function validateDrupalConfig(
         string $siteDirs = 'default',
-        array $options = ['set-pr-status' => false]
+        array $options = ['set-pr-status' => false, 'stop-on-fail' => true]
     ): void {
         $this->io()->title('validate drupal configuration.');
 
-        if ($options['set-pr-status']) {
+        list('set-pr-status' => $setPrStatus, 'stop-on-fail' => $stopOnFail) = $options;
+        if ($stopOnFail) {
+            // Treat this command like bash -e and exit as soon as there's a failure.
+            $this->stopOnFail();
+        }
+        if ($setPrStatus) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }
         $sites = explode(',', $siteDirs);
@@ -80,7 +82,7 @@ class ValidateConfigCommands extends Tasks
             $configJson = json_decode($drushOutput);
             if (!is_array($configJson) || count($configJson) > 0) {
                 $this->say($drushOutput);
-                if ($options['set-pr-status']) {
+                if ($setPrStatus) {
                     $this->setGitHubStatusError(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation failed!');
                 }
                 throw new TaskException(
@@ -91,7 +93,7 @@ class ValidateConfigCommands extends Tasks
         }
 
         $this->say('Drupal database configuration matches the tracked file system configuration.');
-        if ($options['set-pr-status']) {
+        if ($setPrStatus) {
             $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation passed!');
         }
     }
