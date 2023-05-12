@@ -85,9 +85,10 @@ class DeployCommands extends Tasks
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
             ->exec("$appDirPath/vendor/bin/drush config:import --yes")
             ->run();
+        list('notify-slack' => $notifySlack, 'notify-slack-force' => $notifySlackForce) = $options;
         // Notify Slack about the failed deployment if the option was provided.
-        if ($options['notify-slack'] || $options['notify-slack-force']) {
-            $this->notifySlackOnFailedBasePreviewBuild($result, $options['notify-slack-force']);
+        if ($notifySlack || $notifySlackForce) {
+            $this->notifySlackOnFailedBasePreviewBuild($result, $notifySlackForce);
         }
         return $result;
     }
