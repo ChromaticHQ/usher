@@ -64,7 +64,8 @@ class ValidateConfigCommands extends Tasks
     ): Result {
         $this->io()->title('validate drupal configuration.');
 
-        if ($options['set-pr-status']) {
+        list('set-pr-status' => $setPrStatus) = $options;
+        if ($setPrStatus) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }
 
@@ -86,7 +87,7 @@ class ValidateConfigCommands extends Tasks
             $configJson = json_decode($drushOutput);
             if (!is_array($configJson) || count($configJson) > 0) {
                 $this->say($drushOutput);
-                if ($options['set-pr-status']) {
+                if ($setPrStatus) {
                     $this->setGitHubStatusError(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation failed!');
                 }
                 throw new TaskException(
@@ -97,7 +98,7 @@ class ValidateConfigCommands extends Tasks
         }
 
         $this->say('Drupal database configuration matches the tracked file system configuration.');
-        if ($options['set-pr-status']) {
+        if ($setPrStatus) {
             $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation passed!');
         }
         return $result;

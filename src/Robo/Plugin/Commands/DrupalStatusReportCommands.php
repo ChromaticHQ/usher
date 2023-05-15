@@ -67,7 +67,8 @@ class DrupalStatusReportCommands extends Tasks
     ): Result {
         $this->io()->title('drupal status report.');
 
-        if ($options['set-pr-status']) {
+        list('set-pr-status' => $setPrStatus) = $options;
+        if ($setPrStatus) {
             $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
         }
 
@@ -92,7 +93,7 @@ class DrupalStatusReportCommands extends Tasks
             $reportJson = json_decode($drushOutput);
             if (!is_array($reportJson) || count($reportJson) > 0) {
                 $this->say($drushOutput);
-                if ($options['set-pr-status']) {
+                if ($setPrStatus) {
                     $this->setGitHubStatusError(
                         self::GITHUB_STATUS_CHECK_NAME,
                         'Drupal status report shows one or more unexpected warnings or errors.'
@@ -106,7 +107,7 @@ class DrupalStatusReportCommands extends Tasks
         }
 
         $this->say('Drupal status report(s) show no unexpected warnings or errors.');
-        if ($options['set-pr-status']) {
+        if ($setPrStatus) {
             $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
             $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, $checkDescription);
         }
