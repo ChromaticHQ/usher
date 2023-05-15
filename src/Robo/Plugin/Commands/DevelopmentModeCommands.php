@@ -56,11 +56,11 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      */
     public function devRefreshAll(array $options = ['skip-sites' => '', 'skip-lando-start' => false]): Result
     {
-        $skipLandoStart = $options['skip-lando-start'];
+        list('skip-sites' => $skipSites, 'skip-lando-start' => $skipLandoStart) = $options;
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {
-            if (in_array($siteName, explode(',', $options['skip-sites']), true)) {
+            if (in_array($siteName, explode(',', $skipSites), true)) {
                 continue;
             }
             $result = $this->devRefreshDrupal($siteName, $skipLandoStart);
