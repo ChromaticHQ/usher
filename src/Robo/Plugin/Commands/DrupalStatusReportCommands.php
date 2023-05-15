@@ -69,7 +69,7 @@ class DrupalStatusReportCommands extends Tasks
 
         list('set-pr-status' => $setPrStatus) = $options;
         if ($setPrStatus) {
-            $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
+            $this->setGitHubStatusPending(gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME);
         }
 
         $result = null;
@@ -95,8 +95,8 @@ class DrupalStatusReportCommands extends Tasks
                 $this->say($drushOutput);
                 if ($setPrStatus) {
                     $this->setGitHubStatusError(
-                        self::GITHUB_STATUS_CHECK_NAME,
-                        'Drupal status report shows one or more unexpected warnings or errors.'
+                        gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                        gitHubCheckDescription: 'Drupal status report shows one or more unexpected warnings or errors.'
                     );
                 }
                 throw new TaskException(
@@ -109,7 +109,10 @@ class DrupalStatusReportCommands extends Tasks
         $this->say('Drupal status report(s) show no unexpected warnings or errors.');
         if ($setPrStatus) {
             $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
-            $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, $checkDescription);
+            $this->setGitHubStatusSuccess(
+                gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                gitHubCheckDescription: $checkDescription
+            );
         }
         return $result;
     }

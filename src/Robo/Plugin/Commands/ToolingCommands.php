@@ -53,7 +53,7 @@ class ToolingCommands extends Tasks
     {
         $this->io()->title("Updating PHP version.");
 
-        $currentPhpVersion = $this->getRequiredRoboConfigStringFor('php_current_version');
+        $currentPhpVersion = $this->getRequiredRoboConfigStringFor(key: 'php_current_version');
         $this->say("Current PHP version: $currentPhpVersion");
         $this->say("New PHP version: $version");
         if ($currentPhpVersion == $version) {
@@ -62,7 +62,7 @@ class ToolingCommands extends Tasks
 
         $configFilePaths = array_map(
             fn(string $path): string => "$this->cwd/$path",
-            $this->getRequiredRoboConfigArrayFor('php_version_config_paths')
+            $this->getRequiredRoboConfigArrayFor(key: 'php_version_config_paths')
         );
 
         $result = Result::cancelled();
@@ -87,7 +87,7 @@ class ToolingCommands extends Tasks
                 $result = $this->taskComposerValidate()->run();
             }
         }
-        $this->updateRoboConfig('php_current_version', $version);
+        $this->updateRoboConfig(key: 'php_current_version', value: $version);
         $this->yell("PHP version updated from $currentPhpVersion to $version.");
         return $result;
     }

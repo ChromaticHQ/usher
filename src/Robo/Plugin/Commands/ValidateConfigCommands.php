@@ -66,7 +66,7 @@ class ValidateConfigCommands extends Tasks
 
         list('set-pr-status' => $setPrStatus) = $options;
         if ($setPrStatus) {
-            $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
+            $this->setGitHubStatusPending(gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME);
         }
 
         $result = null;
@@ -88,7 +88,10 @@ class ValidateConfigCommands extends Tasks
             if (!is_array($configJson) || count($configJson) > 0) {
                 $this->say($drushOutput);
                 if ($setPrStatus) {
-                    $this->setGitHubStatusError(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation failed!');
+                    $this->setGitHubStatusError(
+                        gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                        gitHubCheckDescription: 'Drupal config validation failed!'
+                    );
                 }
                 throw new TaskException(
                     $this,
@@ -99,7 +102,10 @@ class ValidateConfigCommands extends Tasks
 
         $this->say('Drupal database configuration matches the tracked file system configuration.');
         if ($setPrStatus) {
-            $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation passed!');
+            $this->setGitHubStatusSuccess(
+                gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                gitHubCheckDescription: 'Drupal config validation passed!'
+            );
         }
         return $result;
     }
