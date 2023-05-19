@@ -70,7 +70,7 @@ class ValidateConfigCommands extends Tasks
         }
 
         $result = null;
-        $sites = explode(',', $siteDirs);
+        $sites = explode(separator: ',', string: $siteDirs);
         foreach ($sites as $siteDir) {
             // Clear the "config" cache bin before we verify config status to
             // improve the accuracy of this check.

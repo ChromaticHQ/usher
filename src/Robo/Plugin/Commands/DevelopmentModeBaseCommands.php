@@ -286,7 +286,10 @@ class DevelopmentModeBaseCommands extends Tasks
             $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
                 str_contains($domain, $siteDir));
             if (count($siteDomains) > 1) {
-                $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
+                $this->say('More than one possible URI found in Lando config >>> ' . implode(
+                    separator: ' | ',
+                    array: $siteDomains,
+                ));
             } elseif (count($siteDomains) == 1) {
                 $domain = array_pop($siteDomains);
                 return "https://$domain";

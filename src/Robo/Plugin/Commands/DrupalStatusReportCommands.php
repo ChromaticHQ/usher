@@ -73,7 +73,7 @@ class DrupalStatusReportCommands extends Tasks
         }
 
         $result = null;
-        $sites = explode(',', $siteDirs);
+        $sites = explode(separator: ',', string: $siteDirs);
         foreach ($sites as $siteDir) {
             $cmd = [
                 "$this->drupalRoot/../vendor/bin/drush",
@@ -82,10 +82,10 @@ class DrupalStatusReportCommands extends Tasks
                 "--severity=$severity",
             ];
             if (is_array($ignoreArray = Robo::config()->get('drupal_status_report_ignore_checks'))) {
-                $ignoreList = implode(',', $ignoreArray);
+                $ignoreList = implode(separator: ',', array: $ignoreArray);
                 $cmd[] = "--ignore=$ignoreList";
             }
-            $result = $this->taskExec(implode(' ', $cmd))
+            $result = $this->taskExec(implode(separator: ' ', array: $cmd))
                 ->dir("$this->drupalRoot/sites/$siteDir/")
                 ->printOutput(false)
                 ->run();

@@ -101,9 +101,18 @@ class CICommands extends Tasks
     protected function jobRunCodingStandards(bool $applyFixes = false): Result
     {
         $customCodePaths = $this->getCustomCodePaths();
-        $phpcsStandards = implode(',', $this->getRequiredRoboConfigArrayFor(key: 'phpcs_standards'));
-        $phpcsCheckExtensions = implode(',', $this->getRequiredRoboConfigArrayFor(key: 'phpcs_check_extensions'));
-        $phpcsIgnorePaths = implode(',', $this->getRequiredRoboConfigArrayFor(key: 'phpcs_ignore_paths'));
+        $phpcsStandards = implode(
+            separator: ',',
+            array: $this->getRequiredRoboConfigArrayFor(key: 'phpcs_standards'),
+        );
+        $phpcsCheckExtensions = implode(
+            separator: ',',
+            array: $this->getRequiredRoboConfigArrayFor(key: 'phpcs_check_extensions'),
+        );
+        $phpcsIgnorePaths = implode(
+            separator: ',',
+            array: $this->getRequiredRoboConfigArrayFor(key: 'phpcs_ignore_paths'),
+        );
         $phpcsPhpVersion = Robo::config()->get('phpcs_php_version', $this::PHPCS_DEFAULT_PHP_VERSION);
         $twigLintEnabled = Robo::config()->get('twig_lint_enable') ?? true;
 
@@ -137,6 +146,6 @@ class CICommands extends Tasks
      */
     protected function getCustomCodePaths(): string
     {
-        return implode(' ', $this->getRequiredRoboConfigArrayFor(key: 'custom_code_paths'));
+        return implode(separator: ' ', array: $this->getRequiredRoboConfigArrayFor(key: 'custom_code_paths'));
     }
 }
