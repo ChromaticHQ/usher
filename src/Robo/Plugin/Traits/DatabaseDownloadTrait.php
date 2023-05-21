@@ -69,7 +69,7 @@ trait DatabaseDownloadTrait
                 'Key' => $dbFilename,
             ]);
             $fp = fopen($downloadFileName, 'wb');
-            stream_copy_to_stream($result->getBody()->getContentAsResource(), $fp);
+            stream_copy_to_stream(from: $result->getBody()->getContentAsResource(), to: $fp);
             $this->say("Database dump file downloaded >>> $downloadFileName");
         }
         return $downloadFileName;
