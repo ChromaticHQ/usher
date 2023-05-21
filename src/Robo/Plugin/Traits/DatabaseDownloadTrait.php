@@ -55,8 +55,10 @@ trait DatabaseDownloadTrait
         // Ensure objects are sorted by last modified date.
         usort(
             array: $objects,
+            /** @var \AsyncAws\S3\ValueObject\AwsObject $a */
             callback: fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
         );
+        /** @var \AsyncAws\S3\ValueObject\AwsObject $latestDatabaseDump */
         $latestDatabaseDump = array_pop(array: $objects);
         $dbFilename = $latestDatabaseDump->getKey();
         $downloadFileName = $this->sanitizeFileNameForWindows($dbFilename);
@@ -68,8 +70,10 @@ trait DatabaseDownloadTrait
                 'Bucket' => $this->s3BucketForSite($siteName),
                 'Key' => $dbFilename,
             ]);
-            $fp = fopen($downloadFileName, 'wb');
-            stream_copy_to_stream(from: $result->getBody()->getContentAsResource(), to: $fp);
+            stream_copy_to_stream(
+                from: $result->getBody()->getContentAsResource(),
+                to: fopen($downloadFileName, 'wb'),
+            );
             $this->say("Database dump file downloaded >>> $downloadFileName");
         }
         return $downloadFileName;

@@ -5,5 +5,12 @@ parameters:
     - message: '#\Call to deprecated method io\(\) of class Robo\\Tasks#'
       paths:
         - 'src/'
+    # https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
+    - message: '#\Call to an undefined method Robo\\Collection\\CollectionBuilder::taskFilesystemStack\(\)#'
+      paths:
+        - 'src/'
+    - message: '#\Call to an undefined method Robo\\Collection\\CollectionBuilder|Robo\\Task\\Base\\Exec::dir\(\)#'
+      paths:
+        - 'src/'
   level: 6
   reportUnmatchedIgnoredErrors: true

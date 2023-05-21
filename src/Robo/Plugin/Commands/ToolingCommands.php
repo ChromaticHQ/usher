@@ -103,7 +103,7 @@ class ToolingCommands extends Tasks
     protected function updateRoboConfig(string $key, string $value): void
     {
         $roboConfigPath = "$this->cwd/robo.yml";
-        $roboConfig = Yaml::parse(file_get_contents($roboConfigPath));
+        $roboConfig = Yaml::parse((string) file_get_contents($roboConfigPath));
         $roboConfig[$key] = $value;
         file_put_contents($roboConfigPath, Yaml::dump($roboConfig));
     }
