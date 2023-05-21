@@ -53,8 +53,11 @@ trait DatabaseDownloadTrait
             throw new TaskException($this, "No database dumps found for '$siteName'.");
         }
         // Ensure objects are sorted by last modified date.
-        usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
-        $latestDatabaseDump = array_pop($objects);
+        usort(
+            array: $objects,
+            callback: fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
+        );
+        $latestDatabaseDump = array_pop(array: $objects);
         $dbFilename = $latestDatabaseDump->getKey();
         $downloadFileName = $this->sanitizeFileNameForWindows($dbFilename);
 
@@ -82,7 +85,7 @@ trait DatabaseDownloadTrait
      *
      * @return \Robo\Result
      */
-    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath)
+    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath): Result
     {
         $yes = $this->io()->confirm('AWS S3 credentials not detected. Do you wish to configure them?');
         if (!$yes) {
