@@ -68,12 +68,17 @@ trait GitHubStatusTrait
      *   The name of the status check.
      * @param string $gitHubCheckDescription
      *   The description text to associate with the status check.
+     * @param string $gitHubCheckUrl
+     *   The URL the status check will link to.
      */
-    protected function setGitHubStatusSuccess(string $gitHubCheckName, string $gitHubCheckDescription): void
-    {
+    protected function setGitHubStatusSuccess(
+        string $gitHubCheckName,
+        string $gitHubCheckDescription,
+        string $gitHubCheckUrl = null
+    ): void {
         $this->yell("Setting success status on GitHub check: $gitHubCheckName");
         $this->say($gitHubCheckDescription);
-        $this->setGitHubStatus($this->checkStatusSuccess, $gitHubCheckName, $gitHubCheckDescription);
+        $this->setGitHubStatus($this->checkStatusSuccess, $gitHubCheckName, $gitHubCheckDescription, $gitHubCheckUrl);
     }
 
     /**
@@ -83,12 +88,17 @@ trait GitHubStatusTrait
      *   The name of the status check.
      * @param string $gitHubCheckDescription
      *   The description text to associate with the status check.
+     * @param string $gitHubCheckUrl
+     *   The URL the status check will link to.
      */
-    protected function setGitHubStatusError(string $gitHubCheckName, string $gitHubCheckDescription): void
-    {
+    protected function setGitHubStatusError(
+        string $gitHubCheckName,
+        string $gitHubCheckDescription,
+        string $gitHubCheckUrl = null
+    ): void {
         $this->yell("Setting failure status on GitHub check: $gitHubCheckName");
         $this->say($gitHubCheckDescription);
-        $this->setGitHubStatus($this->checkStatusError, $gitHubCheckName, $gitHubCheckDescription);
+        $this->setGitHubStatus($this->checkStatusError, $gitHubCheckName, $gitHubCheckDescription, $gitHubCheckUrl);
     }
 
     /**
@@ -100,13 +110,16 @@ trait GitHubStatusTrait
      *   The name of the status check.
      * @param string $checkDescription
      *   The descriptive text to set on the check.
+     * @param string $targetUrl
+     *   The URL the status check will link to.
      *
      * @see https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28#create-a-commit-status
      */
     protected function setGitHubStatus(
         string $state,
         string $gitHubCheckName,
-        string $checkDescription = ''
+        string $checkDescription = '',
+        string $targetUrl = null
     ): void {
         $tugboatPreviewID = getenv('TUGBOAT_PREVIEW_ID');
         $tugboatPreviewSHA = getenv('TUGBOAT_PREVIEW_SHA');
@@ -119,7 +132,7 @@ trait GitHubStatusTrait
         $body = [
             'state' => $state,
             'context' => $gitHubCheckName,
-            'target_url' => "$this->tugboatDashboardUrl/$tugboatPreviewID",
+            'target_url' => $targetUrl ?? "$this->tugboatDashboardUrl/$tugboatPreviewID",
         ];
         if (strlen($checkDescription) > 0) {
             $body['description'] = $checkDescription;
