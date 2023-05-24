@@ -285,9 +285,9 @@ class DevelopmentModeBaseCommands extends Tasks
             // proxy URL.
             $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
                 strpos($domain, $siteDir) === 0);
-            if (count($siteDomains) > 1) {
+            if (count((array) $siteDomains) > 1) {
                 $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
-            } elseif (count($siteDomains) == 1) {
+            } elseif (count((array) $siteDomains) == 1) {
                 $domain = array_pop($siteDomains);
                 return "https://$domain";
             }
@@ -315,7 +315,7 @@ class DevelopmentModeBaseCommands extends Tasks
     protected function drushDeployLando(string $siteDir = 'default'): Result
     {
         $this->io()->section('drush deploy.');
-        if (!class_exists('Drush\Commands\core\DeployCommands')) {
+        if (!class_exists(\Drush\Commands\core\DeployCommands::class)) {
             throw new TaskException(
                 $this,
                 "'drush deploy' command not found. Further work is necessary to support this version of Drush."

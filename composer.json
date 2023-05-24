@@ -32,10 +32,13 @@
         "php-check": "composer robo job:check-coding-standards",
         "php-fix": "composer robo job:fix-coding-standards",
         "php-stan": "composer robo job:run-static-analysis",
+        "rector": "vendor/bin/rector process --dry-run",
+        "rector-fix": "vendor/bin/rector process",
         "robo": "robo --ansi",
         "test": [
             "@php-check",
-            "@php-stan"
+            "@php-stan",
+            "@rector"
         ]
     },
     "config": {
@@ -46,6 +49,7 @@
         }
     },
     "require-dev": {
-        "phpstan/phpstan-strict-rules": "^1.1"
+        "phpstan/phpstan-strict-rules": "^1.1",
+        "rector/rector": "^0.16.0"
     }
 }
