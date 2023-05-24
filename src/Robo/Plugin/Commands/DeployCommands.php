@@ -31,9 +31,6 @@ class DeployCommands extends Tasks
      *   The Drupal site shortname. Optional.
      * @param string $docroot
      *   The Drupal document root directory. Optional.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function deployDrupal7(string $appDirPath, string $siteName = 'default', string $docroot = 'web'): Result
     {
@@ -64,9 +61,6 @@ class DeployCommands extends Tasks
      *   an attempt to notify Slack about the build regardless of what happened.
      *
      * @aliases deployd
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function deployDrupal(
         string $appDirPath,

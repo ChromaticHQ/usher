@@ -53,9 +53,6 @@ class ValidateConfigCommands extends Tasks
      *   on the associated pull request.
      * @aliases vdc
      *
-     * @return \Robo\Result
-     *   The result of the collection of tasks.
-     *
      * @throws \Robo\Exception\TaskException
      */
     public function validateDrupalConfig(

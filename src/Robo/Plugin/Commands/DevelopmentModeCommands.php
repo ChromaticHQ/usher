@@ -28,9 +28,6 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      *   Skip starting Lando.
      *
      * @aliases magic
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function devRefresh(string $siteName = 'default', array $options = ['skip-lando-start' => false]): Result
     {
@@ -50,9 +47,6 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      *   A comma separated list of sites to skip.
      * @option skip-lando-start
      *   Skip starting Lando.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function devRefreshAll(array $options = ['skip-sites' => '', 'skip-lando-start' => false]): Result
     {
@@ -60,7 +54,7 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {
-            if (in_array($siteName, explode(separator: ',', string: $skipSites), true)) {
+            if (in_array($siteName, explode(separator: ',', string: (string) $skipSites), true)) {
                 continue;
             }
             $result = $this->devRefreshDrupal($siteName, $skipLandoStart);

@@ -44,9 +44,6 @@ trait SitesConfigTrait
 
     /**
      * Determine how many sites are included in sites config.
-     *
-     * @return int
-     *   The number of sites.
      */
     public function getSitesCount(): int
     {
@@ -81,9 +78,6 @@ trait SitesConfigTrait
      *   The site configuration key to load.
      * @param string $siteName
      *   The site name.
-     *
-     * @return mixed
-     *   A configuration value.
      */
     public function getSiteConfigItem(string $key, string $siteName = 'default'): mixed
     {

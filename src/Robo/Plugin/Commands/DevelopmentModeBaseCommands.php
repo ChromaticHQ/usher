@@ -66,9 +66,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteName
      *   The Drupal site name.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function databaseRefreshLando(string $siteName = 'default'): Result
     {
@@ -93,9 +90,6 @@ class DevelopmentModeBaseCommands extends Tasks
 
     /**
      * Refresh database on Tugboat.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function databaseRefreshTugboat(): Result
     {
@@ -104,7 +98,7 @@ class DevelopmentModeBaseCommands extends Tasks
         foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
             try {
                 $dbPath = $this->databaseDownload($siteName);
-            } catch (TaskException $e) {
+            } catch (TaskException) {
                 $this->yell("$siteName: No database configured. Download/import skipped.");
                 // @todo: Should we run a site-install by default?
                 continue;
@@ -148,9 +142,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *   Array of options as described below.
      *
      * @option lando Whether to run the automatic fixer or not.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function drupalLoginLink(string $siteDir = 'default', array $options = ['lando' => true]): Result
     {
@@ -211,9 +202,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *   The Drupal site name.
      * @param bool $skipLandoStart
      *   If TRUE, skip starting Lando.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     protected function devRefreshDrupal(string $siteName = 'default', bool $skipLandoStart = false): Result
     {
@@ -238,9 +226,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteDir
      *   The Drupal site directory name.
-     *
-     * @return string
-     *   The Lando URI.
      */
     protected function landoUri(string $siteDir): string
     {
@@ -255,7 +240,7 @@ class DevelopmentModeBaseCommands extends Tasks
         foreach ($possibleLandoConfigPaths as $landoConfigPath) {
             try {
                 $landoCfg = Yaml::parseFile($landoConfigPath);
-            } catch (ParseException $exception) {
+            } catch (ParseException) {
                 $this->say("Unable to load Lando config from $landoConfigPath.");
             }
             // Break out of the loop if valid configuration was found.
@@ -282,7 +267,7 @@ class DevelopmentModeBaseCommands extends Tasks
             // We look for the $siteDir to be at the beginning of the appserver
             // proxy URL.
             $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
-                strpos($domain, $siteDir) === 0);
+                str_starts_with((string) $domain, $siteDir));
             if (count((array) $siteDomains) > 1) {
                 $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
             } elseif (count((array) $siteDomains) == 1) {
@@ -304,9 +289,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteDir
      *   The Drupal site directory name.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      *
      * @see https://www.drush.org/deploycommand
      */
@@ -342,9 +324,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @option boolean $yes Default answers to yes.
      * @aliases fede
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     protected function frontendDevEnableDrupal(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
     {

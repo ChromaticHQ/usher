@@ -55,9 +55,6 @@ class DrupalStatusReportCommands extends Tasks
      *   Use this flag in Tugboat environments to set the GitHub status check
      *   on the associated pull request.
      *
-     * @return \Robo\Result
-     *   The result of the collection of tasks.
-     *
      * @throws \Robo\Exception\TaskException
      */
     public function drupalStatusReport(

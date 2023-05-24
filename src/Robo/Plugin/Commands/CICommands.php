@@ -35,9 +35,6 @@ class CICommands extends Tasks
      * Command to run unit tests.
      *
      * @aliases punit
-     *
-     * @return \Robo\Result
-     *   The result of the collection of tasks.
      */
     public function jobRunUnitTests(): Result
     {
@@ -48,9 +45,6 @@ class CICommands extends Tasks
      * Run phpstan static analysis command.
      *
      * @aliases stan
-     *
-     * @return \Robo\Result
-     *   The result of the collection of tasks.
      *
      * @throws \Robo\Exception\TaskException
      */
@@ -67,9 +61,6 @@ class CICommands extends Tasks
      * Command to check coding standards.
      *
      * @aliases phpcs twigcs
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function jobCheckCodingStandards(): Result
     {
@@ -80,9 +71,6 @@ class CICommands extends Tasks
      * Command to fix coding standards where possible.
      *
      * @aliases phpfix
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function jobFixCodingStandards(): Result
     {
@@ -94,9 +82,6 @@ class CICommands extends Tasks
      *
      * @param bool $applyFixes
      *   FALSE if phpcs should be run, else phpcbf.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     protected function jobRunCodingStandards(bool $applyFixes = false): Result
     {
@@ -140,9 +125,6 @@ class CICommands extends Tasks
 
     /**
      * Get the list of custom code paths to check.
-     *
-     * @return string
-     *   A space separated list of custom code paths.
      */
     protected function getCustomCodePaths(): string
     {

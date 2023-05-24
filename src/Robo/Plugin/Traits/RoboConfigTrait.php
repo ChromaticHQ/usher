@@ -16,9 +16,6 @@ trait RoboConfigTrait
      *
      * @param string $key
      *   The key of the configuration to load.
-     *
-     * @return array
-     *   A configuration array.
      */
     protected function getRequiredRoboConfigArrayFor(string $key): array
     {
@@ -36,9 +33,6 @@ trait RoboConfigTrait
      *
      * @param string $key
      *   The key of the configuration to load.
-     *
-     * @return string
-     *   A configuration string.
      */
     protected function getRequiredRoboConfigStringFor(string $key): string
     {
@@ -56,9 +50,6 @@ trait RoboConfigTrait
      *
      * @param string $key
      *   The key of the configuration to load.
-     *
-     * @return bool
-     *   A configuration value.
      */
     protected function getRequiredRoboConfigBoolFor(string $key): bool
     {
@@ -77,12 +68,9 @@ trait RoboConfigTrait
      * @param string $key
      *   The key of the configuration to load.
      *
-     * @return mixed
-     *   A configuration value.
-     *
      * @throws \Robo\Exception\TaskException
      */
-    private function getRequiredRoboConfigValueFor(string $key)
+    private function getRequiredRoboConfigValueFor(string $key): mixed
     {
         $configValue = Robo::config()->get($key);
         if (!isset($configValue)) {
@@ -101,13 +89,13 @@ trait RoboConfigTrait
      * @param string $key
      *   The key of the configuration.
      *
-     * @return bool
-     *   TRUE if configuration value matches the expected type.
-     *
      * @throws \Robo\Exception\TaskException
      */
-    private function validateRoboConfigValueMatchesType($configValue, ConfigTypes $expectedType, string $key): bool
-    {
+    private function validateRoboConfigValueMatchesType(
+        mixed $configValue,
+        ConfigTypes $expectedType,
+        string $key,
+    ): bool {
         $foundType = gettype($configValue);
         if ($foundType != $expectedType->name) {
             throw new TaskException(

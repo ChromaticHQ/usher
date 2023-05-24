@@ -79,16 +79,13 @@ trait SlackNotifierTrait
         try {
             $client = new Client(['timeout' => 5]);
             $client->post($slack_webhook_url, ['body' => json_encode($payload, JSON_THROW_ON_ERROR)]);
-        } catch (RequestException $exception) {
+        } catch (RequestException) {
             $this->yell('Slack webhook request failed.');
         }
     }
 
     /**
      * Determine if we are in a Tugboat base preview.
-     *
-     * @return bool
-     *   Boolean indicating if we are interacting with a Tugboat base preview.
      */
     protected function isTugboatBasePreview(): bool
     {

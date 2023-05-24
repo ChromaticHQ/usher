@@ -44,9 +44,6 @@ class ToolingCommands extends Tasks
      *
      * @option boolean $skip-composer-update Skip composer update.
      *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
-     *
      * @throws \Robo\Exception\TaskException
      */
     public function configUpdatePhpVersion(string $version, array $opts = ['skip-composer-update' => false]): Result
