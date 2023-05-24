@@ -56,7 +56,7 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      */
     public function devRefreshAll(array $options = ['skip-sites' => '', 'skip-lando-start' => false]): Result
     {
-        list('skip-sites' => $skipSites, 'skip-lando-start' => $skipLandoStart) = $options;
+        ['skip-sites' => $skipSites, 'skip-lando-start' => $skipLandoStart] = $options;
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {

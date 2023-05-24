@@ -67,7 +67,7 @@ class DrupalStatusReportCommands extends Tasks
     ): Result {
         $this->io()->title('drupal status report.');
 
-        list('set-pr-status' => $setPrStatus) = $options;
+        ['set-pr-status' => $setPrStatus] = $options;
         if ($setPrStatus) {
             $this->setGitHubStatusPending(gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME);
         }
@@ -90,7 +90,7 @@ class DrupalStatusReportCommands extends Tasks
                 ->printOutput(false)
                 ->run();
             $drushOutput = trim($result->getOutputData());
-            $reportJson = json_decode($drushOutput);
+            $reportJson = json_decode($drushOutput, null, 512, JSON_THROW_ON_ERROR);
             if (!is_array($reportJson) || count($reportJson) > 0) {
                 $this->say($drushOutput);
                 if ($setPrStatus) {

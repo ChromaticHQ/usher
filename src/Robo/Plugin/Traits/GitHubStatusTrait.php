@@ -145,7 +145,7 @@ trait GitHubStatusTrait
                     'Authorization' => "Bearer $gitHubAccessToken",
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
-                'body' => json_encode($body),
+                'body' => json_encode($body, JSON_THROW_ON_ERROR),
             ]);
         } catch (RequestException $exception) {
             $this->yell('GitHub status request failed.');
