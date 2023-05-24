@@ -197,8 +197,6 @@ class DevelopmentModeBaseCommands extends Tasks
             }
         }
         $this->io()->title('disabling front-end development mode.');
-        // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
-        // @phpstan-ignore-next-line
         return $this->collectionBuilder()
             ->taskFilesystemStack()
             ->remove($devSettingsPath)
@@ -286,7 +284,10 @@ class DevelopmentModeBaseCommands extends Tasks
             $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
                 str_contains($domain, $siteDir));
             if (count($siteDomains) > 1) {
-                $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
+                $this->say('More than one possible URI found in Lando config >>> ' . implode(
+                    separator: ' | ',
+                    array: $siteDomains,
+                ));
             } elseif (count($siteDomains) == 1) {
                 $domain = array_pop($siteDomains);
                 return "https://$domain";
@@ -398,7 +399,6 @@ class DevelopmentModeBaseCommands extends Tasks
         file_put_contents($this->devServicesPath, Yaml::dump($devServices));
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
         // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
-        // @phpstan-ignore-next-line
         $result = $this->collectionBuilder()
             ->taskReplaceInFile($devSettingsPath)
             ->from('/sites/development.services.yml')

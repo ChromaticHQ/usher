@@ -22,8 +22,12 @@ trait RoboConfigTrait
      */
     protected function getRequiredRoboConfigArrayFor(string $key): array
     {
-        $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, ConfigTypes::array, $key);
+        $configValue = $this->getRequiredRoboConfigValueFor(key: $key);
+        $this->validateRoboConfigValueMatchesType(
+            configValue: $configValue,
+            expectedType: ConfigTypes::array,
+            key: $key
+        );
         return $configValue;
     }
 
@@ -38,8 +42,12 @@ trait RoboConfigTrait
      */
     protected function getRequiredRoboConfigStringFor(string $key): string
     {
-        $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, ConfigTypes::string, $key);
+        $configValue = $this->getRequiredRoboConfigValueFor(key: $key);
+        $this->validateRoboConfigValueMatchesType(
+            configValue: $configValue,
+            expectedType: ConfigTypes::string,
+            key: $key
+        );
         return $configValue;
     }
 
@@ -54,8 +62,12 @@ trait RoboConfigTrait
      */
     protected function getRequiredRoboConfigBoolFor(string $key): bool
     {
-        $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, ConfigTypes::boolean, $key);
+        $configValue = $this->getRequiredRoboConfigValueFor(key: $key);
+        $this->validateRoboConfigValueMatchesType(
+            configValue: $configValue,
+            expectedType: ConfigTypes::boolean,
+            key: $key
+        );
         return $configValue;
     }
 

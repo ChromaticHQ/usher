@@ -60,7 +60,7 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {
-            if (in_array($siteName, explode(',', $skipSites), true)) {
+            if (in_array($siteName, explode(separator: ',', string: $skipSites), true)) {
                 continue;
             }
             $result = $this->devRefreshDrupal($siteName, $skipLandoStart);
