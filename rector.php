@@ -11,8 +11,8 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/tests',
     ]);
 
-    // define sets of rules
-       $rectorConfig->sets([
-           LevelSetList::UP_TO_PHP_81
-       ]);
+    // Define sets of rules.
+    $rectorConfig->sets([
+        LevelSetList::UP_TO_PHP_81
+    ]);
 };
