@@ -1,6 +1,7 @@
 ---
 custom_code_paths:
   - 'src'
+  - 'rector.php'
 phpcs_check_extensions:
   - php
   - txt
