@@ -1,16 +1,19 @@
 ---
 custom_code_paths:
-  - 'src'
-  - 'rector.php'
+    - src
+    - rector.php
 phpcs_check_extensions:
-  - php
-  - txt
+    - php
+    - txt
 phpcs_ignore_paths:
-  - '*/themes/*/css/'
-  - '*/themes/*/js/'
-  - '*/themes/*/node_modules'
-  - '*/themes/*/libraries/'
+    - '*/themes/*/css/'
+    - '*/themes/*/js/'
+    - '*/themes/*/node_modules'
+    - '*/themes/*/libraries/'
 phpcs_standards:
-  - PSR12
+    - PSR12
 drupal_document_root: web
 twig_lint_enable: false
+php_current_version: '7.4'
+php_version_config_paths:
+    - rector.php
