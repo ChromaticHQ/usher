@@ -71,8 +71,8 @@ class ToolingCommands extends Tasks
                 ->run();
 
             $result = $this->taskReplaceInFile($configPath)
-                ->from($this->getRectorRuleNameFor($currentPhpVersion))
-                ->to($this->getRectorRuleNameFor($version))
+                ->from($this->getRectorRuleNameFor(version: $currentPhpVersion))
+                ->to($this->getRectorRuleNameFor(version: $version))
                 ->run();
 
             if (str_contains($configPath, $composerFilename)) {
@@ -120,7 +120,7 @@ class ToolingCommands extends Tasks
      */
     protected function getRectorRuleNameFor(string $version): string
     {
-        $versionWithNoDot = str_replace('.', '', $version);
+        $versionWithNoDot = str_replace(search: '.', replace: '', subject: $version);
         return "UP_TO_PHP_$versionWithNoDot";
     }
 }
