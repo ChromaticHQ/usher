@@ -41,6 +41,9 @@ jobs:
       - name: Test robo theme:build command.
         run: composer robo theme:build
 
+      - name: Test robo config:update-php-version command.
+        run: composer robo config:update-php-version 8.2
+
   yaml-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 15
