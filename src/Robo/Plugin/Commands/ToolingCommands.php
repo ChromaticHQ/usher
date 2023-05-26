@@ -70,6 +70,11 @@ class ToolingCommands extends Tasks
                 ->to($version)
                 ->run();
 
+            $result = $this->taskReplaceInFile($configPath)
+                ->from($this->getRectorRuleNameFor($currentPhpVersion))
+                ->to($this->getRectorRuleNameFor($version))
+                ->run();
+
             if (str_contains($configPath, $composerFilename)) {
                 $this->say("Change to $composerFilename detected.");
                 if ($opts['skip-composer-update']) {
@@ -103,5 +108,19 @@ class ToolingCommands extends Tasks
         $roboConfig = Yaml::parse((string) file_get_contents($roboConfigPath));
         $roboConfig[$key] = $value;
         file_put_contents($roboConfigPath, Yaml::dump($roboConfig));
+    }
+
+    /**
+     * Get Rector rule name.
+     *
+     * For PHP 8.2, it would be UP_TO_PHP_82.
+     *
+     * @param string $version
+     *   PHP major/minor version. ex. "8.2"
+     */
+    protected function getRectorRuleNameFor(string $version): string
+    {
+        $versionWithNoDot = str_replace('.', '', $version);
+        return "UP_TO_PHP_$versionWithNoDot";
     }
 }
