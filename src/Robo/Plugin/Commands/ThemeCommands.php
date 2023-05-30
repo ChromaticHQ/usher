@@ -37,7 +37,8 @@ class ThemeCommands extends Tasks
      */
     public function themeBuild(string $siteName = 'default'): Result
     {
-        $result = $this->io()->title("theme build");
+        $result = null;
+        $this->io()->title("theme build");
         try {
             $themeBuildConfiguration = $this->getSiteConfigItem('theme_build', $siteName);
         } catch (TaskException $e) {
