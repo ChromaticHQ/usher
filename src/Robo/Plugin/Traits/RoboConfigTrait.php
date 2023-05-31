@@ -40,7 +40,7 @@ trait RoboConfigTrait
         $this->validateRoboConfigValueMatchesType(
             configValue: $configValue,
             expectedType: ConfigTypes::string,
-            key: $key
+            key: $key,
         );
         return $configValue;
     }
@@ -57,7 +57,7 @@ trait RoboConfigTrait
         $this->validateRoboConfigValueMatchesType(
             configValue: $configValue,
             expectedType: ConfigTypes::boolean,
-            key: $key
+            key: $key,
         );
         return $configValue;
     }
