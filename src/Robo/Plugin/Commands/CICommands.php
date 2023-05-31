@@ -129,8 +129,8 @@ class CICommands extends Tasks
     protected function getCustomCodePaths(): string
     {
         return implode(
-          separator: ' ',
-          array: $this->getRequiredRoboConfigArrayFor(key: 'custom_code_paths'),
+            separator: ' ',
+            array: $this->getRequiredRoboConfigArrayFor(key: 'custom_code_paths'),
         );
     }
 }
