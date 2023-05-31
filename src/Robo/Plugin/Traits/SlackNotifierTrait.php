@@ -21,11 +21,6 @@ trait SlackNotifierTrait
     /**
      * Notify Slack if a base preview build failed.
      *
-     * @param \Robo\Result $result
-     *   The result of the task to check.
-     * @param bool $force
-     *   If the notification should be forced.
-     *
      * @see https://docs.tugboatqa.com/starter-configs/code-snippets/slack-integration/
      */
     protected function notifySlackOnFailedBasePreviewBuild(Result $result, bool $force = false): void

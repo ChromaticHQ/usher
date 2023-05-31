@@ -82,13 +82,6 @@ trait RoboConfigTrait
     /**
      * Validate Robo configuration value type.
      *
-     * @param mixed $configValue
-     *   The configuration value.
-     * @param ConfigTypes $expectedType
-     *   The type we are expecting the value to be of.
-     * @param string $key
-     *   The key of the configuration.
-     *
      * @throws \Robo\Exception\TaskException
      */
     private function validateRoboConfigValueMatchesType(
