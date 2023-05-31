@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Commands;
 
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
+use Robo\Result;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\GitHubStatusTrait;
 
@@ -56,15 +57,17 @@ class ValidateConfigCommands extends Tasks
      */
     public function validateDrupalConfig(
         string $siteDirs = 'default',
-        array $options = ['set-pr-status' => false]
-    ): void {
+        array $options = ['set-pr-status' => false],
+    ): Result {
         $this->io()->title('validate drupal configuration.');
 
         ['set-pr-status' => $setPrStatus] = $options;
         if ($setPrStatus) {
-            $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
+            $this->setGitHubStatusPending(gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME);
         }
-        $sites = explode(',', $siteDirs);
+
+        $result = null;
+        $sites = explode(separator: ',', string: $siteDirs);
         foreach ($sites as $siteDir) {
             // Clear the "config" cache bin before we verify config status to
             // improve the accuracy of this check.
@@ -82,7 +85,10 @@ class ValidateConfigCommands extends Tasks
             if (!is_array($configJson) || count($configJson) > 0) {
                 $this->say($drushOutput);
                 if ($setPrStatus) {
-                    $this->setGitHubStatusError(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation failed!');
+                    $this->setGitHubStatusError(
+                        gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                        gitHubCheckDescription: 'Drupal config validation failed!'
+                    );
                 }
                 throw new TaskException(
                     $this,
@@ -93,7 +99,11 @@ class ValidateConfigCommands extends Tasks
 
         $this->say('Drupal database configuration matches the tracked file system configuration.');
         if ($setPrStatus) {
-            $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, 'Drupal config validation passed!');
+            $this->setGitHubStatusSuccess(
+                gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                gitHubCheckDescription: 'Drupal config validation passed!'
+            );
         }
+        return $result;
     }
 }

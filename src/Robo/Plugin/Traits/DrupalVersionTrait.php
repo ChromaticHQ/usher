@@ -19,7 +19,7 @@ trait DrupalVersionTrait
         $bootstrapPath = "$drupalRootPath/includes/bootstrap.inc";
         if (file_exists($bootstrapPath)) {
             include_once($bootstrapPath);
-            if (defined('VERSION') && substr(VERSION, 0, 2) === '7.') {
+            if (defined('VERSION') && str_starts_with((string) VERSION, '7.')) {
                 return true;
             }
         }

@@ -31,9 +31,6 @@ class ThemeCommands extends Tasks
      * in your .sites.config.yml file.
      *
      * @aliases tb
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function themeBuild(string $siteName = 'default'): Result
     {
@@ -41,7 +38,7 @@ class ThemeCommands extends Tasks
         $this->io()->title("theme build");
         try {
             $themeBuildConfiguration = $this->getSiteConfigItem('theme_build', $siteName);
-        } catch (TaskException $e) {
+        } catch (TaskException) {
             $this->say("'$siteName' theme_build confguration not set.");
             return $this->taskExec('echo skipping')->run();
         }

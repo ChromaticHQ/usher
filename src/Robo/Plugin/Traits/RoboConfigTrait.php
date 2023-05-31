@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Traits;
 
 use Robo\Robo;
 use Robo\Exception\TaskException;
+use Usher\Robo\Plugin\Enums\ConfigTypes;
 
 /**
  * Trait to provide access to Robo configuration.
@@ -15,14 +16,15 @@ trait RoboConfigTrait
      *
      * @param string $key
      *   The key of the configuration to load.
-     *
-     * @return array
-     *   A configuration array.
      */
     protected function getRequiredRoboConfigArrayFor(string $key): array
     {
-        $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, 'array', $key);
+        $configValue = $this->getRequiredRoboConfigValueFor(key: $key);
+        $this->validateRoboConfigValueMatchesType(
+            configValue: $configValue,
+            expectedType: ConfigTypes::array,
+            key: $key,
+        );
         return $configValue;
     }
 
@@ -31,14 +33,15 @@ trait RoboConfigTrait
      *
      * @param string $key
      *   The key of the configuration to load.
-     *
-     * @return string
-     *   A configuration string.
      */
     protected function getRequiredRoboConfigStringFor(string $key): string
     {
-        $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, 'string', $key);
+        $configValue = $this->getRequiredRoboConfigValueFor(key: $key);
+        $this->validateRoboConfigValueMatchesType(
+            configValue: $configValue,
+            expectedType: ConfigTypes::string,
+            key: $key,
+        );
         return $configValue;
     }
 
@@ -47,14 +50,15 @@ trait RoboConfigTrait
      *
      * @param string $key
      *   The key of the configuration to load.
-     *
-     * @return bool
-     *   A configuration value.
      */
     protected function getRequiredRoboConfigBoolFor(string $key): bool
     {
-        $configValue = $this->getRequiredRoboConfigValueFor($key);
-        $this->validateRoboConfigValueMatchesType($configValue, 'boolean', $key);
+        $configValue = $this->getRequiredRoboConfigValueFor(key: $key);
+        $this->validateRoboConfigValueMatchesType(
+            configValue: $configValue,
+            expectedType: ConfigTypes::boolean,
+            key: $key,
+        );
         return $configValue;
     }
 
@@ -64,12 +68,9 @@ trait RoboConfigTrait
      * @param string $key
      *   The key of the configuration to load.
      *
-     * @return mixed
-     *   A configuration value.
-     *
      * @throws \Robo\Exception\TaskException
      */
-    private function getRequiredRoboConfigValueFor(string $key)
+    private function getRequiredRoboConfigValueFor(string $key): mixed
     {
         $configValue = Robo::config()->get($key);
         if (!isset($configValue)) {
@@ -81,25 +82,18 @@ trait RoboConfigTrait
     /**
      * Validate Robo configuration value type.
      *
-     * @param mixed $configValue
-     *   The configuration value.
-     * @param string $expectedType
-     *   The type we are expecting the value to be of.
-     * @param string $key
-     *   The key of the configuration.
-     *
-     * @return bool
-     *   TRUE if configuration value matches the expected type.
-     *
      * @throws \Robo\Exception\TaskException
      */
-    private function validateRoboConfigValueMatchesType($configValue, string $expectedType, string $key): bool
-    {
+    private function validateRoboConfigValueMatchesType(
+        mixed $configValue,
+        ConfigTypes $expectedType,
+        string $key,
+    ): bool {
         $foundType = gettype($configValue);
-        if ($foundType != $expectedType) {
+        if ($foundType != $expectedType->name) {
             throw new TaskException(
                 $this,
-                "Key $key in Robo configuration does not match expected type: $expectedType. Found $foundType."
+                "Key $key in Robo configuration does not match expected type: $expectedType->name. Found $foundType."
             );
         }
         return true;

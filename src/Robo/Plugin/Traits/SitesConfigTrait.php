@@ -44,9 +44,6 @@ trait SitesConfigTrait
 
     /**
      * Determine how many sites are included in sites config.
-     *
-     * @return int
-     *   The number of sites.
      */
     public function getSitesCount(): int
     {
@@ -81,13 +78,10 @@ trait SitesConfigTrait
      *   The site configuration key to load.
      * @param string $siteName
      *   The site name.
-     *
-     * @return mixed
-     *   A configuration value.
      */
-    public function getSiteConfigItem(string $key, string $siteName = 'default')
+    public function getSiteConfigItem(string $key, string $siteName = 'default'): mixed
     {
-        $siteConfig = $this->getSiteConfig($siteName);
+        $siteConfig = $this->getSiteConfig(siteName: $siteName);
         if (!isset($siteConfig[$key])) {
             throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
         }

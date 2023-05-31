@@ -74,7 +74,7 @@ trait GitHubStatusTrait
     protected function setGitHubStatusSuccess(
         string $gitHubCheckName,
         string $gitHubCheckDescription,
-        string $gitHubCheckUrl = null
+        string $gitHubCheckUrl = null,
     ): void {
         $this->yell("Setting success status on GitHub check: $gitHubCheckName");
         $this->say($gitHubCheckDescription);
@@ -94,7 +94,7 @@ trait GitHubStatusTrait
     protected function setGitHubStatusError(
         string $gitHubCheckName,
         string $gitHubCheckDescription,
-        string $gitHubCheckUrl = null
+        string $gitHubCheckUrl = null,
     ): void {
         $this->yell("Setting failure status on GitHub check: $gitHubCheckName");
         $this->say($gitHubCheckDescription);
@@ -119,7 +119,7 @@ trait GitHubStatusTrait
         string $state,
         string $gitHubCheckName,
         string $checkDescription = '',
-        string $targetUrl = null
+        string $targetUrl = null,
     ): void {
         $tugboatPreviewID = getenv('TUGBOAT_PREVIEW_ID');
         $tugboatPreviewSHA = getenv('TUGBOAT_PREVIEW_SHA');

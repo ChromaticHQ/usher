@@ -19,9 +19,6 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
      *
      * @param string $siteName
      *   The Drupal site name.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function devRefreshDrupal7(string $siteName = 'default'): Result
     {
@@ -37,9 +34,6 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
      *   The options.
      *
      * @option boolean $yes Default answers to yes.
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
     public function frontendDevEnableDrupal7(string $siteDir = 'default', array $opts = ['yes|y' => false]): Result
     {

@@ -14,6 +14,6 @@ phpcs_standards:
     - PSR12
 drupal_document_root: web
 twig_lint_enable: false
-php_current_version: '7.4'
+php_current_version: '8.1'
 php_version_config_paths:
     - rector.php

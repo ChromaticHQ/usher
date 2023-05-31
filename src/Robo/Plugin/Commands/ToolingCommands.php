@@ -44,16 +44,13 @@ class ToolingCommands extends Tasks
      *
      * @option boolean $skip-composer-update Skip composer update.
      *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
-     *
      * @throws \Robo\Exception\TaskException
      */
     public function configUpdatePhpVersion(string $version, array $opts = ['skip-composer-update' => false]): Result
     {
         $this->io()->title("Updating PHP version.");
 
-        $currentPhpVersion = $this->getRequiredRoboConfigStringFor('php_current_version');
+        $currentPhpVersion = $this->getRequiredRoboConfigStringFor(key: 'php_current_version');
         $this->say("Current PHP version: $currentPhpVersion");
         $this->say("New PHP version: $version");
         if ($currentPhpVersion == $version) {
@@ -62,7 +59,7 @@ class ToolingCommands extends Tasks
 
         $configFilePaths = array_map(
             fn(string $path): string => "$this->cwd/$path",
-            $this->getRequiredRoboConfigArrayFor('php_version_config_paths')
+            $this->getRequiredRoboConfigArrayFor(key: 'php_version_config_paths')
         );
 
         $result = Result::cancelled();
@@ -74,8 +71,8 @@ class ToolingCommands extends Tasks
                 ->run();
 
             $result = $this->taskReplaceInFile($configPath)
-                ->from($this->getRectorRuleNameFor($currentPhpVersion))
-                ->to($this->getRectorRuleNameFor($version))
+                ->from($this->getRectorRuleNameFor(version: $currentPhpVersion))
+                ->to($this->getRectorRuleNameFor(version: $version))
                 ->run();
 
             if (str_contains($configPath, $composerFilename)) {
@@ -92,7 +89,7 @@ class ToolingCommands extends Tasks
                 $result = $this->taskComposerValidate()->run();
             }
         }
-        $this->updateRoboConfig('php_current_version', $version);
+        $this->updateRoboConfig(key: 'php_current_version', value: $version);
         $this->yell("PHP version updated from $currentPhpVersion to $version.");
         return $result;
     }
@@ -108,7 +105,7 @@ class ToolingCommands extends Tasks
     protected function updateRoboConfig(string $key, string $value): void
     {
         $roboConfigPath = "$this->cwd/robo.yml";
-        $roboConfig = Yaml::parse(file_get_contents($roboConfigPath));
+        $roboConfig = Yaml::parse((string) file_get_contents($roboConfigPath));
         $roboConfig[$key] = $value;
         file_put_contents($roboConfigPath, Yaml::dump($roboConfig));
     }
@@ -123,7 +120,7 @@ class ToolingCommands extends Tasks
      */
     protected function getRectorRuleNameFor(string $version): string
     {
-        $versionWithNoDot = str_replace('.', '', $version);
+        $versionWithNoDot = str_replace(search: '.', replace: '', subject: $version);
         return "UP_TO_PHP_$versionWithNoDot";
     }
 }

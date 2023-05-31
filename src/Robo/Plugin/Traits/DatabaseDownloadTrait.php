@@ -26,12 +26,9 @@ trait DatabaseDownloadTrait
      *
      * @aliases dbdl
      *
-     * @return string|\Robo\Result
-     *   The path of the last downloaded database.
-     *
      * @throws \Robo\Exception\TaskException
      */
-    public function databaseDownload(string $siteName = 'default')
+    public function databaseDownload(string $siteName = 'default'): string|\Robo\Result
     {
         $this->io()->title('database download.');
 
@@ -53,8 +50,13 @@ trait DatabaseDownloadTrait
             throw new TaskException($this, "No database dumps found for '$siteName'.");
         }
         // Ensure objects are sorted by last modified date.
-        usort($objects, fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp());
-        $latestDatabaseDump = array_pop($objects);
+        usort(
+            array: $objects,
+            /** @var \AsyncAws\S3\ValueObject\AwsObject $a */
+            callback: fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
+        );
+        /** @var \AsyncAws\S3\ValueObject\AwsObject $latestDatabaseDump */
+        $latestDatabaseDump = array_pop(array: $objects);
         $dbFilename = $latestDatabaseDump->getKey();
         $downloadFileName = $this->sanitizeFileNameForWindows($dbFilename);
 
@@ -65,8 +67,10 @@ trait DatabaseDownloadTrait
                 'Bucket' => $this->s3BucketForSite($siteName),
                 'Key' => $dbFilename,
             ]);
-            $fp = fopen($downloadFileName, 'wb');
-            stream_copy_to_stream($result->getBody()->getContentAsResource(), $fp);
+            stream_copy_to_stream(
+                from: $result->getBody()->getContentAsResource(),
+                to: fopen($downloadFileName, 'wb'),
+            );
             $this->say("Database dump file downloaded >>> $downloadFileName");
         }
         return $downloadFileName;
@@ -79,10 +83,8 @@ trait DatabaseDownloadTrait
      *   Path to the AWS configuration directory.
      * @param string $awsConfigFilePath
      *   Path to the AWS configuration file.
-     *
-     * @return \Robo\Result
      */
-    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath)
+    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath): Result
     {
         $yes = $this->io()->confirm('AWS S3 credentials not detected. Do you wish to configure them?');
         if (!$yes) {
@@ -111,9 +113,6 @@ trait DatabaseDownloadTrait
      *
      * @param string $siteName
      *   The site name.
-     *
-     * @return array
-     *   An S3 request object configuration array.
      */
     protected function s3BucketRequestConfig(string $siteName): array
     {
@@ -122,7 +121,7 @@ trait DatabaseDownloadTrait
             $s3KeyPrefix = $this->getSiteConfigItem('database_s3_key_prefix_string', $siteName);
             $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
             $s3ConfigArray['Prefix'] = $s3KeyPrefix;
-        } catch (TaskException $e) {
+        } catch (TaskException) {
             $this->say("No S3 Key prefix found for $siteName.");
         }
         return $s3ConfigArray;
@@ -133,9 +132,6 @@ trait DatabaseDownloadTrait
      *
      * @param string $siteName
      *   The site name.
-     *
-     * @return string
-     *   An S3 bucket.
      *
      * @throws \Robo\Exception\TaskException
      */
@@ -153,16 +149,13 @@ trait DatabaseDownloadTrait
      *
      * @param string $siteName
      *   The site name.
-     *
-     * @return string
-     *   An S3 region.
      */
     protected function s3RegionForSite(string $siteName): string
     {
         try {
             $region = $this->getSiteConfigItem('database_s3_region', $siteName);
             $this->say("'$siteName' database_s3_region set to $region.");
-        } catch (TaskException $e) {
+        } catch (TaskException) {
             // Set default region if one is not set.
             $defaultRegion = $this->s3DefaultRegion;
             $this->say("'$siteName' database_s3_region not set. Defaulting to $defaultRegion.");
@@ -176,9 +169,6 @@ trait DatabaseDownloadTrait
      *
      * @param string $fileName
      *   The file name to sanitize.
-     *
-     * @return string
-     *   The sanitized filename.
      */
     public function sanitizeFileNameForWindows(string $fileName): string
     {

@@ -5,6 +5,7 @@ namespace Usher\Robo\Plugin\Commands;
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
 use Robo\Robo;
+use Robo\Result;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\GitHubStatusTrait;
 
@@ -59,15 +60,17 @@ class DrupalStatusReportCommands extends Tasks
     public function drupalStatusReport(
         string $siteDirs = 'default',
         int $severity = 1,
-        array $options = ['set-pr-status' => false]
-    ): void {
+        array $options = ['set-pr-status' => false],
+    ): Result {
         $this->io()->title('drupal status report.');
 
         ['set-pr-status' => $setPrStatus] = $options;
         if ($setPrStatus) {
-            $this->setGitHubStatusPending(self::GITHUB_STATUS_CHECK_NAME);
+            $this->setGitHubStatusPending(gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME);
         }
-        $sites = explode(',', $siteDirs);
+
+        $result = null;
+        $sites = explode(separator: ',', string: $siteDirs);
         foreach ($sites as $siteDir) {
             $cmd = [
                 "$this->drupalRoot/../vendor/bin/drush",
@@ -76,10 +79,10 @@ class DrupalStatusReportCommands extends Tasks
                 "--severity=$severity",
             ];
             if (is_array($ignoreArray = Robo::config()->get('drupal_status_report_ignore_checks'))) {
-                $ignoreList = implode(',', $ignoreArray);
+                $ignoreList = implode(separator: ',', array: $ignoreArray);
                 $cmd[] = "--ignore=$ignoreList";
             }
-            $result = $this->taskExec(implode(' ', $cmd))
+            $result = $this->taskExec(implode(separator: ' ', array: $cmd))
                 ->dir("$this->drupalRoot/sites/$siteDir/")
                 ->printOutput(false)
                 ->run();
@@ -89,8 +92,8 @@ class DrupalStatusReportCommands extends Tasks
                 $this->say($drushOutput);
                 if ($setPrStatus) {
                     $this->setGitHubStatusError(
-                        self::GITHUB_STATUS_CHECK_NAME,
-                        'Drupal status report shows one or more unexpected warnings or errors.'
+                        gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                        gitHubCheckDescription: 'Drupal status report shows one or more unexpected warnings or errors.'
                     );
                 }
                 throw new TaskException(
@@ -103,7 +106,11 @@ class DrupalStatusReportCommands extends Tasks
         $this->say('Drupal status report(s) show no unexpected warnings or errors.');
         if ($setPrStatus) {
             $checkDescription = 'Drupal status report shows no unexpected warnings or errors.';
-            $this->setGitHubStatusSuccess(self::GITHUB_STATUS_CHECK_NAME, $checkDescription);
+            $this->setGitHubStatusSuccess(
+                gitHubCheckName: self::GITHUB_STATUS_CHECK_NAME,
+                gitHubCheckDescription: $checkDescription
+            );
         }
+        return $result;
     }
 }

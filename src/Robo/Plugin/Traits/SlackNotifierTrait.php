@@ -21,11 +21,6 @@ trait SlackNotifierTrait
     /**
      * Notify Slack if a base preview build failed.
      *
-     * @param \Robo\Result $result
-     *   The result of the task to check.
-     * @param bool $force
-     *   If the notification should be forced.
-     *
      * @see https://docs.tugboatqa.com/starter-configs/code-snippets/slack-integration/
      */
     protected function notifySlackOnFailedBasePreviewBuild(Result $result, bool $force = false): void
@@ -79,16 +74,13 @@ trait SlackNotifierTrait
         try {
             $client = new Client(['timeout' => 5]);
             $client->post($slack_webhook_url, ['body' => json_encode($payload, JSON_THROW_ON_ERROR)]);
-        } catch (RequestException $exception) {
+        } catch (RequestException) {
             $this->yell('Slack webhook request failed.');
         }
     }
 
     /**
      * Determine if we are in a Tugboat base preview.
-     *
-     * @return bool
-     *   Boolean indicating if we are interacting with a Tugboat base preview.
      */
     protected function isTugboatBasePreview(): bool
     {
