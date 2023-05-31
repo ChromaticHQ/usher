@@ -23,7 +23,7 @@ trait RoboConfigTrait
         $this->validateRoboConfigValueMatchesType(
             configValue: $configValue,
             expectedType: ConfigTypes::array,
-            key: $key
+            key: $key,
         );
         return $configValue;
     }
