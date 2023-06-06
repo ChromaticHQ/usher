@@ -15,7 +15,7 @@
         "phpstan/phpstan-deprecation-rules": "^0.12.6 || ^1.0.0",
         "async-aws/s3": "^1.8",
         "php": ">=8.1",
-        "drush/drush": "^8 || ^10 || ^11",
+        "drush/drush": "^8 || ^10 || ^11 || ^12",
         "webflo/drupal-finder": "^1.2",
         "vincentlanglet/twig-cs-fixer": "^0.4.1 || ^0.5 || ^0.6 || ^1.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2 || ^1.0.0",
