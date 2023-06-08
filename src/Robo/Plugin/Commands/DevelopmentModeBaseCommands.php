@@ -9,6 +9,7 @@ use Robo\Robo;
 use Robo\Tasks;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use Usher\Robo\Plugin\Enums\LocalDevEnvironmentTypes;
 use Usher\Robo\Plugin\Traits\DatabaseDownloadTrait;
 use Usher\Robo\Plugin\Traits\DrupalVersionTrait;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
@@ -62,6 +63,34 @@ class DevelopmentModeBaseCommands extends Tasks
     }
 
     /**
+     * Refresh a site database in DDEV.
+     *
+     * @param string $siteName
+     *   The Drupal site name.
+     */
+    public function databaseRefreshDdev(string $siteName = 'default'): Result
+    {
+        $this->io()->title('DDEV database refresh.');
+
+        $dbPath = $this->databaseDownload($siteName);
+
+        $this->io()->section("importing $siteName database.");
+        $this->say("Importing $dbPath");
+        $this->taskExec('ddev')
+            ->arg('import-db')
+            ->option('target-db', $siteName == 'default' ? 'db' : $siteName)
+            ->option('src', $dbPath)
+            ->run();
+
+        $this->say("Deleting $dbPath");
+        $this->taskExec('rm')->args($dbPath)->run();
+        return $this->drushDeployWith(
+            localEnvironmentType: LocalDevEnvironmentTypes::DDEV,
+            siteDir: $siteName,
+        );
+    }
+
+    /**
      * Refresh a site database in Lando.
      *
      * @param string $siteName
@@ -85,7 +114,10 @@ class DevelopmentModeBaseCommands extends Tasks
 
         $this->say("Deleting $dbPath");
         $this->taskExec('rm')->args($dbPath)->run();
-        return $this->drushDeployLando($siteName);
+        return $this->drushDeployWith(
+            localEnvironmentType: LocalDevEnvironmentTypes::LANDO,
+            siteDir: $siteName,
+        );
     }
 
     /**
@@ -136,27 +168,21 @@ class DevelopmentModeBaseCommands extends Tasks
      * @command drupal:login-link
      * @aliases uli
      *
+     * @param string $environmentType
+     *   Specify local development enviroment: ddev, lando.
      * @param string $siteDir
      *   The Drupal site directory name.
-     * @param array $options
-     *   Array of options as described below.
      *
      * @option lando Whether to run the automatic fixer or not.
      */
-    public function drupalLoginLink(string $siteDir = 'default', array $options = ['lando' => true]): Result
-    {
+    public function drupalLoginLink(
+        string $environmentType,
+        string $siteDir = 'default',
+    ): Result {
         $this->io()->section("create login link.");
-        if ($options['lando']) {
-            $uri = $this->landoUri($siteDir);
-            $this->say("Lando URI detected: $uri");
-            return $this->taskExec('lando')
-                ->arg('drush')
-                ->arg('user:login')
-                ->option('--uri', $uri)
-                ->dir("$this->drupalRoot/sites/$siteDir")
-                ->run();
-        }
-        return $this->taskExec("$this->vendorDirectory/bin/drush")
+        return $this->taskExec($environmentType)
+            ->arg('drush')
+            ->arg("@$siteDir.$environmentType")
             ->arg('user:login')
             ->dir("$this->drupalRoot/sites/$siteDir")
             ->run();
@@ -198,17 +224,26 @@ class DevelopmentModeBaseCommands extends Tasks
     /**
      * Refreshes a development environment based upon the Drupal version.
      *
+     * @param LocalDevEnvironmentTypes $environmentType
+     *   The environment type.
      * @param string $siteName
      *   The Drupal site name.
-     * @param bool $skipLandoStart
-     *   If TRUE, skip starting Lando.
+     * @param bool $startLocalEnv
+     *   If TRUE, start local development environment.
      */
-    protected function devRefreshDrupal(string $siteName = 'default', bool $skipLandoStart = false): Result
-    {
+    protected function devRefreshDrupal(
+        LocalDevEnvironmentTypes $environmentType,
+        string $siteName = 'default',
+        bool $startLocalEnv = false,
+    ): Result {
         $this->io()->title('development environment refresh. 🦄✨');
         $result = $this->taskComposerInstall()->run();
-        if (!$skipLandoStart) {
-            $result = $this->taskExec('lando')->arg('start')->run();
+        if ($startLocalEnv) {
+            if ($environmentType == LocalDevEnvironmentTypes::LANDO) {
+                $result = $this->taskExec('lando')->arg('start')->run();
+            } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
+                $result = $this->taskExec('ddev')->arg('start')->run();
+            }
         }
         // There isn't a great way to call a command in one class from another.
         // https://github.com/consolidation/Robo/issues/743
@@ -216,84 +251,29 @@ class DevelopmentModeBaseCommands extends Tasks
         $result = $this->taskExec("composer robo theme:build $siteName")
             ->run();
         $result = $this->frontendDevEnableDrupal($siteName, ['yes' => true]);
-        $result = $this->databaseRefreshLando($siteName);
-        $result = $this->drupalLoginLink($siteName);
+        if ($environmentType == LocalDevEnvironmentTypes::LANDO) {
+            $result = $this->databaseRefreshLando($siteName);
+        } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
+            $result = $this->databaseRefreshDdev($siteName);
+        }
+        $result = $this->drupalLoginLink($environmentType->value, $siteName);
         return $result;
     }
 
     /**
-     * Detect Lando URI.
+     * Deploy with Drush via a local development environment.
      *
-     * @param string $siteDir
-     *   The Drupal site directory name.
-     */
-    protected function landoUri(string $siteDir): string
-    {
-        $landoCfg = false;
-        $possibleLandoConfigPaths = [
-            // The usual suspect.
-            "$this->drupalRoot/../.lando.yml",
-            // The site could have a front-end and back-end site in different
-            // subdirectories with the lando.yml in the root directory.
-            "$this->drupalRoot/../../.lando.yml",
-        ];
-        foreach ($possibleLandoConfigPaths as $landoConfigPath) {
-            try {
-                $landoCfg = Yaml::parseFile($landoConfigPath);
-            } catch (ParseException) {
-                $this->say("Unable to load Lando config from $landoConfigPath.");
-            }
-            // Break out of the loop if valid configuration was found.
-            if ($landoCfg !== false) {
-                $this->say("Found Lando config at $landoConfigPath.");
-                break;
-            }
-        }
-        if ($landoCfg === false) {
-            throw new TaskException(
-                $this,
-                'Unable to determine where the .lando.yml file is located.'
-            );
-        }
-        // First, check for multisite proxy configuration.
-        if (isset($landoCfg['proxy']['appserver'])) {
-            if ($siteDir === 'default') {
-                throw new TaskException(
-                    $this,
-                    'Unable to determine URI. Multi-site detected, but you did not specify a site name.',
-                );
-            }
-            // Detect multi-site configurations.
-            // We look for the $siteDir to be at the beginning of the appserver
-            // proxy URL.
-            $siteDomains = array_filter($landoCfg['proxy']['appserver'], fn($domain) =>
-                str_starts_with((string) $domain, $siteDir));
-            if (count((array) $siteDomains) > 1) {
-                $this->say('More than one possible URI found in Lando config >>> ' . implode(' | ', $siteDomains));
-            } elseif (count((array) $siteDomains) == 1) {
-                $domain = array_pop($siteDomains);
-                return "https://$domain";
-            }
-        } elseif (isset($landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'])) {
-            // If a Drush URI is explicitly set, use that.
-            return $landoCfg['services']['appserver']['overrides']['environment']['DRUSH_OPTIONS_URI'];
-        } else {
-            // Our final fallback.
-            return 'https://' . $landoCfg['name'] . '.' . 'lndo.site';
-        }
-        throw new TaskException($this, 'Unable to determine URI.');
-    }
-
-    /**
-     * Deploy with Drush via Lando.
-     *
+     * @param LocalDevEnvironmentTypes $localEnvironmentType
+     *   The local environment type.
      * @param string $siteDir
      *   The Drupal site directory name.
      *
      * @see https://www.drush.org/deploycommand
      */
-    protected function drushDeployLando(string $siteDir = 'default'): Result
-    {
+    protected function drushDeployWith(
+        LocalDevEnvironmentTypes $localEnvironmentType,
+        string $siteDir = 'default',
+    ): Result {
         $this->io()->section('drush deploy.');
         if (!class_exists(\Drush\Commands\core\DeployCommands::class)) {
             throw new TaskException(
@@ -303,14 +283,14 @@ class DevelopmentModeBaseCommands extends Tasks
         }
         return $this->taskExecStack()
             ->dir("$this->drupalRoot/sites/$siteDir")
-            ->exec("lando drush deploy --yes")
+            ->exec("$localEnvironmentType->value drush @$siteDir.$localEnvironmentType->value deploy --yes")
             // Import the latest configuration again. This includes the latest
             // configuration_split configuration. Importing this twice ensures that
             // the latter command enables and disables modules based upon the most up
             // to date configuration. Additional information and discussion can be
             // found here:
             // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
-            ->exec("lando drush config:import --yes")
+            ->exec("$localEnvironmentType->value drush @$siteDir.$localEnvironmentType->value config:import --yes")
             ->run();
     }
 

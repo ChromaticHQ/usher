@@ -9,6 +9,7 @@ use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
 use Symfony\Component\Yaml\Yaml;
+use Usher\Robo\Plugin\Enums\LocalDevEnvironmentTypes;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
 
 /**
@@ -22,16 +23,25 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * Completely refreshes a development environment including running 'composer install', starting Lando, downloading
      * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
      *
+     * @param string $environmentType
+     *   Specify local development environment: ddev, lando.
      * @param string $siteName
      *   The Drupal site name.
-     * @option skip-lando-start
+     * @option start-local-dev
      *   Skip starting Lando.
      *
      * @aliases magic
      */
-    public function devRefresh(string $siteName = 'default', array $options = ['skip-lando-start' => false]): Result
-    {
-        return $this->devRefreshDrupal($siteName, $options['skip-lando-start']);
+    public function devRefresh(
+        string $environmentType,
+        string $siteName = 'default',
+        array $options = ['start-local-dev' => false],
+    ): Result {
+        return $this->devRefreshDrupal(
+            LocalDevEnvironmentTypes::from($environmentType),
+            $siteName,
+            $options['start-local-dev'],
+        );
     }
 
     /**
@@ -57,6 +67,7 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
             if (in_array($siteName, explode(separator: ',', string: (string) $skipSites), true)) {
                 continue;
             }
+            // @todo: Not updated for ddev yet.
             $result = $this->devRefreshDrupal($siteName, $skipLandoStart);
         }
         return $result;
