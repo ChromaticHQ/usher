@@ -223,13 +223,6 @@ class DevelopmentModeBaseCommands extends Tasks
 
     /**
      * Refreshes a development environment based upon the Drupal version.
-     *
-     * @param LocalDevEnvironmentTypes $environmentType
-     *   The environment type.
-     * @param string $siteName
-     *   The Drupal site name.
-     * @param bool $startLocalEnv
-     *   If TRUE, start local development environment.
      */
     protected function devRefreshDrupal(
         LocalDevEnvironmentTypes $environmentType,
@@ -262,11 +255,6 @@ class DevelopmentModeBaseCommands extends Tasks
 
     /**
      * Deploy with Drush via a local development environment.
-     *
-     * @param LocalDevEnvironmentTypes $localEnvironmentType
-     *   The local environment type.
-     * @param string $siteDir
-     *   The Drupal site directory name.
      *
      * @see https://www.drush.org/deploycommand
      */
