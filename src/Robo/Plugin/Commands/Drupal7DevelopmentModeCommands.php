@@ -25,7 +25,10 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
      */
     public function devRefreshDrupal7(string $environmentType, string $siteName = 'default'): Result
     {
-        return $this->devRefreshDrupal(LocalDevEnvironmentTypes::from($environmentType), $siteName);
+        return $this->devRefreshDrupal(
+            environmentType: LocalDevEnvironmentTypes::from($environmentType),
+            siteName: $siteName,
+        );
     }
 
     /**

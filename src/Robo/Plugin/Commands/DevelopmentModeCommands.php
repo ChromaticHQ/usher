@@ -38,9 +38,9 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
         array $options = ['start-local-dev' => false],
     ): Result {
         return $this->devRefreshDrupal(
-            LocalDevEnvironmentTypes::from($environmentType),
-            $siteName,
-            $options['start-local-dev'],
+            environmentType: LocalDevEnvironmentTypes::from($environmentType),
+            siteName: $siteName,
+            startLocalEnv: $options['start-local-dev'],
         );
     }
 
@@ -72,9 +72,9 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
                 continue;
             }
             $result = $this->devRefreshDrupal(
-                LocalDevEnvironmentTypes::from($environmentType),
-                $siteName,
-                $startLocalDev,
+                environmentType: LocalDevEnvironmentTypes::from($environmentType),
+                siteName: $siteName,
+                startLocalEnv: $startLocalDev,
             );
         }
         return $result;
