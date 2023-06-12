@@ -51,24 +51,31 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
      *
      * Examples:
-     *   dev:refresh-all --skip-sites=common,example --skip-lando-start
+     *   dev:refresh-all ddev --skip-sites=common,example
      *
+     * @param string $environmentType
+     *   Specify local development environment: ddev, lando.
      * @option skip-sites
      *   A comma separated list of sites to skip.
-     * @option skip-lando-start
-     *   Skip starting Lando.
+     * @option start-local-dev
+     *   Start local development environment.
      */
-    public function devRefreshAll(array $options = ['skip-sites' => '', 'skip-lando-start' => false]): Result
-    {
-        ['skip-sites' => $skipSites, 'skip-lando-start' => $skipLandoStart] = $options;
+    public function devRefreshAll(
+        string $environmentType,
+        array $options = ['skip-sites' => '', 'start-local-dev' => false]
+    ): Result {
+        ['skip-sites' => $skipSites, 'start-local-dev' => $startLocalDev] = $options;
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {
             if (in_array($siteName, explode(separator: ',', string: (string) $skipSites), true)) {
                 continue;
             }
-            // @todo: Not updated for ddev yet.
-            $result = $this->devRefreshDrupal($siteName, $skipLandoStart);
+            $result = $this->devRefreshDrupal(
+                LocalDevEnvironmentTypes::from($environmentType),
+                $siteName,
+                $startLocalDev,
+            );
         }
         return $result;
     }
