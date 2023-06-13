@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Commands;
 
 use Robo\Exception\TaskException;
 use Robo\Result;
+use Usher\Robo\Plugin\Enums\LocalDevEnvironmentTypes;
 
 /**
  * Robo commands related to changing development modes for Drupal 7.
@@ -17,12 +18,17 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * downloading a database dump, importing it, running deployment commands, disabling front-end caches,
      * and providing a login link.
      *
+     * @param string $environmentType
+     *   Specify local development environment: ddev, lando.
      * @param string $siteName
      *   The Drupal site name.
      */
-    public function devRefreshDrupal7(string $siteName = 'default'): Result
+    public function devRefreshDrupal7(string $environmentType, string $siteName = 'default'): Result
     {
-        return $this->devRefreshDrupal($siteName);
+        return $this->devRefreshDrupal(
+            environmentType: LocalDevEnvironmentTypes::from($environmentType),
+            siteName: $siteName,
+        );
     }
 
     /**
@@ -75,20 +81,5 @@ class Drupal7DevelopmentModeCommands extends DevelopmentModeBaseCommands
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function drushDeployLando($siteDir = 'default'): Result
-    {
-        $this->io()->section('drush updatedb & drush cach-clear.');
-        return $this->taskExecStack()
-            ->dir("$this->drupalRoot/sites/$siteDir")
-            ->exec("lando drush cache-clear all")
-            ->exec("lando drush updatedb --yes")
-            ->exec("lando drush fra --yes")
-            ->exec("lando drush cache-clear all")
-            ->run();
     }
 }

@@ -9,6 +9,7 @@ use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
 use Symfony\Component\Yaml\Yaml;
+use Usher\Robo\Plugin\Enums\LocalDevEnvironmentTypes;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
 
 /**
@@ -22,16 +23,25 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * Completely refreshes a development environment including running 'composer install', starting Lando, downloading
      * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
      *
+     * @param string $environmentType
+     *   Specify local development environment: ddev, lando.
      * @param string $siteName
      *   The Drupal site name.
-     * @option skip-lando-start
+     * @option start-local-dev
      *   Skip starting Lando.
      *
      * @aliases magic
      */
-    public function devRefresh(string $siteName = 'default', array $options = ['skip-lando-start' => false]): Result
-    {
-        return $this->devRefreshDrupal($siteName, $options['skip-lando-start']);
+    public function devRefresh(
+        string $environmentType,
+        string $siteName = 'default',
+        array $options = ['start-local-dev' => false],
+    ): Result {
+        return $this->devRefreshDrupal(
+            environmentType: LocalDevEnvironmentTypes::from($environmentType),
+            siteName: $siteName,
+            startLocalEnv: $options['start-local-dev'],
+        );
     }
 
     /**
@@ -41,23 +51,31 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
      *
      * Examples:
-     *   dev:refresh-all --skip-sites=common,example --skip-lando-start
+     *   dev:refresh-all ddev --skip-sites=common,example
      *
+     * @param string $environmentType
+     *   Specify local development environment: ddev, lando.
      * @option skip-sites
      *   A comma separated list of sites to skip.
-     * @option skip-lando-start
-     *   Skip starting Lando.
+     * @option start-local-dev
+     *   Start local development environment.
      */
-    public function devRefreshAll(array $options = ['skip-sites' => '', 'skip-lando-start' => false]): Result
-    {
-        ['skip-sites' => $skipSites, 'skip-lando-start' => $skipLandoStart] = $options;
+    public function devRefreshAll(
+        string $environmentType,
+        array $options = ['skip-sites' => '', 'start-local-dev' => false]
+    ): Result {
+        ['skip-sites' => $skipSites, 'start-local-dev' => $startLocalDev] = $options;
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {
             if (in_array($siteName, explode(separator: ',', string: (string) $skipSites), true)) {
                 continue;
             }
-            $result = $this->devRefreshDrupal($siteName, $skipLandoStart);
+            $result = $this->devRefreshDrupal(
+                environmentType: LocalDevEnvironmentTypes::from($environmentType),
+                siteName: $siteName,
+                startLocalEnv: $startLocalDev,
+            );
         }
         return $result;
     }
