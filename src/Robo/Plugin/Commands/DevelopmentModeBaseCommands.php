@@ -172,8 +172,6 @@ class DevelopmentModeBaseCommands extends Tasks
      *   Specify local development enviroment: ddev, lando.
      * @param string $siteDir
      *   The Drupal site directory name.
-     *
-     * @option lando Whether to run the automatic fixer or not.
      */
     public function drupalLoginLink(
         string $environmentType,
