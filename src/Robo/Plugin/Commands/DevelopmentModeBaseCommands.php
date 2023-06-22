@@ -101,7 +101,7 @@ class DevelopmentModeBaseCommands extends Tasks
     {
         $this->io()->title('refresh tugboat databases.');
         $result = null;
-        foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
+        foreach (array_keys($this->getAllSitesConfig()) as $siteName) {
             try {
                 $dbPath = $this->databaseDownload($siteName);
             } catch (TaskException $e) {
