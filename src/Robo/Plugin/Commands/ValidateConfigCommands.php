@@ -82,7 +82,7 @@ class ValidateConfigCommands extends Tasks
                 ->run();
             $drushOutput = trim($result->getOutputData());
             $configJson = json_decode($drushOutput, null, 512, JSON_THROW_ON_ERROR);
-            if (!is_array($configJson) || count($configJson) > 0) {
+            if (!is_array($configJson) || $configJson !== []) {
                 $this->say($drushOutput);
                 if ($setPrStatus) {
                     $this->setGitHubStatusError(
