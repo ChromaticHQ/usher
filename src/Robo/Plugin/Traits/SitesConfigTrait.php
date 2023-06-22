@@ -50,7 +50,6 @@ trait SitesConfigTrait
      */
     public function getSitesCount(): int
     {
-        /** @noRector Rector\Php71\Rector\FuncCall\CountOnNullRector */
         return count($this->getAllSitesConfig());
     }
 

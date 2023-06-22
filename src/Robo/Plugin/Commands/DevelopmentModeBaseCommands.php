@@ -231,8 +231,7 @@ class DevelopmentModeBaseCommands extends Tasks
             ->run();
         $result = $this->frontendDevEnableDrupal($siteName, ['yes' => true]);
         $result = $this->databaseRefreshLando($siteName);
-        $result = $this->drupalLoginLink($siteName);
-        return $result;
+        return $this->drupalLoginLink($siteName);
     }
 
     /**

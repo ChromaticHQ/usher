@@ -37,8 +37,8 @@
         "rector-fix": "vendor/bin/rector process",
         "robo": "robo --ansi",
         "test": [
-            "@php-check",
-            "@php-stan",
+            "@phpcs",
+            "@phpstan",
             "@rector"
         ]
     },
