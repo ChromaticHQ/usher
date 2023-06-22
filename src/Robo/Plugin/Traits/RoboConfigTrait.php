@@ -96,7 +96,7 @@ trait RoboConfigTrait
     private function validateRoboConfigValueMatchesType($configValue, string $expectedType, string $key): bool
     {
         $foundType = gettype($configValue);
-        if ($foundType != $expectedType) {
+        if ($foundType !== $expectedType) {
             throw new TaskException(
                 $this,
                 "Key $key in Robo configuration does not match expected type: $expectedType. Found $foundType."

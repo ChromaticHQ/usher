@@ -30,15 +30,15 @@
         }
     },
     "scripts": {
-        "php-check": "composer robo job:check-coding-standards",
-        "php-fix": "composer robo job:fix-coding-standards",
-        "php-stan": "composer robo job:run-static-analysis",
+        "phpcs": "composer robo job:check-coding-standards",
+        "phpcbf": "composer robo job:fix-coding-standards",
+        "phpstan": "composer robo job:run-static-analysis",
         "rector": "vendor/bin/rector process --dry-run",
         "rector-fix": "vendor/bin/rector process",
         "robo": "robo --ansi",
         "test": [
-            "@php-check",
-            "@php-stan",
+            "@phpcs",
+            "@phpstan",
             "@rector"
         ]
     },

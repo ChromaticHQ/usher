@@ -97,9 +97,6 @@ trait SlackNotifierTrait
             return false;
         }
         // Determine if we are building a base preview.
-        if (getenv('TUGBOAT_PREVIEW_ID') !== getenv('TUGBOAT_BASE_PREVIEW_ID')) {
-            return false;
-        }
-        return true;
+        return getenv('TUGBOAT_PREVIEW_ID') === getenv('TUGBOAT_BASE_PREVIEW_ID');
     }
 }

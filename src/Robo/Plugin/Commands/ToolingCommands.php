@@ -56,7 +56,7 @@ class ToolingCommands extends Tasks
         $currentPhpVersion = $this->getRequiredRoboConfigStringFor('php_current_version');
         $this->say("Current PHP version: $currentPhpVersion");
         $this->say("New PHP version: $version");
-        if ($currentPhpVersion == $version) {
+        if ($currentPhpVersion === $version) {
             throw new TaskException($this, "New PHP version matches existing version: $currentPhpVersion.");
         }
 
