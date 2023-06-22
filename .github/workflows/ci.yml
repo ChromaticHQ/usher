@@ -30,10 +30,10 @@ jobs:
         uses: "ramsey/composer-install@v2"
 
       - name: PHP coding standards
-        run: composer php-check
+        run: composer phpcs
 
       - name: PHP static analysis
-        run: composer php-stan
+        run: composer phpstan
 
       - name: PHP rector
         run: composer rector
