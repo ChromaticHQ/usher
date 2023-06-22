@@ -88,7 +88,7 @@ class DrupalStatusReportCommands extends Tasks
                 ->run();
             $drushOutput = trim($result->getOutputData());
             $reportJson = json_decode($drushOutput, null, 512, JSON_THROW_ON_ERROR);
-            if (!is_array($reportJson) || count($reportJson) > 0) {
+            if (!is_array($reportJson) || $reportJson !== []) {
                 $this->say($drushOutput);
                 if ($setPrStatus) {
                     $this->setGitHubStatusError(
