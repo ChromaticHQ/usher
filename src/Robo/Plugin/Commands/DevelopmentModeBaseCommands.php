@@ -127,7 +127,7 @@ class DevelopmentModeBaseCommands extends Tasks
     {
         $this->io()->title('refresh tugboat databases.');
         $result = null;
-        foreach ($this->getAllSitesConfig() as $siteName => $siteInfo) {
+        foreach (array_keys($this->getAllSitesConfig()) as $siteName) {
             try {
                 $dbPath = $this->databaseDownload($siteName);
             } catch (TaskException) {
@@ -247,8 +247,7 @@ class DevelopmentModeBaseCommands extends Tasks
         } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
             $result = $this->databaseRefreshDdev($siteName);
         }
-        $result = $this->drupalLoginLink($environmentType->value, $siteName);
-        return $result;
+        return $this->drupalLoginLink($environmentType->value, $siteName);
     }
 
     /**
