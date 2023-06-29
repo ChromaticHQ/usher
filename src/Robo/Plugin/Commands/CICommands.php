@@ -104,7 +104,7 @@ class CICommands extends Tasks
         $phpcsStandards = implode(',', $this->getRequiredRoboConfigArrayFor('phpcs_standards'));
         $phpcsCheckExtensions = implode(',', $this->getRequiredRoboConfigArrayFor('phpcs_check_extensions'));
         $phpcsIgnorePaths = implode(',', $this->getRequiredRoboConfigArrayFor('phpcs_ignore_paths'));
-        $phpcsPhpVersion = Robo::config()->get('phpcs_php_version', $this::PHPCS_DEFAULT_PHP_VERSION);
+        $phpcsPhpVersion = Robo::config()->get('php_current_version', $this::PHPCS_DEFAULT_PHP_VERSION);
         $twigLintEnabled = Robo::config()->get('twig_lint_enable') ?? true;
 
         /** @var \Robo\Task\CommandStack $stack */
