@@ -59,7 +59,7 @@ class DevelopmentModeBaseCommands extends Tasks
         $drupalFinder->locateRoot(getcwd());
         $this->drupalRoot = $drupalFinder->getDrupalRoot();
         $this->vendorDirectory = $drupalFinder->getVendorDir();
-        $this->devServicesPath = "$this->drupalRoot/sites/fe.development.services.yml";
+        $this->devServicesPath = "$this->drupalRoot/sites/development.services.yml";
     }
 
     /**
@@ -319,7 +319,7 @@ class DevelopmentModeBaseCommands extends Tasks
             );
         }
         // Copy the development services file.
-        $development_services_file = "$this->drupalRoot/sites/development.services.yml";
+        $development_services_file = "$this->drupalRoot/sites/example.development.services.yml";
         if (file_exists($development_services_file)) {
             $result = $this->taskFilesystemStack()
                 ->copy($development_services_file, $this->devServicesPath, true)
@@ -331,13 +331,6 @@ class DevelopmentModeBaseCommands extends Tasks
             );
         }
 
-        $this->say("enablig twig.debug in development.services.yml.");
-        $devServices = Yaml::parseFile($this->devServicesPath);
-        $devServices['parameters']['twig.config'] = [
-            'debug' => true,
-            'auto_reload' => true,
-        ];
-        file_put_contents($this->devServicesPath, Yaml::dump($devServices));
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
         // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
         $result = $this->collectionBuilder()
