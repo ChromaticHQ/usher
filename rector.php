@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php71\Rector\FuncCall\CountOnNullRector;
+use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
-use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
-use Rector\Php71\Rector\FuncCall\CountOnNullRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
