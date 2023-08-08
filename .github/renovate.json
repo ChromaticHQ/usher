@@ -8,5 +8,6 @@
     ],
     "reviewers": [
         "markdorison"
-    ]
+    ],
+    "rangeStrategy": "widen"
 }
