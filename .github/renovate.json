@@ -9,6 +9,5 @@
     "reviewers": [
         "markdorison"
     ],
-    "rangeStrategy": "widen",
-    "dependencyDashboard": true
+    "rangeStrategy": "widen"
 }
