@@ -1,7 +1,7 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "config:base"
+        "config:recommended"
     ],
     "assignees": [
         "markdorison"
@@ -9,5 +9,6 @@
     "reviewers": [
         "markdorison"
     ],
-    "rangeStrategy": "widen"
+    "rangeStrategy": "widen",
+    "dependencyDashboard": true
 }
