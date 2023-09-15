@@ -5,14 +5,14 @@ namespace Usher\Robo\Plugin\Commands;
 use DrupalFinder\DrupalFinder;
 use Robo\Exception\TaskException;
 use Robo\Result;
-use Robo\Robo;
+use Robo\ResultData;
 use Robo\Tasks;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Usher\Robo\Plugin\Enums\LocalDevEnvironmentTypes;
 use Usher\Robo\Plugin\Traits\DatabaseDownloadTrait;
 use Usher\Robo\Plugin\Traits\DrupalVersionTrait;
 use Usher\Robo\Plugin\Traits\SitesConfigTrait;
+use Usher\Robo\Task\Discovery\Alternatives;
 
 /**
  * Robo commands related to changing development modes.
@@ -123,43 +123,55 @@ class DevelopmentModeBaseCommands extends Tasks
     /**
      * Refresh database on Tugboat.
      */
-    public function databaseRefreshTugboat(): Result
+    public function databaseRefreshTugboat(): ResultData
     {
         $this->io()->title('refresh tugboat databases.');
-        $result = null;
+        $result_data = new ResultData();
+
         foreach (array_keys($this->getAllSitesConfig()) as $siteName) {
             try {
                 $dbPath = $this->databaseDownload($siteName);
-            } catch (TaskException) {
-                $this->yell("$siteName: No database configured. Download/import skipped.");
+            } catch (TaskException $te) {
+                $result_data->append($te->getMessage());
                 // @todo: Should we run a site-install by default?
                 continue;
             }
-            if (!is_string($dbPath) || strlen($dbPath) == 0) {
+            if (!isset($dbPath) || !is_string($dbPath) || strlen($dbPath) == 0) {
                 $this->yell("'$siteName' database path not found.");
+                $result_data->append("'$siteName' database path not found.");
                 continue;
             }
             $dbName = $siteName === 'default' ? 'tugboat' : $siteName;
-            $result = $this->taskExec('mysql')
+            $taskResult = $this->task(Alternatives::class, 'mariadb', 'mysql')->run();
+            if (!$taskResult->wasSuccessful()) {
+                $result_data->append($taskResult);
+                continue;
+            }
+            $dbDriver = $taskResult->getData()['path'];
+            $taskResult = $this->taskExec($dbDriver)
                 ->option('-h', 'mariadb')
                 ->option('-u', 'tugboat')
                 ->option('-ptugboat')
                 ->option('-e', "drop database if exists $dbName; create database $dbName;")
                 ->run();
-
+            $result_data->append($taskResult);
             $this->io()->section("import $siteName database.");
-            $result = $this->taskExec("zcat $dbPath | mysql -h mariadb -u tugboat -ptugboat $dbName")
+            $taskResult = $this->taskExec("zcat $dbPath | $dbDriver -h mariadb -u tugboat -ptugboat $dbName")
                 ->run();
-            $result = $this->taskExec('rm')->args($dbPath)->run();
+            $result_data->append($taskResult);
+            $taskResult = $this->taskExec('rm')->args($dbPath)->run();
+            $result_data->append($taskResult);
 
             if (!$this->drupalVersionIsD7($this->drupalRoot)) {
-                $result = $this->taskExec("$this->vendorDirectory/bin/drush")
+                $taskResult = $this->taskExec("$this->vendorDirectory/bin/drush")
                     ->arg('cache:rebuild')
                     ->dir("$this->drupalRoot/sites/$siteName")
                     ->run();
+                $result_data->append($taskResult);
             }
         }
-        return $result;
+
+        return $result_data;
     }
 
     /**
