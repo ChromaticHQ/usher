@@ -4,6 +4,7 @@ namespace Usher\Robo\Task\Discovery;
 
 use Robo\Task\BaseTask;
 use Robo\Result;
+use Robo\ResultData;
 
 /**
  * Use this to figure out which binary to use from a series of alternatives.
@@ -21,9 +22,9 @@ use Robo\Result;
 class Alternatives extends BaseTask
 {
     /**
-     * @var string
+     * @var array
      */
-    protected string $alternatives;
+    protected array $alternatives;
 
     /**
      * @var string
@@ -40,11 +41,11 @@ class Alternatives extends BaseTask
      *
      * @param string $command
      *   The preferred binary or path to binary to execute.
-     * @param string $alternatives
-     *   A comma-separated list of alternative binaries or paths to binaries to
+     * @param array $alternatives
+     *   A list of alternative binaries or paths to binaries to
      *   execute.
      */
-    public function __construct(string $command, string $alternatives)
+    public function __construct(string $command, array $alternatives)
     {
         $this->command = $command;
         $this->alternatives = $alternatives;
@@ -56,17 +57,17 @@ class Alternatives extends BaseTask
      * The array returned by Result::getData() will always contain a 'path'
      *   property, even if empty.
      */
-    public function run(): Result
+    public function run(): Result|ResultData
     {
         $this->printTaskInfo("Resolving binary for {$this->command}...");
         if (@file_exists($this->command) && is_executable($this->command)) {
             return Result::success($this, "Found {$this->command}", ['path' => $this->command]);
         }
         $output = [];
-        $result_code = NULL;
-        $alternatives = explode(',', $this->alternatives);
-        array_unshift($alternatives, $this->command);
-        foreach ($alternatives as $alternative) {
+        $result_code = null;
+
+        array_unshift($this->alternatives, $this->command);
+        foreach ($this->alternatives as $alternative) {
             $arg = escapeshellarg($alternative);
             exec("which $arg", $output, $result_code);
             if ($result_code === static::SHELL_SUCCESS) {
@@ -76,5 +77,4 @@ class Alternatives extends BaseTask
         $this->printTaskWarning('Could not resolve any of the executables suggested.');
         return Result::cancelled('Could not resolve any of the executables suggested.', ['path' => '']);
     }
-
 }

@@ -132,6 +132,7 @@ class DevelopmentModeBaseCommands extends Tasks
             try {
                 $dbPath = $this->databaseDownload($siteName);
             } catch (TaskException $te) {
+                $this->yell("$siteName: No database configured. Download/import skipped.");
                 $result_data->append($te->getMessage());
                 // @todo: Should we run a site-install by default?
                 continue;
