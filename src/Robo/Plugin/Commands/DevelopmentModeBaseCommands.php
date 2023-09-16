@@ -137,6 +137,7 @@ class DevelopmentModeBaseCommands extends Tasks
                 // @todo: Should we run a site-install by default?
                 continue;
             }
+            /* @phpstan-ignore-next-line */
             if (!isset($dbPath) || !is_string($dbPath) || strlen($dbPath) == 0) {
                 $this->yell("'$siteName' database path not found.");
                 $result_data->append("'$siteName' database path not found.");
