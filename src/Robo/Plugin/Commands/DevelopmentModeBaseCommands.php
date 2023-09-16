@@ -137,6 +137,10 @@ class DevelopmentModeBaseCommands extends Tasks
                 // @todo: Should we run a site-install by default?
                 continue;
             }
+            // phpstan doesn't seem to be able to understand that $dbPath will
+            // be undefined if an exception is thrown in try{}, so it complains.
+            // I could not find any identifier that would silence this so I had
+            // to silence the whole line :(.
             /* @phpstan-ignore-next-line */
             if (!isset($dbPath) || !is_string($dbPath) || strlen($dbPath) == 0) {
                 $this->yell("'$siteName' database path not found.");
