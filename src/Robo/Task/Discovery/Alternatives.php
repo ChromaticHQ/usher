@@ -22,16 +22,6 @@ use Robo\ResultData;
 class Alternatives extends BaseTask
 {
     /**
-     * @var array
-     */
-    protected array $alternatives;
-
-    /**
-     * @var string
-     */
-    protected string $command;
-
-    /**
      * @var int
      */
     protected const SHELL_SUCCESS = 0;
@@ -45,10 +35,10 @@ class Alternatives extends BaseTask
      *   A list of alternative binaries or paths to binaries to
      *   execute.
      */
-    public function __construct(string $command, array $alternatives)
-    {
-        $this->command = $command;
-        $this->alternatives = $alternatives;
+    public function __construct(
+        protected string $command,
+        protected array $alternatives
+    ) {
     }
 
     /**
@@ -68,7 +58,7 @@ class Alternatives extends BaseTask
 
         array_unshift($this->alternatives, $this->command);
         foreach ($this->alternatives as $alternative) {
-            $arg = escapeshellarg($alternative);
+            $arg = escapeshellarg((string) $alternative);
             exec("which $arg", $output, $result_code);
             if ($result_code === static::SHELL_SUCCESS) {
                 return Result::success($this, "Resolved to $alternative", ['path' => current($output)]);
