@@ -50,17 +50,17 @@ class Alternatives extends BaseTask
     public function run(): Result|ResultData
     {
         $this->printTaskInfo("Resolving binary for {$this->command}...");
-        if (@file_exists($this->command) && is_executable($this->command)) {
+        if (file_exists($this->command) && is_executable($this->command)) {
             return Result::success($this, "Found {$this->command}", ['path' => $this->command]);
         }
         $output = [];
-        $result_code = null;
+        $resultCode = null;
 
         array_unshift($this->alternatives, $this->command);
         foreach ($this->alternatives as $alternative) {
             $arg = escapeshellarg((string) $alternative);
-            exec("which $arg", $output, $result_code);
-            if ($result_code === static::SHELL_SUCCESS) {
+            exec("which $arg", $output, $resultCode);
+            if ($resultCode === static::SHELL_SUCCESS) {
                 return Result::success($this, "Resolved to $alternative", ['path' => current($output)]);
             }
         }

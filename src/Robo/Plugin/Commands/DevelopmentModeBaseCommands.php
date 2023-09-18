@@ -30,21 +30,21 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @var string
      */
-    protected $drupalRoot;
+    protected string $drupalRoot;
 
     /**
      * Composer vendor directory.
      *
      * @var string
      */
-    protected $vendorDirectory;
+    protected string $vendorDirectory;
 
     /**
      * Path to front-end development services path.
      *
      * @var string
      */
-    protected $devServicesPath;
+    protected string $devServicesPath;
 
     /**
      * Class constructor.
@@ -126,31 +126,27 @@ class DevelopmentModeBaseCommands extends Tasks
     public function databaseRefreshTugboat(): ResultData
     {
         $this->io()->title('refresh tugboat databases.');
-        $result_data = new ResultData();
+        $resultData = new ResultData();
 
         foreach (array_keys($this->getAllSitesConfig()) as $siteName) {
+            $dbPath = '';
             try {
                 $dbPath = $this->databaseDownload($siteName);
-            } catch (TaskException $te) {
+            } catch (TaskException $e) {
                 $this->yell("$siteName: No database configured. Download/import skipped.");
-                $result_data->append($te->getMessage());
+                $resultData->append($e->getMessage());
                 // @todo: Should we run a site-install by default?
                 continue;
             }
-            // phpstan doesn't seem to be able to understand that $dbPath will
-            // be undefined if an exception is thrown in try{}, so it complains.
-            // I could not find any identifier that would silence this so I had
-            // to silence the whole line :(.
-            /* @phpstan-ignore-next-line */
-            if (!isset($dbPath) || !is_string($dbPath) || strlen($dbPath) == 0) {
+            if (!is_string($dbPath) || strlen($dbPath) === 0) {
                 $this->yell("'$siteName' database path not found.");
-                $result_data->append("'$siteName' database path not found.");
+                $resultData->append("'$siteName' database path not found.");
                 continue;
             }
             $dbName = $siteName === 'default' ? 'tugboat' : $siteName;
             $taskResult = $this->task(Alternatives::class, 'mariadb', 'mysql')->run();
             if (!$taskResult->wasSuccessful()) {
-                $result_data->append($taskResult);
+                $resultData->append($taskResult);
                 continue;
             }
             $dbDriver = $taskResult->getData()['path'];
@@ -160,24 +156,24 @@ class DevelopmentModeBaseCommands extends Tasks
                 ->option('-ptugboat')
                 ->option('-e', "drop database if exists $dbName; create database $dbName;")
                 ->run();
-            $result_data->append($taskResult);
+            $resultData->append($taskResult);
             $this->io()->section("import $siteName database.");
             $taskResult = $this->taskExec("zcat $dbPath | $dbDriver -h mariadb -u tugboat -ptugboat $dbName")
                 ->run();
-            $result_data->append($taskResult);
+            $resultData->append($taskResult);
             $taskResult = $this->taskExec('rm')->args($dbPath)->run();
-            $result_data->append($taskResult);
+            $resultData->append($taskResult);
 
             if (!$this->drupalVersionIsD7($this->drupalRoot)) {
                 $taskResult = $this->taskExec("$this->vendorDirectory/bin/drush")
                     ->arg('cache:rebuild')
                     ->dir("$this->drupalRoot/sites/$siteName")
                     ->run();
-                $result_data->append($taskResult);
+                $resultData->append($taskResult);
             }
         }
 
-        return $result_data;
+        return $resultData;
     }
 
     /**
