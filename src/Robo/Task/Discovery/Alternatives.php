@@ -14,7 +14,7 @@ use Robo\ResultData;
  * // Figure out whether you should use more or less or cat on a system. The
  * // result data will always contain a 'path' property, even if no alternative
  * // could be resolved and the path is empty.
- * $result = $this->task(Alternatives::class, 'more', 'less,cat')->run();
+ * $result = $this->task(Alternatives::class, 'more', ['less', 'cat'])->run();
  * $binary = $result->getData()['path']
  * ?>
  * ```
