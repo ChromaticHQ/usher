@@ -117,7 +117,7 @@ trait SitesConfigTrait
     protected function getDrupalSiteAdminUid(string $siteName = 'default'): int
     {
         return $this->getSiteConfigItem(
-            key: 'drupal_admin_uid',
+            key: 'drupal_user_login_uid',
             siteName: $siteName,
             required: false,
             // @todo: Replace the use of '1' with a constant once we drop PHP
