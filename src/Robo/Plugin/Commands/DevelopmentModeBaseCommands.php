@@ -192,10 +192,12 @@ class DevelopmentModeBaseCommands extends Tasks
         string $siteDir = 'default',
     ): Result {
         $this->io()->section("create login link.");
+        $uid = $this->getSiteConfigItem(key: 'drush_user_login_uid', siteName: $siteDir, required: false) ?? 1;
         return $this->taskExec($environmentType)
             ->arg('drush')
             ->arg("@$siteDir.$environmentType")
             ->arg('user:login')
+            ->option("--uid=$uid")
             ->dir("$this->drupalRoot/sites/$siteDir")
             ->run();
     }

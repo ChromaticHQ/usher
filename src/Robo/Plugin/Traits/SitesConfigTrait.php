@@ -78,12 +78,17 @@ trait SitesConfigTrait
      *   The site configuration key to load.
      * @param string $siteName
      *   The site name.
+     * @param bool $required
+     *   Whether the config item is expected to always be present.
      */
-    public function getSiteConfigItem(string $key, string $siteName = 'default'): mixed
+    public function getSiteConfigItem(string $key, string $siteName = 'default', bool $required = true): mixed
     {
         $siteConfig = $this->getSiteConfig(siteName: $siteName);
         if (!isset($siteConfig[$key])) {
-            throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
+            if ($required) {
+                throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
+            }
+            return null;
         }
         return $siteConfig[$key];
     }
