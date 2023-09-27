@@ -11,13 +11,6 @@ use Symfony\Component\Yaml\Yaml;
 trait SitesConfigTrait
 {
     /**
-     * The default Drupal admin user ID.
-     *
-     * @var int
-     */
-    protected const DRUPAL_DEFAULT_ADMIN_UID = 1;
-
-    /**
      * Filename for a site's configuration file.
      *
      * @var string
@@ -127,6 +120,8 @@ trait SitesConfigTrait
             key: 'drupal_admin_uid',
             siteName: $siteName,
             required: false,
-        ) ?? self::DRUPAL_DEFAULT_ADMIN_UID;
+            // @todo: Replace the use of '1' with a constant once we drop PHP
+            // 8.1 support.
+        ) ?? 1;
     }
 }
