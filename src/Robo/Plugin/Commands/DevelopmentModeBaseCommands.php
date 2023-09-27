@@ -144,7 +144,7 @@ class DevelopmentModeBaseCommands extends Tasks
                 continue;
             }
             $dbName = $siteName === 'default' ? 'tugboat' : $siteName;
-            $taskResult = $this->task(Alternatives::class, 'mariadb', 'mysql')->run();
+            $taskResult = $this->task(Alternatives::class, 'mariadb', ['mysql'])->run();
             if (!$taskResult->wasSuccessful()) {
                 $resultData->append($taskResult);
                 continue;
