@@ -2,6 +2,7 @@
 default:
   database_s3_bucket: S3_BUCKET_NAME
   database_s3_key_prefix_string: prod-db-prefix
+  drupal_user_login_uid: 108
   theme_build:
     - theme_path: web/themes/custom/theme1
       theme_build_commands:

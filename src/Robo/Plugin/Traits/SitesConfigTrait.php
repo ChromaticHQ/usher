@@ -78,12 +78,17 @@ trait SitesConfigTrait
      *   The site configuration key to load.
      * @param string $siteName
      *   The site name.
+     * @param bool $required
+     *   Whether the config item is expected to always be present.
      */
-    public function getSiteConfigItem(string $key, string $siteName = 'default'): mixed
+    public function getSiteConfigItem(string $key, string $siteName = 'default', bool $required = true): mixed
     {
         $siteConfig = $this->getSiteConfig(siteName: $siteName);
         if (!isset($siteConfig[$key])) {
-            throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
+            if ($required) {
+                throw new TaskException($this, "Key $key not found for '$siteName' in $this->sitesConfigFile.");
+            }
+            return null;
         }
         return $siteConfig[$key];
     }
@@ -98,5 +103,25 @@ trait SitesConfigTrait
     {
         ksort($sitesConfig);
         file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
+    }
+
+    /**
+     * Get the Drupal site admin user ID.
+     *
+     * @param string $siteName
+     *   The site name.
+     *
+     * @return int
+     *   The Drupal admin user ID.
+     */
+    protected function getDrupalSiteAdminUid(string $siteName = 'default'): int
+    {
+        return $this->getSiteConfigItem(
+            key: 'drupal_user_login_uid',
+            siteName: $siteName,
+            required: false,
+            // @todo: Replace the use of '1' with a constant once we drop PHP
+            // 8.1 support.
+        ) ?? 1;
     }
 }
