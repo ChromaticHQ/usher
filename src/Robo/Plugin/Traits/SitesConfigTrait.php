@@ -11,6 +11,13 @@ use Symfony\Component\Yaml\Yaml;
 trait SitesConfigTrait
 {
     /**
+     * The default Drupal admin user ID.
+     *
+     * @var int
+     */
+    protected const DRUPAL_DEFAULT_ADMIN_UID = 1;
+
+    /**
      * Filename for a site's configuration file.
      *
      * @var string
@@ -103,5 +110,23 @@ trait SitesConfigTrait
     {
         ksort($sitesConfig);
         file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
+    }
+
+    /**
+     * Get the Drupal site admin user ID.
+     *
+     * @param string $siteName
+     *   The site name.
+     *
+     * @return int
+     *   The Drupal admin user ID.
+     */
+    protected function getDrupalSiteAdminUid(string $siteName = 'default'): int
+    {
+        return $this->getSiteConfigItem(
+            key: 'drupal_admin_uid',
+            siteName: $siteName,
+            required: false,
+        ) ?? self::DRUPAL_DEFAULT_ADMIN_UID;
     }
 }
