@@ -347,11 +347,12 @@ class DevelopmentModeBaseCommands extends Tasks
             );
         }
 
-        $this->say("enablig twig.debug in development.services.yml.");
+        $this->say("enablig twig.debug in development services yml config.");
         $devServices = Yaml::parseFile($this->devServicesPath);
         $devServices['parameters']['twig.config'] = [
             'debug' => true,
             'auto_reload' => true,
+            'cache' => false,
         ];
         file_put_contents($this->devServicesPath, Yaml::dump($devServices));
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
