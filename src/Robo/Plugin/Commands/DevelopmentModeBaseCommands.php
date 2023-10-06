@@ -347,7 +347,7 @@ class DevelopmentModeBaseCommands extends Tasks
             );
         }
 
-        $this->say("enablig twig.debug in development services yml config.");
+        $this->say("optimizing twig for front-end development in development services yml config.");
         $devServices = Yaml::parseFile($this->devServicesPath);
         $devServices['parameters']['twig.config'] = [
             'debug' => true,
