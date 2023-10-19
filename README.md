@@ -53,17 +53,16 @@ is provided as a starting point for Drupal projects.
 ### `robo dev:refresh`
 
 The `dev:refresh` command, often available in downstream repos as
-`composer robo dev:refresh SITENAME`, refreshes your local Lando environment
-which includes:
+`composer robo dev:refresh -- DDEV/LANDO SITENAME`, refreshes your local
+development environment (DDEV or Lando) which includes:
 
 1. `composer install`
-1. `lando start`
 1. Theme build (`robo theme:build`).
 1. Disabling front-end caches.
 1. Downloading the most recent database dump.
 1. Importing the database dump.
 1. `drush deploy`
-1. Generating a login link.
+1. Generating a Drupal login link.
 
 ### `robo deploy:drupal`
 
