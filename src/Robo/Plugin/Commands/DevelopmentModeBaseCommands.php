@@ -78,8 +78,8 @@ class DevelopmentModeBaseCommands extends Tasks
         $this->say("Importing $dbPath");
         $this->taskExec('ddev')
             ->arg('import-db')
-            ->option('target-db', $siteName == 'default' ? 'db' : $siteName)
-            ->option('src', $dbPath)
+            ->option('database', $siteName == 'default' ? 'db' : $siteName)
+            ->option('file', $dbPath)
             ->run();
 
         $this->say("Deleting $dbPath");
