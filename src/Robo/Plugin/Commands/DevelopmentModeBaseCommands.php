@@ -283,7 +283,7 @@ class DevelopmentModeBaseCommands extends Tasks
         $result = $this->frontendDevEnableDrupal($siteName, ['yes' => true]);
 
         if ($environmentType == LocalDevEnvironmentTypes::LANDO) {
-            $result = $this->databaseRefreshLando($siteName);
+            $result = $this->databaseRefreshLando(siteName: $siteName, options: ['db' => $databasePath]);
         } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
             $result = $this->databaseRefreshDdev(siteName: $siteName, options: ['db' => $databasePath]);
         }
