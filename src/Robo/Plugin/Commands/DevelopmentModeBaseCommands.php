@@ -76,9 +76,9 @@ class DevelopmentModeBaseCommands extends Tasks
 
         ['db' => $dbPath] = $options;
         // Track whether a database path was provided by the user or not.
-        $dbPathProvided = $dbPath !== '';
+        $dbPathProvidedByUser = $dbPath !== '';
 
-        if (!$dbPathProvided) {
+        if (!$dbPathProvidedByUser) {
             $dbPath = $this->databaseDownload($siteName);
         }
 
@@ -91,7 +91,7 @@ class DevelopmentModeBaseCommands extends Tasks
             ->run();
 
         // If a database was downloaded as part of this process, delete it.
-        if (!$dbPathProvided) {
+        if (!$dbPathProvidedByUser) {
             $this->deleteDatabase($dbPath);
         }
 
@@ -115,9 +115,9 @@ class DevelopmentModeBaseCommands extends Tasks
 
         ['db' => $dbPath] = $options;
         // Track whether a database path was provided by the user or not.
-        $dbPathProvided = $dbPath !== '';
+        $dbPathProvidedByUser = $dbPath !== '';
 
-        if (!$dbPathProvided) {
+        if (!$dbPathProvidedByUser) {
             $dbPath = $this->databaseDownload($siteName);
         }
 
@@ -132,7 +132,7 @@ class DevelopmentModeBaseCommands extends Tasks
             ->run();
 
         // If a database was downloaded as part of this process, delete it.
-        if (!$dbPathProvided) {
+        if (!$dbPathProvidedByUser) {
             $this->deleteDatabase($dbPath);
         }
 
