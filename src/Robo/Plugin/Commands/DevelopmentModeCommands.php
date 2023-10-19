@@ -20,54 +20,50 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
     /**
      * Refreshes a development environment.
      *
-     * Completely refreshes a development environment including running 'composer install', starting Lando, downloading
-     * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
+     * Completely refreshes a development environment including running 'composer install', downloading
+     * a database dump, importing it, running deployment commands, disabling front-end caches, and
+     * providing a login link.
      *
-     * @param string $environmentType
-     *   Specify local development environment: ddev, lando.
      * @param string $siteName
      *   The Drupal site name.
-     * @option start-local-dev
-     *   Skip starting Lando.
      * @option db
      *   Provide a database dump instead of relying on the latest available.
+     * @option environment-type
+     *   Specify alternative (supported) environment type. See LocalDevEnvironmentTypes enum.
      *
      * @aliases magic
      */
     public function devRefresh(
-        string $environmentType,
         string $siteName = 'default',
-        array $options = ['start-local-dev' => false, 'db' => ''],
+        array $options = ['db' => '', 'environment-type' => 'ddev'],
     ): Result {
+        ['db' => $dbPath, 'environment-type' => $environmentType] = $options;
         return $this->devRefreshDrupal(
             environmentType: LocalDevEnvironmentTypes::from($environmentType),
             siteName: $siteName,
-            startLocalEnv: $options['start-local-dev'],
-            databasePath: $options['db'],
+            databasePath: $dbPath,
         );
     }
 
     /**
      * Refreshes development environments for *all* sites.
      *
-     * Completely refreshes a development environment including running 'composer install', starting Lando, downloading
-     * a database dump, importing it, running 'drush deploy', disabling front-end caches, and providing a login link.
+     * Completely refreshes a development environment including running 'composer install', downloading
+     * a database dump, importing it, running deployment commands, disabling front-end caches, and
+     * providing a login link.
      *
      * Examples:
      *   dev:refresh-all ddev --skip-sites=common,example
      *
-     * @param string $environmentType
-     *   Specify local development environment: ddev, lando.
      * @option skip-sites
      *   A comma separated list of sites to skip.
-     * @option start-local-dev
-     *   Start local development environment.
+     * @option environment-type
+     *   Specify alternative (supported) environment type. See LocalDevEnvironmentTypes enum.
      */
     public function devRefreshAll(
-        string $environmentType,
-        array $options = ['skip-sites' => '', 'start-local-dev' => false]
+        array $options = ['skip-sites' => '', 'environment-type' => 'ddev']
     ): Result {
-        ['skip-sites' => $skipSites, 'start-local-dev' => $startLocalDev] = $options;
+        ['skip-sites' => $skipSites, 'environment-type' => $environmentType] = $options;
         $siteNames = $this->getAllSiteNames();
         $result = null;
         foreach ($siteNames as $siteName) {
@@ -77,7 +73,6 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
             $result = $this->devRefreshDrupal(
                 environmentType: LocalDevEnvironmentTypes::from($environmentType),
                 siteName: $siteName,
-                startLocalEnv: $startLocalDev,
             );
         }
         return $result;

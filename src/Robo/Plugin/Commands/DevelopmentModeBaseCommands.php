@@ -72,6 +72,7 @@ class DevelopmentModeBaseCommands extends Tasks
      */
     public function databaseRefreshDdev(string $siteName = 'default', array $options = ['db' => '']): Result
     {
+        // @todo: Update this method to not be DDEV specific.
         $this->io()->title('DDEV database refresh.');
 
         ['db' => $dbPath] = $options;
@@ -84,7 +85,7 @@ class DevelopmentModeBaseCommands extends Tasks
 
         $this->io()->section("importing $siteName database.");
         $this->say("Importing $dbPath");
-        $this->taskExec('ddev')
+        $this->taskExec(LocalDevEnvironmentTypes::DDEV->value)
             ->arg('import-db')
             ->option('database', $siteName == 'default' ? 'db' : $siteName)
             ->option('file', $dbPath)
@@ -97,47 +98,6 @@ class DevelopmentModeBaseCommands extends Tasks
 
         return $this->drushDeployWith(
             localEnvironmentType: LocalDevEnvironmentTypes::DDEV,
-            siteDir: $siteName,
-        );
-    }
-
-    /**
-     * Refresh a site database in Lando.
-     *
-     * @param string $siteName
-     *   The Drupal site name.
-     * @option db
-     *   Provide a path to a database dump to be used instead of downloading the latest dump.
-     */
-    public function databaseRefreshLando(string $siteName = 'default', array $options = ['db' => '']): Result
-    {
-        $this->io()->title('lando database refresh.');
-
-        ['db' => $dbPath] = $options;
-        // Track whether a database path was provided by the user or not.
-        $dbPathProvidedByUser = $dbPath !== '';
-
-        if (!$dbPathProvidedByUser) {
-            $dbPath = $this->databaseDownload($siteName);
-        }
-
-        $this->io()->section("importing $siteName database.");
-        $this->say("Importing $dbPath");
-        // If this is a multi-site, include a host option so Lando imports to the correct database.
-        $hostOption = $siteName !== 'default' ? "--host=$siteName" : '';
-        $this->taskExec('lando')
-            ->arg('db-import')
-            ->arg($dbPath)
-            ->arg($hostOption)
-            ->run();
-
-        // If a database was downloaded as part of this process, delete it.
-        if (!$dbPathProvidedByUser) {
-            $this->deleteDatabase($dbPath);
-        }
-
-        return $this->drushDeployWith(
-            localEnvironmentType: LocalDevEnvironmentTypes::LANDO,
             siteDir: $siteName,
         );
     }
@@ -205,7 +165,8 @@ class DevelopmentModeBaseCommands extends Tasks
      * @aliases uli
      *
      * @param string $environmentType
-     *   Specify local development enviroment: ddev, lando.
+     *   Specify local development enviroment: ddev. This value is a string instead of LocalDevEnvironmentTypes since
+     *   it is a public command that can be called from the command line.
      * @param string $siteDir
      *   The Drupal site directory name.
      */
@@ -263,18 +224,11 @@ class DevelopmentModeBaseCommands extends Tasks
     protected function devRefreshDrupal(
         LocalDevEnvironmentTypes $environmentType,
         string $siteName = 'default',
-        bool $startLocalEnv = false,
         string $databasePath = '',
     ): Result {
         $this->io()->title('development environment refresh. 🦄✨');
         $result = $this->taskComposerInstall()->run();
-        if ($startLocalEnv) {
-            if ($environmentType == LocalDevEnvironmentTypes::LANDO) {
-                $result = $this->taskExec('lando')->arg('start')->run();
-            } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
-                $result = $this->taskExec('ddev')->arg('start')->run();
-            }
-        }
+
         // There isn't a great way to call a command in one class from another.
         // https://github.com/consolidation/Robo/issues/743
         // For now, it seems like calling robo from within robo works.
@@ -282,11 +236,8 @@ class DevelopmentModeBaseCommands extends Tasks
             ->run();
         $result = $this->frontendDevEnableDrupal($siteName, ['yes' => true]);
 
-        if ($environmentType == LocalDevEnvironmentTypes::LANDO) {
-            $result = $this->databaseRefreshLando(siteName: $siteName, options: ['db' => $databasePath]);
-        } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
-            $result = $this->databaseRefreshDdev(siteName: $siteName, options: ['db' => $databasePath]);
-        }
+        $result = $this->databaseRefreshDdev(siteName: $siteName, options: ['db' => $databasePath]);
+
         return $this->drupalLoginLink($environmentType->value, $siteName);
     }
 

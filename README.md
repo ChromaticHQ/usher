@@ -53,8 +53,8 @@ is provided as a starting point for Drupal projects.
 ### `robo dev:refresh`
 
 The `dev:refresh` command, often available in downstream repos as
-`composer robo dev:refresh -- DDEV/LANDO SITENAME`, refreshes your local
-development environment (DDEV or Lando) which includes:
+`composer robo dev:refresh -- SITENAME`, refreshes your local
+development environment (DDEV) which includes:
 
 1. `composer install`
 1. Theme build (`robo theme:build`).

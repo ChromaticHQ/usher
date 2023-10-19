@@ -29,8 +29,8 @@ phpcs_standards:
   - DrupalPractice
 php_current_version: '8.1'
 php_version_config_paths:
+  - .ddev/config.yaml
   - composer.json
-  - .lando.yml
   - .tugboat/config.yml
   - .platform.app.yaml
   - .github/workflows/ci.yml
