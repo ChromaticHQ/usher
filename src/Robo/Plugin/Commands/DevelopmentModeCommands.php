@@ -29,18 +29,21 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
      *   The Drupal site name.
      * @option start-local-dev
      *   Skip starting Lando.
+     * @option db
+     *   Provide a database dump instead of relying on the latest available.
      *
      * @aliases magic
      */
     public function devRefresh(
         string $environmentType,
         string $siteName = 'default',
-        array $options = ['start-local-dev' => false],
+        array $options = ['start-local-dev' => false, 'db' => ''],
     ): Result {
         return $this->devRefreshDrupal(
             environmentType: LocalDevEnvironmentTypes::from($environmentType),
             siteName: $siteName,
             startLocalEnv: $options['start-local-dev'],
+            databasePath: $options['db'],
         );
     }
 
