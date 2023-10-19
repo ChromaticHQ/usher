@@ -190,4 +190,13 @@ trait DatabaseDownloadTrait
         }
         return $fileName;
     }
+
+    /**
+     * Delete the specified database.
+     */
+    protected function deleteDatabase(string $dbPath): Result
+    {
+        $this->say("Deleting $dbPath");
+        return $this->taskExec('rm')->args($dbPath)->run();
+    }
 }

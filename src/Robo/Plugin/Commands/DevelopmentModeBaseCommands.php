@@ -67,12 +67,20 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteName
      *   The Drupal site name.
+     * @option db
+     *   Provide a path to a database dump to be used instead of downloading the latest dump.
      */
-    public function databaseRefreshDdev(string $siteName = 'default'): Result
+    public function databaseRefreshDdev(string $siteName = 'default', array $options = ['db' => '']): Result
     {
         $this->io()->title('DDEV database refresh.');
 
-        $dbPath = $this->databaseDownload($siteName);
+        ['db' => $dbPath] = $options;
+        // Track whether a database path was provided by the user or not.
+        $dbPathProvidedByUser = $dbPath !== '';
+
+        if (!$dbPathProvidedByUser) {
+            $dbPath = $this->databaseDownload($siteName);
+        }
 
         $this->io()->section("importing $siteName database.");
         $this->say("Importing $dbPath");
@@ -82,8 +90,11 @@ class DevelopmentModeBaseCommands extends Tasks
             ->option('file', $dbPath)
             ->run();
 
-        $this->say("Deleting $dbPath");
-        $this->taskExec('rm')->args($dbPath)->run();
+        // If a database was downloaded as part of this process, delete it.
+        if (!$dbPathProvidedByUser) {
+            $this->deleteDatabase($dbPath);
+        }
+
         return $this->drushDeployWith(
             localEnvironmentType: LocalDevEnvironmentTypes::DDEV,
             siteDir: $siteName,
@@ -95,12 +106,20 @@ class DevelopmentModeBaseCommands extends Tasks
      *
      * @param string $siteName
      *   The Drupal site name.
+     * @option db
+     *   Provide a path to a database dump to be used instead of downloading the latest dump.
      */
-    public function databaseRefreshLando(string $siteName = 'default'): Result
+    public function databaseRefreshLando(string $siteName = 'default', array $options = ['db' => '']): Result
     {
         $this->io()->title('lando database refresh.');
 
-        $dbPath = $this->databaseDownload($siteName);
+        ['db' => $dbPath] = $options;
+        // Track whether a database path was provided by the user or not.
+        $dbPathProvidedByUser = $dbPath !== '';
+
+        if (!$dbPathProvidedByUser) {
+            $dbPath = $this->databaseDownload($siteName);
+        }
 
         $this->io()->section("importing $siteName database.");
         $this->say("Importing $dbPath");
@@ -112,8 +131,11 @@ class DevelopmentModeBaseCommands extends Tasks
             ->arg($hostOption)
             ->run();
 
-        $this->say("Deleting $dbPath");
-        $this->taskExec('rm')->args($dbPath)->run();
+        // If a database was downloaded as part of this process, delete it.
+        if (!$dbPathProvidedByUser) {
+            $this->deleteDatabase($dbPath);
+        }
+
         return $this->drushDeployWith(
             localEnvironmentType: LocalDevEnvironmentTypes::LANDO,
             siteDir: $siteName,
@@ -242,6 +264,7 @@ class DevelopmentModeBaseCommands extends Tasks
         LocalDevEnvironmentTypes $environmentType,
         string $siteName = 'default',
         bool $startLocalEnv = false,
+        string $databasePath = '',
     ): Result {
         $this->io()->title('development environment refresh. 🦄✨');
         $result = $this->taskComposerInstall()->run();
@@ -258,10 +281,11 @@ class DevelopmentModeBaseCommands extends Tasks
         $result = $this->taskExec("composer robo theme:build $siteName")
             ->run();
         $result = $this->frontendDevEnableDrupal($siteName, ['yes' => true]);
+
         if ($environmentType == LocalDevEnvironmentTypes::LANDO) {
-            $result = $this->databaseRefreshLando($siteName);
+            $result = $this->databaseRefreshLando(siteName: $siteName, options: ['db' => $databasePath]);
         } elseif ($environmentType == LocalDevEnvironmentTypes::DDEV) {
-            $result = $this->databaseRefreshDdev($siteName);
+            $result = $this->databaseRefreshDdev(siteName: $siteName, options: ['db' => $databasePath]);
         }
         return $this->drupalLoginLink($environmentType->value, $siteName);
     }
