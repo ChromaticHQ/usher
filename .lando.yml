@@ -1,9 +1,0 @@
-name: usher
-recipe: symfony
-config:
-  php: '8.1'
-  webroot: .
-
-tooling:
-  robo:
-    service: appserver

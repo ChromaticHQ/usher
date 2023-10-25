@@ -14,7 +14,8 @@ downstream repos.
 
 | Usher Version | PHP | Drupal | Notes |
 | --- | --- | --- | --- |
-| 3.x | 8.1+ | 9.5 - 10.1+ | **Active development**
+| 4.x | 8.1+ | 9.5 - 10.1+ | **Active development**
+| 3.x | 8.1+ | 9.5 - 10.1+ | **Minimally maintained**
 | 2.x | 7.4 - 8.1 | 7, 9.4 - 10.0 | **Minimally maintained**
 | 1.x | 7.4 | 7, 8 | **Unsupported**
 
@@ -53,8 +54,8 @@ is provided as a starting point for Drupal projects.
 ### `robo dev:refresh`
 
 The `dev:refresh` command, often available in downstream repos as
-`composer robo dev:refresh -- DDEV/LANDO SITENAME`, refreshes your local
-development environment (DDEV or Lando) which includes:
+`composer robo dev:refresh -- SITENAME`, refreshes your local
+development environment (DDEV) which includes:
 
 1. `composer install`
 1. Theme build (`robo theme:build`).
