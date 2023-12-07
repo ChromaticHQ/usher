@@ -86,4 +86,54 @@ class DevelopmentModeCommands extends DevelopmentModeBaseCommands
     {
         return $this->frontendDevEnableDrupal($siteDir, $opts);
     }
+
+    /**
+     * Setup a site in GitHub Codespaces.
+     *
+     * @return \Robo\Result
+     *   The result of the set of tasks.
+     *
+     * @throws \Robo\Exception\TaskException
+     *
+     */
+    public function setupCodespaces(): Result
+    {
+        $this->io()->title('Symlinking file system.');
+        $docRootDir = Robo::config()->get('drupal_document_root') ?? 'web';
+        $codespaces_directory = getenv('PWD') . '/' . $docRootDir;
+        if (empty($codespaces_directory)) {
+            throw new TaskException($this, 'Codespaces directory is unavailable.');
+        }
+        $this->taskDeleteDir('/var/www/html')->run();
+        $result = $this->taskExec("ln -s $codespaces_directory /var/www/html")->run();
+
+        $this->io()->title('Start apache, forwarding port 80.');
+        $result = $this->taskExec('service apache2 start')->run();
+
+        $this->io()->title('Download database.');
+        $dbPath = $this->databaseDownload();
+        if (empty($dbPath)) {
+            throw new TaskException($this, 'Database download failed.');
+        }
+
+        $this->io()->section('Importing database.');
+        $result = $this->taskExec("zcat $dbPath | mysql -h db -u mariadb -pmariadb mariadb")->run();
+        $result = $this->taskExec('rm')->args($dbPath)->run();
+
+        $this->io()->section('Building theme.');
+        $result = $this->taskExec('composer robo theme:build')->run();
+
+        $this->io()->section('Drush deploy.');
+        $result = $this->taskExecStack()
+            ->exec("vendor/bin/drush deploy --yes")
+            // Import the latest configuration again. This includes the latest
+            // configuration_split configuration. Importing this twice ensures that
+            // the latter command enables and disables modules based upon the most up
+            // to date configuration. Additional information and discussion can be
+            // found here:
+            // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
+            ->exec("drush config:import --yes")
+            ->run();
+        return $result;
+    }
 }
