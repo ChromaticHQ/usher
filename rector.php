@@ -21,10 +21,6 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
-        MixedTypeRector::class,
-        CountOnNullRector::class => [
-            // @see https://github.com/rectorphp/rector/issues/8016
-            __DIR__ . '/src/Robo/Plugin/Traits/SitesConfigTrait.php',
-        ],
+        MixedTypeRector::class
     ]);
 };
