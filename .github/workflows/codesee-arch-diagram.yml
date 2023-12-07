@@ -4,7 +4,7 @@
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
-      - 3.x
+      - "[0-9].x"
   pull_request_target:
     types: [opened, synchronize, reopened]
 
