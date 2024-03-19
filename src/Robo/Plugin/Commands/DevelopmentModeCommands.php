@@ -146,7 +146,7 @@ class DevelopmentModeCommands extends Tasks
         $this->say("Importing $dbPath");
         $this->taskExec(LocalDevEnvironmentTypes::DDEV->value)
             ->arg('import-db')
-            ->option('database', $siteName == 'default' ? 'db' : $siteName)
+            ->option('database', $siteName === 'default' ? 'db' : $siteName)
             ->option('file', $dbPath)
             ->run();
 
