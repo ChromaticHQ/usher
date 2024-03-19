@@ -86,7 +86,7 @@ class DrupalStatusReportCommands extends Tasks
                 ->dir("$this->drupalRoot/sites/$siteDir/")
                 ->printOutput(false)
                 ->run();
-            $drushOutput = trim($result->getOutputData());
+            $drushOutput = trim((string) $result->getOutputData());
             $reportJson = json_decode($drushOutput, null, 512, JSON_THROW_ON_ERROR);
             if (!is_array($reportJson) || $reportJson !== []) {
                 $this->say($drushOutput);
