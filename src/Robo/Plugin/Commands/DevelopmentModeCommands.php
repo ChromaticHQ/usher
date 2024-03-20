@@ -142,7 +142,7 @@ class DevelopmentModeCommands extends Tasks
             $dbPath = $this->databaseDownload($siteName);
         }
 
-        $this->io()->section("importing $siteName database.");
+        $this->io()->section("refreshing $siteName database.");
         $this->say("Dropping existing database for $siteName");
         $this->taskExec('drush')
             ->arg('sql:drop')
@@ -325,25 +325,18 @@ class DevelopmentModeCommands extends Tasks
                 "'drush deploy' command not found. Further work is necessary to support this version of Drush."
             );
         }
-        // After drush deploy, import the latest configuration again. This
-        // includes the latest configuration_split configuration. Importing this
-        // twice ensures that the latter command enables and disables modules
-        // based upon the most up--to-date configuration. Additional information
-        // and discussion can be found here:
+            // After drush deploy, re-import the latest configuration. This includes
+        // the latest configuration_split configuration. Importing this twice
+        // ensures that the latter command enables and disables modules based
+        // upon the most up--to-date configuration. More at:
         // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
 
-        // ddev command is not available inside ddev containers.
-        if ($localEnvironmentType->value == 'ddev') {
-            return $this->taskExecStack()
-                ->dir("$this->drupalRoot/sites/$siteDir")
-                ->exec("drush @$siteDir.$localEnvironmentType->value deploy --yes")
-                ->exec("drush @$siteDir.$localEnvironmentType->value config:import --yes")
-                ->run();
-        }
+        // Currently we only have one local environment type:
+        // LocalDevEnvironmentTypes::DDEV, so no need for other implementations.
         return $this->taskExecStack()
             ->dir("$this->drupalRoot/sites/$siteDir")
-            ->exec("$localEnvironmentType->value drush @$siteDir.$localEnvironmentType->value deploy --yes")
-            ->exec("$localEnvironmentType->value drush @$siteDir.$localEnvironmentType->value config:import --yes")
+            ->exec("drush @$siteDir.$localEnvironmentType->value deploy --yes")
+            ->exec("drush @$siteDir.$localEnvironmentType->value config:import --yes")
             ->run();
     }
 
