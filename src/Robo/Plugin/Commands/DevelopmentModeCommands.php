@@ -325,7 +325,7 @@ class DevelopmentModeCommands extends Tasks
                 "'drush deploy' command not found. Further work is necessary to support this version of Drush."
             );
         }
-            // After drush deploy, re-import the latest configuration. This includes
+        // After drush deploy, re-import the latest configuration. This includes
         // the latest configuration_split configuration. Importing this twice
         // ensures that the latter command enables and disables modules based
         // upon the most up--to-date configuration. More at:
