@@ -142,14 +142,15 @@ class DevelopmentModeCommands extends Tasks
             $dbPath = $this->databaseDownload($siteName);
         }
 
-        $this->io()->section("importing $siteName database.");
-        $this->say("Importing $dbPath");
-        $this->taskExec(LocalDevEnvironmentTypes::DDEV->value)
-            ->arg('import-db')
-            ->option('database', $siteName === 'default' ? 'db' : $siteName)
-            ->option('file', $dbPath)
+        $this->io()->section("refreshing $siteName database.");
+        $this->say("Dropping existing database for $siteName");
+        $this->taskExec('drush')
+            ->arg('sql:drop')
+            ->option('uri', $siteName)
+            ->option('yes')
             ->run();
-
+        $this->say("Importing $dbPath");
+        $this->_exec("zcat '$dbPath' | drush sql:cli --uri=$siteName");
         // If a database was downloaded as part of this process, delete it.
         if (!$dbPathProvidedByUser) {
             $this->deleteDatabase($dbPath);
@@ -235,6 +236,14 @@ class DevelopmentModeCommands extends Tasks
     ): Result {
         $this->io()->section("create login link.");
         $uid = $this->getDrupalSiteAdminUid(siteName: $siteDir);
+        if ($environmentType === 'ddev') {
+            return $this->taskExec('drush')
+                ->arg("@$siteDir.$environmentType")
+                ->arg('user:login')
+                ->option("--uid=$uid")
+                ->dir("$this->drupalRoot/sites/$siteDir")
+                ->run();
+        }
         return $this->taskExec($environmentType)
             ->arg('drush')
             ->arg("@$siteDir.$environmentType")
@@ -316,16 +325,18 @@ class DevelopmentModeCommands extends Tasks
                 "'drush deploy' command not found. Further work is necessary to support this version of Drush."
             );
         }
+        // After drush deploy, re-import the latest configuration. This includes
+        // the latest configuration_split configuration. Importing this twice
+        // ensures that the latter command enables and disables modules based
+        // upon the most up--to-date configuration. More at:
+        // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
+
+        // Currently we only have one local environment type:
+        // LocalDevEnvironmentTypes::DDEV, so no need for other implementations.
         return $this->taskExecStack()
             ->dir("$this->drupalRoot/sites/$siteDir")
-            ->exec("$localEnvironmentType->value drush @$siteDir.$localEnvironmentType->value deploy --yes")
-            // Import the latest configuration again. This includes the latest
-            // configuration_split configuration. Importing this twice ensures that
-            // the latter command enables and disables modules based upon the most up
-            // to date configuration. Additional information and discussion can be
-            // found here:
-            // https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
-            ->exec("$localEnvironmentType->value drush @$siteDir.$localEnvironmentType->value config:import --yes")
+            ->exec("drush @$siteDir.$localEnvironmentType->value deploy --yes")
+            ->exec("drush @$siteDir.$localEnvironmentType->value config:import --yes")
             ->run();
     }
 
