@@ -236,7 +236,7 @@ class DevelopmentModeCommands extends Tasks
     ): Result {
         $this->io()->section("create login link.");
         $uid = $this->getDrupalSiteAdminUid(siteName: $siteDir);
-        if ($environmentType == 'ddev') {
+        if ($environmentType === 'ddev') {
             return $this->taskExec('drush')
                 ->arg("@$siteDir.$environmentType")
                 ->arg('user:login')
