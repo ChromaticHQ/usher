@@ -11,6 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 trait SitesConfigTrait
 {
     use RoboConfigTrait;
+
     /**
      * Filename for a site's configuration file.
      *

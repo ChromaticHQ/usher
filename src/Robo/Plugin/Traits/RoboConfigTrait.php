@@ -12,18 +12,22 @@ use Usher\Robo\Plugin\Enums\ConfigTypes;
  */
 trait RoboConfigTrait
 {
-
-    const defaultYamlConf = [
+    protected array $defaultYamlConf = [
         'inline_level' => 10,
         'indent' => 2,
-        'dump_bits' => Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK | Yaml::DUMP_NUMERIC_KEY_AS_STRING | Yaml::DUMP_OBJECT_AS_MAP,
+        'dump_bits' => Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE |
+            Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE |
+            Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK |
+            Yaml::DUMP_NUMERIC_KEY_AS_STRING |
+            Yaml::DUMP_OBJECT_AS_MAP,
     ];
 
     /**
      * Get the default YAML configuration.
      */
-    protected function getDefaultYamlConf(): array {
-        return static::defaultYamlConf;
+    protected function getDefaultYamlConf(): array
+    {
+        return $this->defaultYamlConf;
     }
 
     /**
@@ -155,5 +159,4 @@ trait RoboConfigTrait
             )
         );
     }
-
 }
