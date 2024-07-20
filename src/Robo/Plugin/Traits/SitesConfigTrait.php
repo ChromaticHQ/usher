@@ -10,6 +10,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 trait SitesConfigTrait
 {
+    use RoboConfigTrait;
     /**
      * Filename for a site's configuration file.
      *
@@ -102,7 +103,7 @@ trait SitesConfigTrait
     protected function writeSitesConfig(array $sitesConfig): void
     {
         ksort($sitesConfig);
-        file_put_contents($this->sitesConfigFile, Yaml::dump($sitesConfig));
+        $this->writeYaml($this->sitesConfigFile, $sitesConfig);
     }
 
     /**
