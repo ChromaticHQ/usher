@@ -50,6 +50,7 @@
         }
     },
     "require-dev": {
-        "phpstan/phpstan-strict-rules": "^1.5"
+        "phpstan/phpstan-strict-rules": "^1.5",
+        "drupal/core": "*"
     }
 }
