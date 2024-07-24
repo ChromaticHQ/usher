@@ -31,7 +31,7 @@ trait RoboConfigTrait
     }
 
     /**
-     * Get Robo configuration value.
+     * Get an optional Robo configuration array.
      *
      * @param string $key
      *   The key of the configuration to load.
@@ -41,12 +41,17 @@ trait RoboConfigTrait
     protected function getOptionalRoboConfigArrayFor(string $key): mixed
     {
         $configValue = Robo::config()->get($key);
-        $this->validateRoboConfigValueMatchesType(
-            configValue: $configValue,
-            expectedType: ConfigTypes::array,
-            key: $key,
-        );
-        return $configValue ?? [];
+        if (is_null($configValue)) {
+            $configValue = [];
+        }
+        else {
+            $this->validateRoboConfigValueMatchesType(
+                configValue: $configValue,
+                expectedType: ConfigTypes::array,
+                key: $key,
+            );
+        }
+        return $configValue;
     }
 
     /**
