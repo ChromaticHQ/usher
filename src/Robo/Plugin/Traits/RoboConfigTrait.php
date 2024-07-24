@@ -43,8 +43,7 @@ trait RoboConfigTrait
         $configValue = Robo::config()->get($key);
         if (is_null($configValue)) {
             $configValue = [];
-        }
-        else {
+        } else {
             $this->validateRoboConfigValueMatchesType(
                 configValue: $configValue,
                 expectedType: ConfigTypes::array,
