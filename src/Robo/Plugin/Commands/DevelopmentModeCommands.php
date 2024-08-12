@@ -390,7 +390,7 @@ class DevelopmentModeCommands extends Tasks
             'auto_reload' => true,
             'cache' => false,
         ];
-        file_put_contents($this->devServicesPath, Yaml::dump($devServices));
+        $this->writeYaml($this->devServicesPath, $devServices);
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
         // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
         $result = $this->collectionBuilder()
