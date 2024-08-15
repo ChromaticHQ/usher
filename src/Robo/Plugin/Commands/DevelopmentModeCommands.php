@@ -2,7 +2,7 @@
 
 namespace Usher\Robo\Plugin\Commands;
 
-use DrupalFinder\DrupalFinder;
+use DrupalFinder\DrupalFinderComposerRuntime;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\ResultData;
@@ -53,8 +53,7 @@ class DevelopmentModeCommands extends Tasks
         $this->stopOnFail();
 
         // Find Drupal root path.
-        $drupalFinder = new DrupalFinder();
-        $drupalFinder->locateRoot(getcwd());
+        $drupalFinder = new DrupalFinderComposerRuntime();
         $this->drupalRoot = $drupalFinder->getDrupalRoot();
         $this->vendorDirectory = $drupalFinder->getVendorDir();
         $this->devServicesPath = "$this->drupalRoot/sites/fe.development.services.yml";
@@ -402,7 +401,7 @@ class DevelopmentModeCommands extends Tasks
             'auto_reload' => true,
             'cache' => false,
         ];
-        file_put_contents($this->devServicesPath, Yaml::dump($devServices));
+        $this->writeYaml($this->devServicesPath, $devServices);
         $this->say("disabling render and dynamic_page_cache in settings.local.php.");
         // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
         $result = $this->collectionBuilder()

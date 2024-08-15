@@ -107,7 +107,7 @@ class ToolingCommands extends Tasks
         $roboConfigPath = "$this->cwd/robo.yml";
         $roboConfig = Yaml::parse((string) file_get_contents($roboConfigPath));
         $roboConfig[$key] = $value;
-        file_put_contents($roboConfigPath, Yaml::dump($roboConfig));
+        $this->writeYaml($roboConfigPath, $roboConfig);
     }
 
     /**

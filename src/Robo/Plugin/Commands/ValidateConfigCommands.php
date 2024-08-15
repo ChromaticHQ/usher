@@ -2,7 +2,7 @@
 
 namespace Usher\Robo\Plugin\Commands;
 
-use DrupalFinder\DrupalFinder;
+use DrupalFinder\DrupalFinderComposerRuntime;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Tasks;
@@ -38,8 +38,7 @@ class ValidateConfigCommands extends Tasks
         $this->stopOnFail();
 
         // Find Drupal root path.
-        $drupalFinder = new DrupalFinder();
-        $drupalFinder->locateRoot(getcwd());
+        $drupalFinder = new DrupalFinderComposerRuntime();
         $this->drupalRoot = $drupalFinder->getDrupalRoot();
     }
 
