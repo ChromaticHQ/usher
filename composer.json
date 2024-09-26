@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "consolidation/robo": "^1.4 || ^2 || ^3 || ^4",
+        "consolidation/robo": "^1.4 || ^2 || ^3 || ^4 || ^5",
         "squizlabs/php_codesniffer": "^3.5",
         "phpstan/phpstan-deprecation-rules": "^0.12.6 || ^1.0.0",
         "async-aws/s3": "^1.8 || ^2.0",
