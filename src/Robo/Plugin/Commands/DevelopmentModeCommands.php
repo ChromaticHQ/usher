@@ -204,14 +204,6 @@ class DevelopmentModeCommands extends Tasks
             $resultData->append($taskResult);
             $taskResult = $this->taskExec('rm')->args($dbPath)->run();
             $resultData->append($taskResult);
-
-            if (!$this->drupalVersionIsD7($this->drupalRoot)) {
-                $taskResult = $this->taskExec("$this->vendorDirectory/bin/drush")
-                    ->arg('cache:rebuild')
-                    ->dir("$this->drupalRoot/sites/$siteName")
-                    ->run();
-                $resultData->append($taskResult);
-            }
         }
 
         return $resultData;
