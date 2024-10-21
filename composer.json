@@ -6,7 +6,15 @@
     "authors": [
         {
             "name": "Mark Dorison",
-            "email": "mark@chromatichq.com"
+            "email": "mark@dorison.org"
+        },
+        {
+            "name": "Adam Zimmermann",
+            "email": "adam@adamzimmermann.com"
+        },
+        {
+            "name": "Kristofer Widholm",
+            "email": "279278+apotek@users.noreply.github.com"
         }
     ],
     "require": {
