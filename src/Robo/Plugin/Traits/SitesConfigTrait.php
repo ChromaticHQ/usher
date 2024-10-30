@@ -71,8 +71,7 @@ trait SitesConfigTrait
                 $this,
                 "Sites configuration in $this->sitesConfigFile is missing or malformed."
             );
-        }
-        else if (
+        } elseif (
             !array_key_exists($siteName, $allSitesConfig)
             || !is_array($allSitesConfig[$siteName])
         ) {
