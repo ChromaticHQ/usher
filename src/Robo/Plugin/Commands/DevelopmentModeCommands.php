@@ -80,7 +80,7 @@ class DevelopmentModeCommands extends Tasks
         ConsoleIO $io,
         string $siteName = 'default',
         array $options = ['db' => '', 'environment-type' => 'ddev'],
-    ): Result {
+    ): Result|ResultData {
         ['db' => $dbPath, 'environment-type' => $environmentType] = $options;
         return $this->devRefreshDrupal(
             io: $io,
@@ -108,7 +108,7 @@ class DevelopmentModeCommands extends Tasks
     public function devRefreshAll(
         ConsoleIO $io,
         array $options = ['skip-sites' => '', 'environment-type' => 'ddev']
-    ): Result {
+    ): Result|ResultData {
         ['skip-sites' => $skipSites, 'environment-type' => $environmentType] = $options;
         $siteNames = $this->getAllSiteNames();
         $result = null;
@@ -121,6 +121,10 @@ class DevelopmentModeCommands extends Tasks
                 environmentType: LocalDevEnvironmentTypes::from($environmentType),
                 siteName: $siteName,
             );
+            if ($result instanceof ResultData) {
+                $io->say("Cancelling the refresh for all sites.");
+                return $result;
+            }
         }
         return $result;
     }
@@ -297,7 +301,7 @@ class DevelopmentModeCommands extends Tasks
         LocalDevEnvironmentTypes $environmentType,
         string $siteName = 'default',
         string $databasePath = '',
-    ): Result {
+    ): Result|ResultData {
         $io->title('development environment refresh. 🦄✨');
         $this->taskComposerInstall()->run();
         // There isn't a great way to call a command in one class from another.
@@ -306,7 +310,10 @@ class DevelopmentModeCommands extends Tasks
         $this->taskExec("composer robo theme:build $siteName")
             ->run();
         $this->frontendDevEnable($io, $siteName, ['yes' => true]);
-        $this->databaseRefreshDdev($io, siteName: $siteName, options: ['db' => $databasePath]);
+        $result = $this->databaseRefreshDdev($io, siteName: $siteName, options: ['db' => $databasePath]);
+        if ($result instanceof ResultData) {
+            return $result;
+        }
 
         return $this->drupalLoginLink($io, $environmentType->value, $siteName);
     }

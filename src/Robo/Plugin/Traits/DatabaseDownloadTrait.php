@@ -2,6 +2,7 @@
 
 namespace Usher\Robo\Plugin\Traits;
 
+use AsyncAws\Core\Exception\Http\ClientException;
 use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\S3\S3Client;
 use AsyncAws\S3\ValueObject\AwsObject;
@@ -44,17 +45,20 @@ trait DatabaseDownloadTrait
             $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
             $objects->resolve();
             $authenticated = $objects->info()['status'] === 200;
-        } catch (\Exception $e) {
+        } catch (ClientException $e) {
             $io->error($e->getMessage());
         }
         if (!$authenticated) {
             if (getenv('AWS_SECRET_ACCESS_KEY')) {
                 $io->error([
-                    'Cannot authenticate to AWS. Please fix your AWS environment',
+                    'Cannot authenticate to AWS S3. Please fix your AWS environment',
                     'variables, or remove them completely and try again.',
                 ]);
                 return Result::cancelled();
             }
+            $io->say("Unable to authenticate to AWS S3.
+            You can either set your credentials as environment variables and try again,
+            or you can continue by configuring your AWS credentials file.");
             $result = $this->configureAwsCredentials($io);
             if ($result->wasCancelled()) {
                 return Result::cancelled();
@@ -109,7 +113,7 @@ trait DatabaseDownloadTrait
         $authenticated = false;
 
         while ($authenticated === false) {
-            $yes = $io->confirm('Do you wish to configure your AWS S3 credentials?');
+            $yes = $io->confirm('Do you wish to configure your AWS S3 credentials file?');
             if (!$yes) {
                 return Result::cancelled();
             }
