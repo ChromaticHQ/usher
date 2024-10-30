@@ -66,14 +66,19 @@ trait SitesConfigTrait
     protected function getSiteConfig(string $siteName = 'default'): mixed
     {
         $allSitesConfig = $this->getAllSitesConfig();
-        if (
-            !is_array($allSitesConfig)
-            || !array_key_exists($siteName, $allSitesConfig)
+        if (!is_array($allSitesConfig)) {
+            throw new TaskException(
+                $this,
+                "Sites configuration in $this->sitesConfigFile is missing or malformed."
+            );
+        }
+        else if (
+            !array_key_exists($siteName, $allSitesConfig)
             || !is_array($allSitesConfig[$siteName])
         ) {
             throw new TaskException(
                 $this,
-                "Sites configuration in $this->sitesConfigFile is missing or malformed."
+                "Sites configuration for '$siteName' in $this->sitesConfigFile is missing or malformed."
             );
         }
 
