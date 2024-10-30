@@ -6,6 +6,7 @@ use DrupalFinder\DrupalFinderComposerRuntime;
 use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\ResultData;
+use Robo\Symfony\ConsoleIO;
 use Robo\Tasks;
 use Symfony\Component\Yaml\Yaml;
 use Usher\Robo\Plugin\Enums\LocalDevEnvironmentTypes;
@@ -76,11 +77,13 @@ class DevelopmentModeCommands extends Tasks
      * @aliases magic
      */
     public function devRefresh(
+        ConsoleIO $io,
         string $siteName = 'default',
         array $options = ['db' => '', 'environment-type' => 'ddev'],
     ): Result {
         ['db' => $dbPath, 'environment-type' => $environmentType] = $options;
         return $this->devRefreshDrupal(
+            io: $io,
             environmentType: LocalDevEnvironmentTypes::from($environmentType),
             siteName: $siteName,
             databasePath: $dbPath,
@@ -103,6 +106,7 @@ class DevelopmentModeCommands extends Tasks
      *   Specify alternative (supported) environment type. See LocalDevEnvironmentTypes enum.
      */
     public function devRefreshAll(
+        ConsoleIO $io,
         array $options = ['skip-sites' => '', 'environment-type' => 'ddev']
     ): Result {
         ['skip-sites' => $skipSites, 'environment-type' => $environmentType] = $options;
@@ -113,6 +117,7 @@ class DevelopmentModeCommands extends Tasks
                 continue;
             }
             $result = $this->devRefreshDrupal(
+                $io,
                 environmentType: LocalDevEnvironmentTypes::from($environmentType),
                 siteName: $siteName,
             );
@@ -128,27 +133,32 @@ class DevelopmentModeCommands extends Tasks
      * @option db
      *   Provide a path to a database dump to be used instead of downloading the latest dump.
      */
-    public function databaseRefreshDdev(string $siteName = 'default', array $options = ['db' => '']): Result
-    {
-        // @todo: Update this method to not be DDEV specific.
-        $this->io()->title('DDEV database refresh.');
+    public function databaseRefreshDdev(
+        ConsoleIO $io,
+        string $siteName = 'default',
+        array $options = ['db' => '']
+    ): Result|ResultData {
+        $io->title('DDEV database refresh.');
 
         ['db' => $dbPath] = $options;
         // Track whether a database path was provided by the user or not.
         $dbPathProvidedByUser = $dbPath !== '';
 
         if (!$dbPathProvidedByUser) {
-            $dbPath = $this->databaseDownload($siteName);
+            $dbPath = $this->databaseDownload($io, $siteName);
+            if ($dbPath instanceof ResultData) {
+                return $dbPath;
+            }
         }
 
-        $this->io()->section("refreshing $siteName database.");
-        $this->say("Dropping existing database for $siteName");
+        $io->section("refreshing $siteName database.");
+        $io->say("Dropping existing database for $siteName");
         $this->taskExec('drush')
             ->arg('sql:drop')
             ->option('uri', $siteName)
             ->option('yes')
             ->run();
-        $this->say("Importing $dbPath");
+        $io->say("Importing $dbPath");
         $this->_exec("zcat '$dbPath' | drush sql:cli --uri=$siteName");
         // If a database was downloaded as part of this process, delete it.
         if (!$dbPathProvidedByUser) {
@@ -156,6 +166,7 @@ class DevelopmentModeCommands extends Tasks
         }
 
         return $this->drushDeployWith(
+            io: $io,
             localEnvironmentType: LocalDevEnvironmentTypes::DDEV,
             siteDir: $siteName,
         );
@@ -164,23 +175,23 @@ class DevelopmentModeCommands extends Tasks
     /**
      * Refresh database on Tugboat.
      */
-    public function databaseRefreshTugboat(): ResultData
+    public function databaseRefreshTugboat(ConsoleIO $io): ResultData
     {
-        $this->io()->title('refresh tugboat databases.');
+        $io->title('refresh tugboat databases.');
         $resultData = new ResultData();
 
         foreach (array_keys($this->getAllSitesConfig()) as $siteName) {
             $dbPath = '';
             try {
-                $dbPath = $this->databaseDownload($siteName);
+                $dbPath = $this->databaseDownload($io, $siteName);
             } catch (TaskException $e) {
-                $this->yell("$siteName: No database configured. Download/import skipped.");
+                $io->yell("$siteName: No database configured. Download/import skipped.");
                 $resultData->append($e->getMessage());
                 // @todo: Should we run a site-install by default?
                 continue;
             }
             if (!is_string($dbPath) || $dbPath === '') {
-                $this->yell("'$siteName' database path not found.");
+                $io->yell("'$siteName' database path not found.");
                 $resultData->append("'$siteName' database path not found.");
                 continue;
             }
@@ -198,7 +209,7 @@ class DevelopmentModeCommands extends Tasks
                 ->option('-e', "drop database if exists $dbName; create database $dbName;")
                 ->run();
             $resultData->append($taskResult);
-            $this->io()->section("import $siteName database.");
+            $io->section("import $siteName database.");
             $taskResult = $this->taskExec("zcat $dbPath | $dbDriver -h mariadb -u tugboat -ptugboat $dbName")
                 ->run();
             $resultData->append($taskResult);
@@ -216,16 +227,17 @@ class DevelopmentModeCommands extends Tasks
      * @aliases uli
      *
      * @param string $environmentType
-     *   Specify local development enviroment: ddev. This value is a string instead of LocalDevEnvironmentTypes since
+     *   Specify local development environment: ddev. This value is a string instead of LocalDevEnvironmentTypes since
      *   it is a public command that can be called from the command line.
      * @param string $siteDir
      *   The Drupal site directory name.
      */
     public function drupalLoginLink(
+        ConsoleIO $io,
         string $environmentType,
         string $siteDir = 'default',
     ): Result {
-        $this->io()->section("create login link.");
+        $io->section("create login link.");
         $uid = $this->getDrupalSiteAdminUid(siteName: $siteDir);
         if ($environmentType === 'ddev') {
             return $this->taskExec('drush')
@@ -254,22 +266,22 @@ class DevelopmentModeCommands extends Tasks
      *
      * @option boolean $yes Default answers to yes.
      * @aliases fedd
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
-    public function frontendDevDisable(string $siteDir = 'default', array $opts = ['yes|y' => false])
-    {
+    public function frontendDevDisable(
+        ConsoleIO $io,
+        string $siteDir = 'default',
+        array $opts = ['yes|y' => false]
+    ): Result|ResultData {
         $devSettingsPath = "$this->drupalRoot/sites/$siteDir/settings.local.php";
         if (!$opts['yes']) {
-            $this->yell("This command will overwrite any customizations you have made to $devSettingsPath and
+            $io->yell("This command will overwrite any customizations you have made to $devSettingsPath and
                 $this->devServicesPath.");
-            $yes = $this->io()->confirm('This command is destructive. Do you wish to continue?');
+            $yes = $io->confirm('This command is destructive. Do you wish to continue?');
             if (!$yes) {
                 return Result::cancelled();
             }
         }
-        $this->io()->title('disabling front-end development mode.');
+        $io->title('disabling front-end development mode.');
         return $this->collectionBuilder()
             ->taskFilesystemStack()
             ->remove($devSettingsPath)
@@ -281,23 +293,22 @@ class DevelopmentModeCommands extends Tasks
      * Refreshes a development environment based upon the Drupal version.
      */
     protected function devRefreshDrupal(
+        ConsoleIO $io,
         LocalDevEnvironmentTypes $environmentType,
         string $siteName = 'default',
         string $databasePath = '',
     ): Result {
-        $this->io()->title('development environment refresh. 🦄✨');
-        $result = $this->taskComposerInstall()->run();
-
+        $io->title('development environment refresh. 🦄✨');
+        $this->taskComposerInstall()->run();
         // There isn't a great way to call a command in one class from another.
         // https://github.com/consolidation/Robo/issues/743
         // For now, it seems like calling robo from within robo works.
-        $result = $this->taskExec("composer robo theme:build $siteName")
+        $this->taskExec("composer robo theme:build $siteName")
             ->run();
-        $result = $this->frontendDevEnable($siteName, ['yes' => true]);
+        $this->frontendDevEnable($io, $siteName, ['yes' => true]);
+        $this->databaseRefreshDdev($io, siteName: $siteName, options: ['db' => $databasePath]);
 
-        $result = $this->databaseRefreshDdev(siteName: $siteName, options: ['db' => $databasePath]);
-
-        return $this->drupalLoginLink($environmentType->value, $siteName);
+        return $this->drupalLoginLink($io, $environmentType->value, $siteName);
     }
 
     /**
@@ -306,10 +317,11 @@ class DevelopmentModeCommands extends Tasks
      * @see https://www.drush.org/deploycommand
      */
     protected function drushDeployWith(
+        ConsoleIO $io,
         LocalDevEnvironmentTypes $localEnvironmentType,
         string $siteDir = 'default',
     ): Result {
-        $this->io()->section('drush deploy.');
+        $io->section('drush deploy.');
         if (!class_exists(\Drush\Commands\core\DeployCommands::class)) {
             throw new TaskException(
                 $this,
@@ -341,30 +353,30 @@ class DevelopmentModeCommands extends Tasks
      *
      * @option boolean $yes Default answers to yes.
      * @aliases fede
-     *
-     * @return \Robo\Result
-     *   The result of the set of tasks.
      */
-    public function frontendDevEnable(string $siteDir = 'default', array $opts = ['yes|y' => false])
-    {
+    public function frontendDevEnable(
+        ConsoleIO $io,
+        string $siteDir = 'default',
+        array $opts = ['yes|y' => false],
+    ): Result|ResultData {
         $devSettingsPath = "$this->drupalRoot/sites/$siteDir/settings.local.php";
 
         if (!$opts['yes']) {
-            $this->yell("This command will overwrite any customizations you have made to $devSettingsPath and
+            $io->yell("This command will overwrite any customizations you have made to $devSettingsPath and
                 $this->devServicesPath.");
-            $yes = $this->io()->confirm('This command is destructive. Do you wish to continue?');
+            $yes = $io->confirm('This command is destructive. Do you wish to continue?');
             if (!$yes) {
                 return Result::cancelled();
             }
         }
 
-        $this->io()->title('enabling front-end development mode.');
-        $this->say("copying settings.local.php and development.services.yml into sites/$siteDir.");
+        $io->title('enabling front-end development mode.');
+        $io->say("copying settings.local.php and development.services.yml into sites/$siteDir.");
 
         // Copy the example local settings file.
         $example_local_settings_file = "$this->drupalRoot/sites/example.settings.local.php";
         if (file_exists($example_local_settings_file)) {
-            $result = $this->taskFilesystemStack()
+            $this->taskFilesystemStack()
                 ->copy($example_local_settings_file, $devSettingsPath)
                 ->run();
         } else {
@@ -376,7 +388,7 @@ class DevelopmentModeCommands extends Tasks
         // Copy the development services file.
         $development_services_file = "$this->drupalRoot/sites/development.services.yml";
         if (file_exists($development_services_file)) {
-            $result = $this->taskFilesystemStack()
+            $this->taskFilesystemStack()
                 ->copy($development_services_file, $this->devServicesPath, true)
                 ->run();
         } else {
@@ -386,7 +398,7 @@ class DevelopmentModeCommands extends Tasks
             );
         }
 
-        $this->say("optimizing twig for front-end development in development services yml config.");
+        $io->say("optimizing twig for front-end development in development services yml config.");
         $devServices = Yaml::parseFile($this->devServicesPath);
         $devServices['parameters']['twig.config'] = [
             'debug' => true,
@@ -394,9 +406,9 @@ class DevelopmentModeCommands extends Tasks
             'cache' => false,
         ];
         $this->writeYaml($this->devServicesPath, $devServices);
-        $this->say("disabling render and dynamic_page_cache in settings.local.php.");
+        $io->say("disabling render and dynamic_page_cache in settings.local.php.");
         // https://github.com/consolidation/robo/issues/1059#issuecomment-967732068
-        $result = $this->collectionBuilder()
+        return $this->collectionBuilder()
             ->taskReplaceInFile($devSettingsPath)
             ->from('/sites/development.services.yml')
             ->to("/sites/fe.development.services.yml")
@@ -417,6 +429,5 @@ class DevelopmentModeCommands extends Tasks
             ->line(' */')
             ->line('$config[\'advagg.settings\'][\'enabled\'] = FALSE;')
             ->run();
-        return $result;
     }
 }

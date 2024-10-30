@@ -2,9 +2,14 @@
 
 namespace Usher\Robo\Plugin\Traits;
 
+use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\S3\S3Client;
+use AsyncAws\S3\ValueObject\AwsObject;
+use Robo\Exception\AbortTasksException;
 use Robo\Exception\TaskException;
 use Robo\Result;
+use Robo\ResultData;
+use Robo\Symfony\ConsoleIO;
 
 /**
  * Trait to provide database download functionality to Robo commands.
@@ -13,10 +18,8 @@ trait DatabaseDownloadTrait
 {
     /**
      * Default S3 region.
-     *
-     * @var string
      */
-    protected $s3DefaultRegion = 'us-east-1';
+    protected string $s3DefaultRegion = 'us-east-1';
 
     /**
      * Download the latest database dump for the site.
@@ -26,25 +29,45 @@ trait DatabaseDownloadTrait
      *
      * @aliases dbdl
      *
-     * @throws \Robo\Exception\TaskException
+     * @throws \Robo\Exception\TaskException|\Robo\Exception\AbortTasksException
      */
-    public function databaseDownload(string $siteName = 'default'): string|\Robo\Result
+    public function databaseDownload(ConsoleIO $io, string $siteName = 'default'): string|ResultData
     {
-        $this->io()->title('database download.');
+        $io->title('database download.');
 
-        $awsConfigDirPath = getenv('HOME') . '/.aws';
-        $awsConfigFilePath = "$awsConfigDirPath/credentials";
-        if (!is_dir($awsConfigDirPath) || !file_exists($awsConfigFilePath)) {
-            $result = $this->configureAwsCredentials($awsConfigDirPath, $awsConfigFilePath);
+        $region = $this->s3RegionForSite($siteName);
+        $authenticated = false;
+        $objects = null;
+        $s3 = new S3Client(['region' => $region]);
+        try {
+            $io->say("Connecting to S3...");
+            $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
+            $objects->resolve();
+            $authenticated = $objects->info()['status'] === 200;
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
+        }
+        if (!$authenticated) {
+            if (getenv('AWS_SECRET_ACCESS_KEY')) {
+                $io->error([
+                    'Cannot authenticate to AWS. Please fix your AWS environment',
+                    'variables, or remove them completely and try again.',
+                ]);
+                return Result::cancelled();
+            }
+            $result = $this->configureAwsCredentials($io);
             if ($result->wasCancelled()) {
                 return Result::cancelled();
             }
+            $s3 = new S3Client(['region' => $region]);
+            try {
+                $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
+            } catch (\Exception $e) {
+                $io->error($e->getMessage());
+                throw new AbortTasksException('Unable to access AWS S3. Giving up.');
+            }
         }
 
-        $s3 = new S3Client([
-            'region' => $this->s3RegionForSite($siteName),
-        ]);
-        $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
         if (count($objects) == 0) {
             throw new TaskException($this, "No database dumps found for '$siteName'.");
@@ -52,8 +75,8 @@ trait DatabaseDownloadTrait
         // Ensure objects are sorted by last modified date.
         usort(
             array: $objects,
-            /** @var \AsyncAws\S3\ValueObject\AwsObject $a */
-            callback: fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
+            callback: fn(AwsObject $a, AwsObject $b) =>
+                $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
         );
         /** @var \AsyncAws\S3\ValueObject\AwsObject $latestDatabaseDump */
         $latestDatabaseDump = array_pop(array: $objects);
@@ -78,34 +101,44 @@ trait DatabaseDownloadTrait
 
     /**
      * Configure AWS credentials.
-     *
-     * @param string $awsConfigDirPath
-     *   Path to the AWS configuration directory.
-     * @param string $awsConfigFilePath
-     *   Path to the AWS configuration file.
      */
-    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath): Result
+    protected function configureAwsCredentials(ConsoleIO $io): Result|ResultData
     {
-        $yes = $this->io()->confirm('AWS S3 credentials not detected. Do you wish to configure them?');
-        if (!$yes) {
-            return Result::cancelled();
+        $awsConfigDirPath = getenv('HOME') . '/.aws';
+        $awsConfigFilePath = "$awsConfigDirPath/credentials";
+        $authenticated = false;
+
+        while ($authenticated === false) {
+            $yes = $io->confirm('Do you wish to configure your AWS S3 credentials?');
+            if (!$yes) {
+                return Result::cancelled();
+            }
+            if (!is_dir($awsConfigDirPath)) {
+                $this->_mkdir($awsConfigDirPath);
+            }
+            if (!file_exists($awsConfigFilePath)) {
+                $this->_touch($awsConfigFilePath);
+            }
+            $awsKeyId = $io->ask("AWS Access Key ID:");
+            $awsSecretKey = $io->askHidden("AWS Secret Access Key:");
+            $writeResult = $this->taskWriteToFile($awsConfigFilePath)
+                ->line('[default]')
+                ->line("aws_access_key_id = $awsKeyId")
+                ->line("aws_secret_access_key = $awsSecretKey")
+                ->run();
+            try {
+                $sts = new StsClient();
+                $stsResponse = $sts->getCallerIdentity();
+                // Ensure the request is completed.
+                if ($stsResponse->resolve()) {
+                    $authenticated = $stsResponse->info()['status'] === 200;
+                }
+            } catch (\Exception $e) {
+                $io->error($e->getMessage());
+            }
         }
 
-        if (!is_dir($awsConfigDirPath)) {
-            $this->_mkdir($awsConfigDirPath);
-        }
-
-        if (!file_exists($awsConfigFilePath)) {
-            $this->_touch($awsConfigFilePath);
-        }
-
-        $awsKeyId = $this->ask("AWS Access Key ID:");
-        $awsSecretKey = $this->askHidden("AWS Secret Access Key:");
-        return $this->taskWriteToFile($awsConfigFilePath)
-            ->line('[default]')
-            ->line("aws_access_key_id = $awsKeyId")
-            ->line("aws_secret_access_key = $awsSecretKey")
-            ->run();
+        return $writeResult;
     }
 
     /**
@@ -113,6 +146,8 @@ trait DatabaseDownloadTrait
      *
      * @param string $siteName
      *   The site name.
+     *
+     * @throws \Robo\Exception\TaskException
      */
     protected function s3BucketRequestConfig(string $siteName): array
     {
