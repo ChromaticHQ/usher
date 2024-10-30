@@ -42,7 +42,7 @@ trait DatabaseDownloadTrait
         $s3Bucket = $this->s3BucketForSite($siteName);
         $s3Prefix = $this->s3PrefixForSite($siteName);
         $requestConfig = ['Bucket' => $s3Bucket];
-        if ($s3Prefix) {
+        if ($s3Prefix !== '') {
             $requestConfig[] = ['Prefix' => $s3Prefix];
         }
         $s3 = new S3Client(['region' => $region]);
@@ -67,7 +67,7 @@ trait DatabaseDownloadTrait
             or you can continue by configuring your AWS credentials file.");
             $result = $this->configureAwsCredentials($io);
             if ($result->wasCancelled()) {
-                return Result::cancelled();
+                return $result;
             }
             $s3 = new S3Client(['region' => $region]);
             try {
@@ -183,7 +183,7 @@ trait DatabaseDownloadTrait
         } catch (TaskException) {
             $this->say("No S3 Key prefix found for $siteName.");
         }
-        if (!empty($s3KeyPrefix) && is_string($s3KeyPrefix)) {
+        if (isset($s3KeyPrefix) && is_string($s3KeyPrefix) && $s3KeyPrefix !== '') {
             $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
             return $s3KeyPrefix;
         }

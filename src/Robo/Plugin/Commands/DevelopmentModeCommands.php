@@ -111,21 +111,23 @@ class DevelopmentModeCommands extends Tasks
     ): Result|ResultData {
         ['skip-sites' => $skipSites, 'environment-type' => $environmentType] = $options;
         $siteNames = $this->getAllSiteNames();
-        $result = null;
+        $result = ResultData::message('No sites were refreshed because all sites were configured to be skipped.');
         foreach ($siteNames as $siteName) {
             if (in_array($siteName, explode(separator: ',', string: (string) $skipSites), true)) {
                 continue;
             }
+            /** @var Result|ResultData $result */
             $result = $this->devRefreshDrupal(
                 $io,
                 environmentType: LocalDevEnvironmentTypes::from($environmentType),
                 siteName: $siteName,
             );
-            if ($result instanceof ResultData) {
+            if ($result->wasCancelled()) {
                 $io->say("Cancelling the refresh for all sites.");
                 return $result;
             }
         }
+
         return $result;
     }
 
@@ -150,7 +152,9 @@ class DevelopmentModeCommands extends Tasks
 
         if (!$dbPathProvidedByUser) {
             $dbPath = $this->databaseDownload($io, $siteName);
-            if ($dbPath instanceof ResultData) {
+            // If we don't have a file path string here, the action was
+            // cancelled and we should respond with the cancellation.
+            if (!is_string($dbPath)) {
                 return $dbPath;
             }
         }
@@ -310,8 +314,9 @@ class DevelopmentModeCommands extends Tasks
         $this->taskExec("composer robo theme:build $siteName")
             ->run();
         $this->frontendDevEnable($io, $siteName, ['yes' => true]);
+        /** @var Result|ResultData $result */
         $result = $this->databaseRefreshDdev($io, siteName: $siteName, options: ['db' => $databasePath]);
-        if ($result instanceof ResultData) {
+        if ($result->wasCancelled()) {
             return $result;
         }
 
