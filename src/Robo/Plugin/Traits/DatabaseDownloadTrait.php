@@ -36,13 +36,19 @@ trait DatabaseDownloadTrait
     {
         $io->title('database download.');
 
-        $region = $this->s3RegionForSite($siteName);
         $authenticated = false;
         $objects = null;
+        $region = $this->s3RegionForSite($siteName);
+        $s3Bucket = $this->s3BucketForSite($siteName);
+        $s3Prefix = $this->s3PrefixForSite($siteName);
+        $requestConfig = ['Bucket' => $s3Bucket];
+        if ($s3Prefix) {
+            $requestConfig[] = ['Prefix' => $s3Prefix];
+        }
         $s3 = new S3Client(['region' => $region]);
         try {
             $io->say("Connecting to S3...");
-            $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
+            $objects = $s3->listObjectsV2($requestConfig);
             $objects->resolve();
             $authenticated = $objects->info()['status'] === 200;
         } catch (ClientException $e) {
@@ -65,7 +71,7 @@ trait DatabaseDownloadTrait
             }
             $s3 = new S3Client(['region' => $region]);
             try {
-                $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
+                $objects = $s3->listObjectsV2($requestConfig);
             } catch (\Exception $e) {
                 $io->error($e->getMessage());
                 throw new AbortTasksException('Unable to access AWS S3. Giving up.');
@@ -91,7 +97,7 @@ trait DatabaseDownloadTrait
             $this->say("Skipping download. Latest database dump file exists >>> $downloadFileName");
         } else {
             $result = $s3->getObject([
-                'Bucket' => $this->s3BucketForSite($siteName),
+                'Bucket' => $s3Bucket,
                 'Key' => $dbFilename,
             ]);
             stream_copy_to_stream(
@@ -146,27 +152,6 @@ trait DatabaseDownloadTrait
     }
 
     /**
-     * Build S3 request configuration from sites config.
-     *
-     * @param string $siteName
-     *   The site name.
-     *
-     * @throws \Robo\Exception\TaskException
-     */
-    protected function s3BucketRequestConfig(string $siteName): array
-    {
-        $s3ConfigArray = ['Bucket' => $this->s3BucketForSite($siteName)];
-        try {
-            $s3KeyPrefix = $this->getSiteConfigItem('database_s3_key_prefix_string', $siteName);
-            $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
-            $s3ConfigArray['Prefix'] = $s3KeyPrefix;
-        } catch (TaskException) {
-            $this->say("No S3 Key prefix found for $siteName.");
-        }
-        return $s3ConfigArray;
-    }
-
-    /**
      * Get S3 Bucket for site.
      *
      * @param string $siteName
@@ -176,11 +161,33 @@ trait DatabaseDownloadTrait
      */
     protected function s3BucketForSite(string $siteName): string
     {
-        if (!is_string($bucket = $this->getSiteConfigItem('database_s3_bucket', $siteName))) {
+        if (!is_string($bucket = $this->getSiteConfigItem('database_s3_bucket', $siteName, true))) {
             throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
         }
         $this->say("'$siteName' S3 bucket: $bucket");
         return $bucket;
+    }
+
+    /**
+     * Get S3 Prefix from sites config.
+     *
+     * @param string $siteName
+     *   The site name.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    protected function s3PrefixForSite(string $siteName): string
+    {
+        try {
+            $s3KeyPrefix = $this->getSiteConfigItem('database_s3_key_prefix_string', $siteName);
+        } catch (TaskException) {
+            $this->say("No S3 Key prefix found for $siteName.");
+        }
+        if (!empty($s3KeyPrefix) && is_string($s3KeyPrefix)) {
+            $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
+            return $s3KeyPrefix;
+        }
+        return '';
     }
 
     /**
