@@ -1,7 +1,7 @@
 parameters:
-  checkMissingIterableValueType: false
   customRulesetUsed: true
   ignoreErrors:
+    - identifier: missingType.iterableValue
     - message: '#\Call to deprecated method io\(\) of class Robo\\Tasks#'
       paths:
         - 'src/'

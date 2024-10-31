@@ -17,20 +17,23 @@ trait SitesConfigTrait
      *
      * @var string
      */
-    protected $sitesConfigFile = '.sites.config.yml';
+    protected string $sitesConfigFile = '.sites.config.yml';
 
     /**
      * Load configuration for all sites.
      *
-     * @return mixed[]
-     *   A configuration array for all sites.
+     * @throws \Robo\Exception\TaskException
      */
-    public function getAllSitesConfig(): array
+    public function getAllSitesConfig(): mixed
     {
-        if (!file_exists($this->sitesConfigFile)) {
-            throw new TaskException($this, "$this->sitesConfigFile not found.");
+        static $allSitesConfig = null;
+        if (is_null($allSitesConfig)) {
+            if (!file_exists($this->sitesConfigFile)) {
+                throw new TaskException($this, "$this->sitesConfigFile not found.");
+            }
+            $allSitesConfig = Yaml::parseFile($this->sitesConfigFile);
         }
-        return Yaml::parseFile($this->sitesConfigFile);
+        return $allSitesConfig;
     }
 
     /**
@@ -38,14 +41,18 @@ trait SitesConfigTrait
      *
      * @return string[]
      *   An array of all site names.
+     * @throws \Robo\Exception\TaskException
      */
     public function getAllSiteNames(): array
     {
+        // @todo Fix assumption that Yaml::parseFile always returns an array.
         return array_keys($this->getAllSitesConfig());
     }
 
     /**
      * Determine how many sites are included in sites config.
+     *
+     * @throws \Robo\Exception\TaskException
      */
     public function getSitesCount(): int
     {
@@ -58,18 +65,26 @@ trait SitesConfigTrait
      * @param string $siteName
      *   The site name.
      *
-     * @return mixed[]
-     *   The specified site configuration array.
+     * @throws \Robo\Exception\TaskException
      */
-    protected function getSiteConfig(string $siteName = 'default'): array
+    protected function getSiteConfig(string $siteName = 'default'): mixed
     {
         $allSitesConfig = $this->getAllSitesConfig();
-        if (!is_array($allSitesConfig[$siteName])) {
+        if (!is_array($allSitesConfig)) {
             throw new TaskException(
                 $this,
-                "Configuration for '$siteName' missing or malformed in $this->sitesConfigFile."
+                "Sites configuration in $this->sitesConfigFile is missing or malformed."
+            );
+        } elseif (
+            !array_key_exists($siteName, $allSitesConfig)
+            || !is_array($allSitesConfig[$siteName])
+        ) {
+            throw new TaskException(
+                $this,
+                "Sites configuration for '$siteName' in $this->sitesConfigFile is missing or malformed."
             );
         }
+
         return $allSitesConfig[$siteName];
     }
 
@@ -82,6 +97,8 @@ trait SitesConfigTrait
      *   The site name.
      * @param bool $required
      *   Whether the config item is expected to always be present.
+     *
+     * @throws \Robo\Exception\TaskException
      */
     public function getSiteConfigItem(string $key, string $siteName = 'default', bool $required = true): mixed
     {
@@ -93,6 +110,20 @@ trait SitesConfigTrait
             return null;
         }
         return $siteConfig[$key];
+    }
+
+    /**
+     * Check if a site has an S3 bucket/has data.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    protected function hasData(string $siteName = 'default'): bool
+    {
+        $db = $this->getSiteConfigItem(
+            key: 'database_s3_bucket',
+            siteName: $siteName
+        );
+        return (is_string($db) && (bool) mb_strlen($db));
     }
 
     /**
@@ -110,11 +141,7 @@ trait SitesConfigTrait
     /**
      * Get the Drupal site admin user ID.
      *
-     * @param string $siteName
-     *   The site name.
-     *
-     * @return int
-     *   The Drupal admin user ID.
+     * @throws \Robo\Exception\TaskException
      */
     protected function getDrupalSiteAdminUid(string $siteName = 'default'): int
     {

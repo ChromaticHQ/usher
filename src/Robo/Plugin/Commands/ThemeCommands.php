@@ -39,7 +39,7 @@ class ThemeCommands extends Tasks
         try {
             $themeBuildConfiguration = $this->getSiteConfigItem('theme_build', $siteName);
         } catch (TaskException) {
-            $this->say("'$siteName' theme_build confguration not set.");
+            $this->say("'$siteName' theme_build configuration not set.");
             return $this->taskExec('echo skipping')->run();
         }
         foreach ($themeBuildConfiguration as $themeConfig) {

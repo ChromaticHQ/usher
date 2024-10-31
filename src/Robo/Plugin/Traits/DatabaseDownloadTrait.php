@@ -2,9 +2,15 @@
 
 namespace Usher\Robo\Plugin\Traits;
 
+use AsyncAws\Core\Exception\Http\ClientException;
+use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\S3\S3Client;
+use AsyncAws\S3\ValueObject\AwsObject;
+use Robo\Exception\AbortTasksException;
 use Robo\Exception\TaskException;
 use Robo\Result;
+use Robo\ResultData;
+use Robo\Symfony\ConsoleIO;
 
 /**
  * Trait to provide database download functionality to Robo commands.
@@ -13,10 +19,8 @@ trait DatabaseDownloadTrait
 {
     /**
      * Default S3 region.
-     *
-     * @var string
      */
-    protected $s3DefaultRegion = 'us-east-1';
+    protected string $s3DefaultRegion = 'us-east-1';
 
     /**
      * Download the latest database dump for the site.
@@ -26,25 +30,54 @@ trait DatabaseDownloadTrait
      *
      * @aliases dbdl
      *
-     * @throws \Robo\Exception\TaskException
+     * @throws \Robo\Exception\TaskException|\Robo\Exception\AbortTasksException
      */
-    public function databaseDownload(string $siteName = 'default'): string|\Robo\Result
+    public function databaseDownload(ConsoleIO $io, string $siteName = 'default'): string|ResultData
     {
-        $this->io()->title('database download.');
+        $io->title('database download.');
 
-        $awsConfigDirPath = getenv('HOME') . '/.aws';
-        $awsConfigFilePath = "$awsConfigDirPath/credentials";
-        if (!is_dir($awsConfigDirPath) || !file_exists($awsConfigFilePath)) {
-            $result = $this->configureAwsCredentials($awsConfigDirPath, $awsConfigFilePath);
-            if ($result->wasCancelled()) {
+        $authenticated = false;
+        $objects = null;
+        $region = $this->s3RegionForSite($siteName);
+        $s3Bucket = $this->s3BucketForSite($siteName);
+        $s3Prefix = $this->s3PrefixForSite($siteName);
+        $requestConfig = ['Bucket' => $s3Bucket];
+        if ($s3Prefix !== '') {
+            $requestConfig[] = ['Prefix' => $s3Prefix];
+        }
+        $s3 = new S3Client(['region' => $region]);
+        try {
+            $io->say("Connecting to S3...");
+            $objects = $s3->listObjectsV2($requestConfig);
+            $objects->resolve();
+            $authenticated = $objects->info()['status'] === 200;
+        } catch (ClientException $e) {
+            $io->error($e->getMessage());
+        }
+        if (!$authenticated) {
+            if (getenv('AWS_SECRET_ACCESS_KEY')) {
+                $io->error([
+                    'Cannot authenticate to AWS S3. Please fix your AWS environment',
+                    'variables in .env, or remove them completely and try again.',
+                ]);
                 return Result::cancelled();
+            }
+            $io->say("Unable to authenticate to AWS S3.
+            You can either set your credentials as environment variables and try again,
+            or you can continue by configuring your AWS credentials file.");
+            $result = $this->configureAwsCredentials($io);
+            if ($result->wasCancelled()) {
+                return $result;
+            }
+            $s3 = new S3Client(['region' => $region]);
+            try {
+                $objects = $s3->listObjectsV2($requestConfig);
+            } catch (\Exception $e) {
+                $io->error($e->getMessage());
+                throw new AbortTasksException('Unable to access AWS S3. Giving up.');
             }
         }
 
-        $s3 = new S3Client([
-            'region' => $this->s3RegionForSite($siteName),
-        ]);
-        $objects = $s3->listObjectsV2($this->s3BucketRequestConfig($siteName));
         $objects = iterator_to_array($objects);
         if (count($objects) == 0) {
             throw new TaskException($this, "No database dumps found for '$siteName'.");
@@ -52,8 +85,8 @@ trait DatabaseDownloadTrait
         // Ensure objects are sorted by last modified date.
         usort(
             array: $objects,
-            /** @var \AsyncAws\S3\ValueObject\AwsObject $a */
-            callback: fn($a, $b) => $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
+            callback: fn(AwsObject $a, AwsObject $b) =>
+                $a->getLastModified()->getTimestamp() <=> $b->getLastModified()->getTimestamp(),
         );
         /** @var \AsyncAws\S3\ValueObject\AwsObject $latestDatabaseDump */
         $latestDatabaseDump = array_pop(array: $objects);
@@ -64,7 +97,7 @@ trait DatabaseDownloadTrait
             $this->say("Skipping download. Latest database dump file exists >>> $downloadFileName");
         } else {
             $result = $s3->getObject([
-                'Bucket' => $this->s3BucketForSite($siteName),
+                'Bucket' => $s3Bucket,
                 'Key' => $dbFilename,
             ]);
             stream_copy_to_stream(
@@ -78,53 +111,48 @@ trait DatabaseDownloadTrait
 
     /**
      * Configure AWS credentials.
-     *
-     * @param string $awsConfigDirPath
-     *   Path to the AWS configuration directory.
-     * @param string $awsConfigFilePath
-     *   Path to the AWS configuration file.
      */
-    protected function configureAwsCredentials(string $awsConfigDirPath, string $awsConfigFilePath): Result
+    protected function configureAwsCredentials(ConsoleIO $io): Result|ResultData
     {
-        $yes = $this->io()->confirm('AWS S3 credentials not detected. Do you wish to configure them?');
-        if (!$yes) {
-            return Result::cancelled();
+        $awsConfigDirPath = getenv('HOME') . '/.aws';
+        $awsConfigFilePath = "$awsConfigDirPath/credentials";
+        $persistentCredentialsPath = '.ddev/homeadditions/.aws';
+        $authenticated = false;
+
+        while ($authenticated === false) {
+            $yes = $io->confirm('Do you wish to configure your AWS S3 credentials file?');
+            if (!$yes) {
+                return Result::cancelled();
+            }
+            if (!is_dir($awsConfigDirPath)) {
+                $this->_mkdir($awsConfigDirPath);
+            }
+            if (!file_exists($awsConfigFilePath)) {
+                $this->_touch($awsConfigFilePath);
+            }
+            $awsKeyId = $io->ask("AWS Access Key ID:");
+            $awsSecretKey = $io->askHidden("AWS Secret Access Key:");
+            $collection = $this->collectionBuilder($io);
+            $collection->taskWriteToFile($awsConfigFilePath)
+                ->line('[default]')
+                ->line("aws_access_key_id = $awsKeyId")
+                ->line("aws_secret_access_key = $awsSecretKey");
+            $collection->taskCopyDir([$awsConfigDirPath => $persistentCredentialsPath])
+                ->overwrite(true);
+            $writeResult = $collection->run();
+            try {
+                $sts = new StsClient();
+                $stsResponse = $sts->getCallerIdentity();
+                // Ensure the request is completed.
+                if ($stsResponse->resolve()) {
+                    $authenticated = $stsResponse->info()['status'] === 200;
+                }
+            } catch (\Exception $e) {
+                $io->error($e->getMessage());
+            }
         }
 
-        if (!is_dir($awsConfigDirPath)) {
-            $this->_mkdir($awsConfigDirPath);
-        }
-
-        if (!file_exists($awsConfigFilePath)) {
-            $this->_touch($awsConfigFilePath);
-        }
-
-        $awsKeyId = $this->ask("AWS Access Key ID:");
-        $awsSecretKey = $this->askHidden("AWS Secret Access Key:");
-        return $this->taskWriteToFile($awsConfigFilePath)
-            ->line('[default]')
-            ->line("aws_access_key_id = $awsKeyId")
-            ->line("aws_secret_access_key = $awsSecretKey")
-            ->run();
-    }
-
-    /**
-     * Build S3 request configuration from sites config.
-     *
-     * @param string $siteName
-     *   The site name.
-     */
-    protected function s3BucketRequestConfig(string $siteName): array
-    {
-        $s3ConfigArray = ['Bucket' => $this->s3BucketForSite($siteName)];
-        try {
-            $s3KeyPrefix = $this->getSiteConfigItem('database_s3_key_prefix_string', $siteName);
-            $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
-            $s3ConfigArray['Prefix'] = $s3KeyPrefix;
-        } catch (TaskException) {
-            $this->say("No S3 Key prefix found for $siteName.");
-        }
-        return $s3ConfigArray;
+        return $writeResult;
     }
 
     /**
@@ -137,11 +165,33 @@ trait DatabaseDownloadTrait
      */
     protected function s3BucketForSite(string $siteName): string
     {
-        if (!is_string($bucket = $this->getSiteConfigItem('database_s3_bucket', $siteName))) {
+        if (!is_string($bucket = $this->getSiteConfigItem('database_s3_bucket', $siteName, true))) {
             throw new TaskException($this, "database_s3_bucket value not set for '$siteName'.");
         }
         $this->say("'$siteName' S3 bucket: $bucket");
         return $bucket;
+    }
+
+    /**
+     * Get S3 Prefix from sites config.
+     *
+     * @param string $siteName
+     *   The site name.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    protected function s3PrefixForSite(string $siteName): string
+    {
+        try {
+            $s3KeyPrefix = $this->getSiteConfigItem('database_s3_key_prefix_string', $siteName);
+        } catch (TaskException) {
+            $this->say("No S3 Key prefix found for $siteName.");
+        }
+        if (isset($s3KeyPrefix) && is_string($s3KeyPrefix) && $s3KeyPrefix !== '') {
+            $this->say("'$siteName' S3 Key prefix: '$s3KeyPrefix'");
+            return $s3KeyPrefix;
+        }
+        return '';
     }
 
     /**
