@@ -123,7 +123,7 @@ trait SitesConfigTrait
             key: 'database_s3_bucket',
             siteName: $siteName
         );
-        return (is_string($db) && mb_strlen($db));
+        return (is_string($db) && (bool) mb_strlen($db));
     }
 
     /**
