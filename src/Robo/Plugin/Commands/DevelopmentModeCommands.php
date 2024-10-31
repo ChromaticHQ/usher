@@ -151,7 +151,15 @@ class DevelopmentModeCommands extends Tasks
         $dbPathProvidedByUser = $dbPath !== '';
 
         if (!$dbPathProvidedByUser) {
-            $dbPath = $this->databaseDownload($io, $siteName);
+            try {
+                $dbPath = $this->databaseDownload($io, $siteName);
+            } catch (TaskException $e) {
+                $resultData = new ResultData(ResultData::EXITCODE_ERROR, $e->getMessage());
+                $io->yell("$siteName: No database configured. Download/import skipped.");
+                // @todo: Should we run a site-install by default? The "common"
+                // site ends up here, but we could change that.
+                return $resultData;
+            }
             // If we don't have a file path string here, the action was
             // cancelled and we should respond with the cancellation.
             if (!is_string($dbPath)) {
@@ -195,7 +203,8 @@ class DevelopmentModeCommands extends Tasks
             } catch (TaskException $e) {
                 $io->yell("$siteName: No database configured. Download/import skipped.");
                 $resultData->append($e->getMessage());
-                // @todo: Should we run a site-install by default?
+                // @todo: Should we run a site-install by default? The "common"
+                // site ends up here, but we could change that.
                 continue;
             }
             if (!is_string($dbPath) || $dbPath === '') {
@@ -316,7 +325,7 @@ class DevelopmentModeCommands extends Tasks
         $this->frontendDevEnable($io, $siteName, ['yes' => true]);
         /** @var Result|ResultData $result */
         $result = $this->databaseRefreshDdev($io, siteName: $siteName, options: ['db' => $databasePath]);
-        if ($result->wasCancelled()) {
+        if ($result->wasCancelled() || $result->getExitCode() !== ResultData::EXITCODE_OK) {
             return $result;
         }
 

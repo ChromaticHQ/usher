@@ -26,10 +26,14 @@ trait SitesConfigTrait
      */
     public function getAllSitesConfig(): mixed
     {
-        if (!file_exists($this->sitesConfigFile)) {
-            throw new TaskException($this, "$this->sitesConfigFile not found.");
+        static $allSitesConfig = null;
+        if (is_null($allSitesConfig)) {
+            if (!file_exists($this->sitesConfigFile)) {
+                throw new TaskException($this, "$this->sitesConfigFile not found.");
+            }
+            $allSitesConfig = Yaml::parseFile($this->sitesConfigFile);
         }
-        return Yaml::parseFile($this->sitesConfigFile);
+        return $allSitesConfig;
     }
 
     /**
@@ -106,6 +110,20 @@ trait SitesConfigTrait
             return null;
         }
         return $siteConfig[$key];
+    }
+
+    /**
+     * Check if a site has an S3 bucket/has data.
+     *
+     * @throws \Robo\Exception\TaskException
+     */
+    protected function hasData(string $siteName = 'default'): bool
+    {
+        $db = $this->getSiteConfigItem(
+            key: 'database_s3_bucket',
+            siteName: $siteName
+        );
+        return (is_string($db) && mb_strlen($db));
     }
 
     /**
