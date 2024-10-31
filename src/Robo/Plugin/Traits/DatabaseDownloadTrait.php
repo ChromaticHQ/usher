@@ -58,7 +58,7 @@ trait DatabaseDownloadTrait
             if (getenv('AWS_SECRET_ACCESS_KEY')) {
                 $io->error([
                     'Cannot authenticate to AWS S3. Please fix your AWS environment',
-                    'variables, or remove them completely and try again.',
+                    'variables in .env, or remove them completely and try again.',
                 ]);
                 return Result::cancelled();
             }
@@ -116,6 +116,7 @@ trait DatabaseDownloadTrait
     {
         $awsConfigDirPath = getenv('HOME') . '/.aws';
         $awsConfigFilePath = "$awsConfigDirPath/credentials";
+        $persistentCredentialsPath = '.ddev/homeadditions/.aws';
         $authenticated = false;
 
         while ($authenticated === false) {
@@ -131,11 +132,14 @@ trait DatabaseDownloadTrait
             }
             $awsKeyId = $io->ask("AWS Access Key ID:");
             $awsSecretKey = $io->askHidden("AWS Secret Access Key:");
-            $writeResult = $this->taskWriteToFile($awsConfigFilePath)
+            $collection = $this->collectionBuilder($io);
+            $collection->taskWriteToFile($awsConfigFilePath)
                 ->line('[default]')
                 ->line("aws_access_key_id = $awsKeyId")
-                ->line("aws_secret_access_key = $awsSecretKey")
-                ->run();
+                ->line("aws_secret_access_key = $awsSecretKey");
+            $collection->taskCopyDir([$awsConfigDirPath => $persistentCredentialsPath])
+                ->overwrite(true);
+            $writeResult = $collection->run();
             try {
                 $sts = new StsClient();
                 $stsResponse = $sts->getCallerIdentity();
