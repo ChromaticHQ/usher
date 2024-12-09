@@ -9,7 +9,7 @@ additional_fqdns: []
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
-nodejs_version: "18"
+nodejs_version: auto
 omit_containers:
     - db
 
