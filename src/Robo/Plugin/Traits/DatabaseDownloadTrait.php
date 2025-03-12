@@ -77,9 +77,9 @@ trait DatabaseDownloadTrait
                 throw new AbortTasksException('Unable to access AWS S3. Giving up.');
             }
         }
-
         $objects = iterator_to_array($objects);
-        if (count($objects) == 0) {
+        /** @var AwsObject[] $objects */
+        if ($objects === []) {
             throw new TaskException($this, "No database dumps found for '$siteName'.");
         }
         // Ensure objects are sorted by last modified date.

@@ -132,7 +132,7 @@ trait RoboConfigTrait
         string $key,
     ): bool {
         $foundType = gettype($configValue);
-        if ($foundType != $expectedType->name) {
+        if ($foundType !== $expectedType->name) {
             throw new TaskException(
                 $this,
                 "Key $key in Robo configuration does not match expected type: $expectedType->name. Found $foundType."
