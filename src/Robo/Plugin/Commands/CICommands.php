@@ -101,7 +101,6 @@ class CICommands extends Tasks
         $phpcsPhpVersion = Robo::config()->get('php_current_version', $this::PHPCS_DEFAULT_PHP_VERSION);
         $twigLintEnabled = Robo::config()->get('twig_lint_enable') ?? true;
 
-        /** @var \Robo\Task\CommandStack $stack */
         $stack = $this->taskExecStack()->stopOnFail();
         $phpBinary = $applyFixes ? 'phpcbf' : 'phpcs';
         // General PHP linting.
@@ -115,7 +114,7 @@ class CICommands extends Tasks
                 --ignore=$phpcsIgnorePaths --extensions=php,module,theme \
                 --runtime-set testVersion $phpcsPhpVersion- $customCodePaths");
         // Lint Twig files.
-        if ($twigLintEnabled == true) {
+        if ($twigLintEnabled === true) {
             $fixFlag = $applyFixes ? '--fix' : '';
             $stack->exec("vendor/bin/twig-cs-fixer lint $customCodePaths $fixFlag");
         }

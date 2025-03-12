@@ -14,11 +14,7 @@ return static function (RectorConfig $rectorConfig): void {
 
     // Define sets of rules.
     $rectorConfig->sets([
-        LevelSetList::UP_TO_PHP_81,
-        SetList::CODE_QUALITY
-    ]);
-
-    $rectorConfig->skip([
-        MixedTypeRector::class
+        LevelSetList::UP_TO_PHP_83,
+        SetList::CODE_QUALITY,
     ]);
 };
