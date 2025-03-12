@@ -2,6 +2,7 @@
 custom_code_paths:
     - src
     - rector.php
+    - RoboFile.php
 phpcs_check_extensions:
     - php
     - txt
