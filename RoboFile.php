@@ -6,11 +6,14 @@
  * @see http://robo.li/
  */
 
+namespace Usher;
+
 use Robo\Tasks;
 
 /**
  * Robo commands available to developers.
  */
-class RoboFile extends Tasks {
-    use Usher\Robo\Task\Discovery\Tasks;
+class RoboFile extends Tasks
+{
+    use Robo\Task\Discovery\Tasks;
 }
