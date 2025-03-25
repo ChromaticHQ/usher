@@ -40,6 +40,9 @@ class CICommands extends Tasks
      * Command to run unit tests.
      *
      * @aliases punit
+     *
+     * @todo Remove support for PHPUnit --verbose syntax in next major Usher
+     * version.
      */
     public function jobRunUnitTests(): Result
     {
