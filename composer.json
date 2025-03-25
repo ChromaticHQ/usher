@@ -60,6 +60,7 @@
     },
     "require-dev": {
         "phpstan/phpstan-strict-rules": "^1.5 || ^2.0",
-        "drupal/core": "*"
+        "drupal/core": "*",
+        "phpunit/phpunit": "*"
     }
 }
