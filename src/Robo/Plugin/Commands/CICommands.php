@@ -23,6 +23,11 @@ class CICommands extends Tasks
     protected const PHPCS_DEFAULT_PHP_VERSION = '8.1';
 
     /**
+     * The maximum PHPUnit version that allows the --verbose flag.
+     */
+    protected const PHPUNIT_MAX_VERSION_WITH_VERBOSE_FLAG = 9;
+
+    /**
      * RoboFile constructor.
      */
     public function __construct()
@@ -35,9 +40,22 @@ class CICommands extends Tasks
      * Command to run unit tests.
      *
      * @aliases punit
+     *
+     * @todo Remove support for PHPUnit --verbose syntax in next major Usher
+     * version.
      */
     public function jobRunUnitTests(): Result
     {
+        exec("phpunit --version | awk '{print $2}'", $output, $result_code);
+        if ($result_code === 0) {
+            $major_version = (int) $output[0];
+            if ($major_version > self::PHPUNIT_MAX_VERSION_WITH_VERBOSE_FLAG) {
+                return $this->taskExec(
+                    'XDEBUG_MODE=coverage vendor/bin/phpunit --debug --log-events-verbose-text phpunit.log'
+                )->run();
+            }
+        }
+        // Default to old PHPUnit verbose flag syntax.
         return $this->taskExec('XDEBUG_MODE=coverage vendor/bin/phpunit --debug --verbose')->run();
     }
 
