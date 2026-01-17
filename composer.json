@@ -55,7 +55,8 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "drupal/core-composer-scaffold": true
         }
     },
     "require-dev": {
