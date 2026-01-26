@@ -134,7 +134,7 @@ trait GitHubStatusTrait
             'context' => $gitHubCheckName,
             'target_url' => $targetUrl ?? "$this->tugboatDashboardUrl/$tugboatPreviewID",
         ];
-        if (strlen($checkDescription) > 0) {
+        if ($checkDescription !== '') {
             $body['description'] = $checkDescription;
         }
         try {
