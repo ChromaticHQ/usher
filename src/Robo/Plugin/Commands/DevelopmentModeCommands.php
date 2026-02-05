@@ -147,7 +147,8 @@ class DevelopmentModeCommands extends Tasks
         array $options = ['db' => '']
     ): Result|ResultData {
         $io->title('DDEV database refresh.');
-
+        // Tell phpstan that robo will enforce string value for $dbPath.
+        /** @var string $dbPath **/
         ['db' => $dbPath] = $options;
         // Track whether a database path was provided by the user or not.
         $dbPathProvidedByUser = $dbPath !== '';
@@ -171,13 +172,11 @@ class DevelopmentModeCommands extends Tasks
 
         if (str_ends_with($dbPath, 'sql.gz')) {
             $importFile = substr($dbPath, 0, -3);
-            $gzip = TRUE;
-        }
-        elseif (str_ends_with($dbPath, '.sql')) {
+            $gzip = true;
+        } elseif (str_ends_with($dbPath, '.sql')) {
             $importFile = $dbPath;
-            $gzip = FALSE;
-        }
-        else {
+            $gzip = false;
+        } else {
             throw new TaskException(
                 $this,
                 'Data import file must either be a .sql file or a .sql.gz file.',
@@ -191,20 +190,22 @@ class DevelopmentModeCommands extends Tasks
             ->option('uri', $siteName)
             ->option('yes')
             ->run();
-        // If a database was downloaded as part of this process, delete it.
-        if ($dbPathProvidedByUser) {
-            if ($gzip) {
+        if ($gzip) {
+            if ($dbPathProvidedByUser) {
+                // Keep the provided file.
                 $this->_exec("gunzip --force --keep '$dbPath'");
-            }
-        }
-        else {
-            if ($gzip) {
+            } else {
+                // Delete the downloaded original gzip file.
                 $this->_exec("gunzip --force '$dbPath'");
             }
         }
         $io->say('Importing data from: ' . $importFile);
-        $this->_exec('$(drush sql:connect --uri="' . $siteName . '") < "' . $importFile .'"');
-        if (!$dbPathProvidedByUser || ($dbPathProvidedByUser && $gzip)) {
+        $this->_exec('$(drush sql:connect --uri="' . $siteName . '") < "' . $importFile . '"');
+        // If the file was not provided by the user (ie downloaded), delete it.
+        // Gzip files unzipped without --keep will already be removed.
+        // Therefore we only need to delete the sql file, and then only if it
+        // was not provided by the user.
+        if (!$dbPathProvidedByUser || $gzip) {
             // gunzip without --keep deletes the sql.gz file while unzipping.
             // Delete the unzipped file.
             $this->deleteDataFile($importFile);
