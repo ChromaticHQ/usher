@@ -257,10 +257,23 @@ class DevelopmentModeCommands extends Tasks
                 ->run();
             $resultData->append($taskResult);
             $io->section("import $siteName database.");
-            $taskResult = $this->taskExec("zcat $dbPath | $dbDriver -h mariadb -u tugboat -ptugboat $dbName")
+            // Unzip the sql data file.
+            $taskResult = $this->taskExec('gunzip')
+                ->option('--force')
+                ->arg($dbPath)
                 ->run();
             $resultData->append($taskResult);
-            $taskResult = $this->taskExec('rm')->args($dbPath)->run();
+            // Strip off the .gz extension for import.
+            $importFile = substr($dbPath, 0, -3);
+            $taskResult = $this->taskExec($dbDriver)
+                ->option('-h', 'mariadb')
+                ->option('-u', 'tugboat')
+                ->option('-ptugboat')
+                ->arg($dbName)
+                ->rawArg("< $importFile")
+                ->run();
+            $resultData->append($taskResult);
+            $taskResult = $this->taskExec('rm')->args($importFile)->run();
             $resultData->append($taskResult);
         }
 
