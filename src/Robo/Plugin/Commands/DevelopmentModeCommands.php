@@ -273,7 +273,7 @@ class DevelopmentModeCommands extends Tasks
                 ->rawArg("< $importFile")
                 ->run();
             $resultData->append($taskResult);
-            $taskResult = $this->taskExec('rm')->args($importFile)->run();
+            $taskResult = $this->deleteDataFile($importFile);
             $resultData->append($taskResult);
         }
 
