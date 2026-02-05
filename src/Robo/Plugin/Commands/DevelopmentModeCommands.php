@@ -138,6 +138,8 @@ class DevelopmentModeCommands extends Tasks
      *   The Drupal site name.
      * @option db
      *   Provide a path to a database dump to be used instead of downloading the latest dump.
+     *
+     * The data file to be imported must be either a gzipped or non-gzipped sql file.
      */
     public function databaseRefreshDdev(
         ConsoleIO $io,
@@ -167,6 +169,21 @@ class DevelopmentModeCommands extends Tasks
             }
         }
 
+        if (str_ends_with($dbPath, 'sql.gz')) {
+            $importFile = substr($dbPath, 0, -3);
+            $gzip = TRUE;
+        }
+        elseif (str_ends_with($dbPath, '.sql')) {
+            $importFile = $dbPath;
+            $gzip = FALSE;
+        }
+        else {
+            throw new TaskException(
+                $this,
+                'Data import file must either be a .sql file or a .sql.gz file.',
+            );
+        }
+
         $io->section("refreshing $siteName database.");
         $io->say("Dropping existing database for $siteName");
         $this->taskExec('drush')
@@ -174,11 +191,23 @@ class DevelopmentModeCommands extends Tasks
             ->option('uri', $siteName)
             ->option('yes')
             ->run();
-        $io->say("Importing $dbPath");
-        $this->_exec("zcat '$dbPath' | drush sql:cli --uri=$siteName");
         // If a database was downloaded as part of this process, delete it.
-        if (!$dbPathProvidedByUser) {
-            $this->deleteDatabase($dbPath);
+        if ($dbPathProvidedByUser) {
+            if ($gzip) {
+                $this->_exec("gunzip --force --keep '$dbPath'");
+            }
+        }
+        else {
+            if ($gzip) {
+                $this->_exec("gunzip --force '$dbPath'");
+            }
+        }
+        $io->say('Importing data from: ' . $importFile);
+        $this->_exec('$(drush sql:connect --uri="' . $siteName . '") < "' . $importFile .'"');
+        if (!$dbPathProvidedByUser || ($dbPathProvidedByUser && $gzip)) {
+            // gunzip without --keep deletes the sql.gz file while unzipping.
+            // Delete the unzipped file.
+            $this->deleteDataFile($importFile);
         }
 
         return $this->drushDeployWith(

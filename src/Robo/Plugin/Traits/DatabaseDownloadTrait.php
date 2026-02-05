@@ -244,7 +244,7 @@ trait DatabaseDownloadTrait
     /**
      * Delete the specified database.
      */
-    protected function deleteDatabase(string $dbPath): Result
+    protected function deleteDataFile(string $dbPath): Result
     {
         $this->say("Deleting $dbPath");
         return $this->taskExec('rm')->args($dbPath)->run();
