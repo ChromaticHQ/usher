@@ -57,8 +57,7 @@
             "phpstan/extension-installer": true,
             "php-http/discovery": true,
             "drupal/core-composer-scaffold": true
-        },
-        "optimize-autoloader": true
+        }
     },
     "require-dev": {
         "phpstan/phpstan-strict-rules": "^1.5 || ^2.0",
