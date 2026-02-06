@@ -138,6 +138,8 @@ class DevelopmentModeCommands extends Tasks
      *   The Drupal site name.
      * @option db
      *   Provide a path to a database dump to be used instead of downloading the latest dump.
+     *
+     * The data file to be imported must be either a gzipped or non-gzipped sql file.
      */
     public function databaseRefreshDdev(
         ConsoleIO $io,
@@ -145,7 +147,8 @@ class DevelopmentModeCommands extends Tasks
         array $options = ['db' => '']
     ): Result|ResultData {
         $io->title('DDEV database refresh.');
-
+        // Tell phpstan that robo will enforce string value for $dbPath.
+        /** @var string $dbPath **/
         ['db' => $dbPath] = $options;
         // Track whether a database path was provided by the user or not.
         $dbPathProvidedByUser = $dbPath !== '';
@@ -167,6 +170,19 @@ class DevelopmentModeCommands extends Tasks
             }
         }
 
+        if (str_ends_with($dbPath, 'sql.gz')) {
+            $importFile = substr($dbPath, 0, -3);
+            $gzip = true;
+        } elseif (str_ends_with($dbPath, '.sql')) {
+            $importFile = $dbPath;
+            $gzip = false;
+        } else {
+            throw new TaskException(
+                $this,
+                'Data import file must either be a .sql file or a .sql.gz file.',
+            );
+        }
+
         $io->section("refreshing $siteName database.");
         $io->say("Dropping existing database for $siteName");
         $this->taskExec('drush')
@@ -174,11 +190,25 @@ class DevelopmentModeCommands extends Tasks
             ->option('uri', $siteName)
             ->option('yes')
             ->run();
-        $io->say("Importing $dbPath");
-        $this->_exec("zcat '$dbPath' | drush sql:cli --uri=$siteName");
-        // If a database was downloaded as part of this process, delete it.
-        if (!$dbPathProvidedByUser) {
-            $this->deleteDatabase($dbPath);
+        if ($gzip) {
+            if ($dbPathProvidedByUser) {
+                // Keep the provided file.
+                $this->_exec("gunzip --force --keep '$dbPath'");
+            } else {
+                // Delete the downloaded original gzip file.
+                $this->_exec("gunzip --force '$dbPath'");
+            }
+        }
+        $io->say('Importing data from: ' . $importFile);
+        $this->_exec('$(drush sql:connect --uri="' . $siteName . '") < "' . $importFile . '"');
+        // If the file was not provided by the user (ie downloaded), delete it.
+        // Gzip files unzipped without --keep will already be removed.
+        // Therefore we only need to delete the sql file, and then only if it
+        // was not provided by the user.
+        if (!$dbPathProvidedByUser || $gzip) {
+            // gunzip without --keep deletes the sql.gz file while unzipping.
+            // Delete the unzipped file.
+            $this->deleteDataFile($importFile);
         }
 
         return $this->drushDeployWith(
@@ -230,7 +260,7 @@ class DevelopmentModeCommands extends Tasks
             $taskResult = $this->taskExec("zcat $dbPath | $dbDriver -h mariadb -u tugboat -ptugboat $dbName")
                 ->run();
             $resultData->append($taskResult);
-            $taskResult = $this->taskExec('rm')->args($dbPath)->run();
+            $taskResult = $this->deleteDataFile($dbPath);
             $resultData->append($taskResult);
         }
 
