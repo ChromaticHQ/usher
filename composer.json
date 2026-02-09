@@ -24,13 +24,11 @@
         "async-aws/s3": "^1.8 || ^2.0 || ^3.0",
         "php": ">=8.1",
         "drush/drush": "^8 || ^10 || ^11 || ^12 || ^13",
-        "webflo/drupal-finder": "^1.2",
         "vincentlanglet/twig-cs-fixer": "^0.4.1 || ^0.5 || ^0.6 || ^1.0 || ^2.0 || ^3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2 || ^1.0.0",
         "phpstan/extension-installer": "^1.1",
         "phpcompatibility/php-compatibility": "^9.3",
         "guzzlehttp/guzzle": "^5.0 || ^6.0 || ^7.0",
-        "rector/rector": "^0.16.0 || ^0.17.0 || ^0.18.0 || ^0.19.0 || ^1.0.0 || ^2.0.0",
         "symfony/yaml": "^6.3 || ^7.0 || ^8.0"
     },
     "autoload": {
@@ -62,6 +60,8 @@
     "require-dev": {
         "phpstan/phpstan-strict-rules": "^1.5 || ^2.0",
         "drupal/core": "*",
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "rector/rector": "^0.16.0 || ^0.17.0 || ^0.18.0 || ^0.19.0 || ^1.0.0 || ^2.0.0",
+        "webflo/drupal-finder": "^1.2"
     }
 }
