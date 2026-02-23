@@ -74,7 +74,7 @@ trait DatabaseDownloadTrait
                 $objects = $s3->listObjectsV2($requestConfig);
             } catch (\Exception $e) {
                 $io->error($e->getMessage());
-                throw new AbortTasksException('Unable to access AWS S3. Giving up.');
+                throw new AbortTasksException('Unable to access AWS S3. Giving up.', $e->getCode(), $e);
             }
         }
         $objects = iterator_to_array($objects);
