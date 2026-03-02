@@ -2,7 +2,6 @@
 
 namespace Usher\Robo\Plugin\Commands;
 
-use Robo\Exception\TaskException;
 use Robo\Result;
 use Robo\Robo;
 use Robo\Tasks;
@@ -114,7 +113,7 @@ class CICommands extends Tasks
         );
         $phpcsIgnorePaths = implode(
             separator: ',',
-            array: $this->getRequiredRoboConfigArrayFor(key: 'phpcs_ignore_paths'),
+            array: $this->getOptionalRoboConfigArrayFor(key: 'phpcs_ignore_paths'),
         );
         $phpcsPhpVersion = Robo::config()->get('php_current_version', $this::PHPCS_DEFAULT_PHP_VERSION);
         $twigLintEnabled = Robo::config()->get('twig_lint_enable') ?? true;
