@@ -57,7 +57,7 @@ class CICommands extends Tasks
             $io->say("Xdebug is not enabled; coverage reports will not be generated.");
             $xdebug_mode = 'off';
         }
-        if (!empty($filter)) {
+        if ($filter !== '') {
             $filter = '--filter "' . $filter . '"';
         }
         // Default (legacy) options.
