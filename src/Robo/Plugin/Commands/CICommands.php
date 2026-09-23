@@ -4,6 +4,7 @@ namespace Usher\Robo\Plugin\Commands;
 
 use Robo\Result;
 use Robo\Robo;
+use Robo\Symfony\ConsoleIO;
 use Robo\Tasks;
 use Usher\Robo\Plugin\Traits\RoboConfigTrait;
 
@@ -38,24 +39,37 @@ class CICommands extends Tasks
     /**
      * Command to run unit tests.
      *
+     * @param string $filter
+     *   An optional PHPUnit filter pattern (Module name or class etc).
+     *
      * @aliases punit
      *
      * @todo Remove support for PHPUnit --verbose syntax in next major Usher
      * version.
      */
-    public function jobRunUnitTests(): Result
+    public function jobRunUnitTests(ConsoleIO $io, string $filter = ''): Result
     {
+        exec("php -v | grep -q 'with Xdebug'", $output, $result_code);
+        // Xdebug is enabled.
+        if ($result_code === 0) {
+            $xdebug_mode = 'coverage';
+        } else {
+            $io->say("Xdebug is not enabled; coverage reports will not be generated.");
+            $xdebug_mode = 'off';
+        }
+        if ($filter !== '') {
+            $filter = '--filter "' . $filter . '"';
+        }
+        // Default (legacy) options.
+        $opts = '--debug --verbose';
         exec("phpunit --version | awk '{print $2}'", $output, $result_code);
         if ($result_code === 0) {
             $major_version = (int) $output[0];
             if ($major_version > self::PHPUNIT_MAX_VERSION_WITH_VERBOSE_FLAG) {
-                return $this->taskExec(
-                    'XDEBUG_MODE=coverage vendor/bin/phpunit --debug --log-events-verbose-text phpunit.log'
-                )->run();
+                $opts = '--debug --log-events-verbose-text phpunit.log';
             }
         }
-        // Default to old PHPUnit verbose flag syntax.
-        return $this->taskExec('XDEBUG_MODE=coverage vendor/bin/phpunit --debug --verbose')->run();
+        return $this->taskExec("XDEBUG_MODE={$xdebug_mode} vendor/bin/phpunit {$opts} {$filter}")->run();
     }
 
     /**
