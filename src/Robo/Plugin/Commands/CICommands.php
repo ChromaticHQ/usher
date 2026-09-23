@@ -39,12 +39,15 @@ class CICommands extends Tasks
     /**
      * Command to run unit tests.
      *
+     * @param string $filter
+     *   An optional PHPUnit filter pattern (Module name or class etc).
+     *
      * @aliases punit
      *
      * @todo Remove support for PHPUnit --verbose syntax in next major Usher
      * version.
      */
-    public function jobRunUnitTests(ConsoleIO $io): Result
+    public function jobRunUnitTests(ConsoleIO $io, string $filter = ''): Result
     {
         exec("php -v | grep -q 'with Xdebug'", $output, $result_code);
         // Xdebug is enabled.
@@ -55,18 +58,21 @@ class CICommands extends Tasks
           $io->say("Xdebug is not enabled; coverage reports will not be generated.");
           $xdebug_mode = 'off';
         }
+        if (!empty($filter)) {
+          $filter = '--filter "' . $filter . '"';
+        }
         exec("phpunit --version | awk '{print $2}'", $output, $result_code);
         if ($result_code === 0) {
             $major_version = (int) $output[0];
 
             if ($major_version > self::PHPUNIT_MAX_VERSION_WITH_VERBOSE_FLAG) {
                 return $this->taskExec(
-                    "XDEBUG_MODE={$xdebug_mode} vendor/bin/phpunit --debug --log-events-verbose-text phpunit.log"
+                    "XDEBUG_MODE={$xdebug_mode} vendor/bin/phpunit --debug --log-events-verbose-text phpunit.log {$filter}"
                 )->run();
             }
         }
         // Default to old PHPUnit verbose flag syntax.
-        return $this->taskExec("XDEBUG_MODE={$xdebug_mode} vendor/bin/phpunit --debug --verbose")->run();
+        return $this->taskExec("XDEBUG_MODE={$xdebug_mode} vendor/bin/phpunit --debug --verbose {$filter}")->run();
     }
 
     /**
