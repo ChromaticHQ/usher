@@ -69,7 +69,6 @@ class CICommands extends Tasks
                 $opts = '--debug --log-events-verbose-text phpunit.log';
             }
         }
-        // Default to old PHPUnit verbose flag syntax.
         return $this->taskExec("XDEBUG_MODE={$xdebug_mode} vendor/bin/phpunit {$opts} {$filter}")->run();
     }
 

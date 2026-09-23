@@ -223,7 +223,7 @@ trait DatabaseDownloadTrait
     public function sanitizeFileNameForWindows(string $fileName): string
     {
         if (PHP_OS_FAMILY === 'Windows') {
-            $fileName = preg_replace(
+            return preg_replace(
                 '~
                 # File system reserved characters.
                 # @link https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
