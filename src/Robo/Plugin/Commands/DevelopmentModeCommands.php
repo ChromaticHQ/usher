@@ -329,11 +329,55 @@ class DevelopmentModeCommands extends Tasks
             }
         }
         $io->title('disabling front-end development mode.');
+        $filesToRemove = [$devSettingsPath];
+        // The front-end development services file is shared by every site. Only
+        // remove it if no other site's settings.local.php still loads it,
+        // otherwise those sites are left pointing at cache.backend.null without
+        // the service definition and fail to bootstrap.
+        $sitesStillUsingServices = $this->getSitesUsingDevServices(excludeSiteDir: $siteDir);
+        if ($sitesStillUsingServices === []) {
+            $filesToRemove[] = $this->devServicesPath;
+        } else {
+            $io->note(sprintf(
+                'Keeping %s because it is still loaded by: %s',
+                $this->devServicesPath,
+                implode(', ', $sitesStillUsingServices),
+            ));
+        }
         return $this->collectionBuilder()
             ->taskFilesystemStack()
-            ->remove($devSettingsPath)
-            ->remove($this->devServicesPath)
+            ->remove($filesToRemove)
             ->run();
+    }
+
+    /**
+     * Gets the sites whose settings.local.php loads the front-end development services file.
+     *
+     * @param string $excludeSiteDir
+     *   A site directory name to leave out of the results.
+     *
+     * @return string[]
+     *   The matching site directory names.
+     */
+    protected function getSitesUsingDevServices(string $excludeSiteDir): array
+    {
+        $servicesFileName = basename($this->devServicesPath);
+        $siteDirs = [];
+        $settingsPaths = glob("$this->drupalRoot/sites/*/settings.local.php");
+        if ($settingsPaths === false) {
+            return [];
+        }
+        foreach ($settingsPaths as $settingsPath) {
+            $siteDir = basename(dirname($settingsPath));
+            if ($siteDir === $excludeSiteDir) {
+                continue;
+            }
+            $settings = file_get_contents($settingsPath);
+            if (is_string($settings) && str_contains($settings, "/sites/$servicesFileName")) {
+                $siteDirs[] = $siteDir;
+            }
+        }
+        return $siteDirs;
     }
 
     /**
